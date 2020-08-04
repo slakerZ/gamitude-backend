@@ -57,7 +57,7 @@ namespace gamitude_backend.Data
 
                         case EntityState.Added:
                             // set both updated and created date to "now"
-                            trackable.timeCreated = utcNow; 
+                            trackable.timeCreated = utcNow;
                             trackable.timeUpdated = utcNow;
                             break;
                     }
@@ -70,7 +70,7 @@ namespace gamitude_backend.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
-            modelBuilder.HasDefaultSchema("bill_gent");
+            modelBuilder.HasDefaultSchema("gamitude");
             base.OnModelCreating(modelBuilder);
 
             // //MANY TO MANY 

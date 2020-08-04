@@ -5,15 +5,16 @@ using gamitude_backend.Model;
 
 namespace gamitude_backend.Model
 {
-    [Table("user_token")]
     public class UserToken : IBaseEntity
     {
         public int id { get; set; }
 
         public String userId { get; set; }
-
+    
+        [ForeignKey("userId")]
         public User user { get; set; }
 
+        [MaxLength(255)]
         public String token { get; set; }
 
         public DateTime date_expires { get; set; }

@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
+using gamitude_backend.Extensions;
+using gamitude_backend.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace gamitude_backend
 {
@@ -25,7 +30,23 @@ namespace gamitude_backend
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.ReadSettings(Configuration);
+            Log.Debug(Configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>().connectionString);
+            Log.Information(Configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>().connectionString);
+            services.ConfigureDatabaseConnection(Configuration);
+
+            services.AddCustomIdentity();
+
+            var key = Encoding.ASCII.GetBytes(Configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>().secret);
+            services.AddCustomAuthenticationConfiguration(key);
+
+            services.AddServices();
+            services.AddCustomControllersConfiguration();
+            services.AddCustomLocalizationConfiguration();
+            services.AddCustomSwaggerConfig();
+            services.AddAutoMapper(typeof(Startup));
+            services.AddHttpContextAccessor();
+            services.AddRouting(c => c.LowercaseUrls = true); // all routing to lowerCase
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,13 +56,19 @@ namespace gamitude_backend
             {
                 app.UseDeveloperExceptionPage();
             }
+            // app.UseCustomLocalization();
+            app.UseStaticFiles();
+            // app.UseHttpsRedirection();
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
 
-            app.UseHttpsRedirection();
-
+            app.UseCustomSwagger();
+            app.UseAuthentication();
             app.UseRouting();
-
+            app.UseCustomExceptionMiddleware();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

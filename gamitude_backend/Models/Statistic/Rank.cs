@@ -1,47 +1,28 @@
 
  
 
-using System;
+// using System;
  
 
-namespace gamitude_backend.Models 
-{
+// namespace gamitude_backend.Models 
+// {
 
-    public enum GAMITUDE_STYLE
-    {
-        DEFAULT,WINTER,BUSINESS,LOL
-    }
-    public enum RANK_TIER
-    {
-        F,D,C,B,A,S
-    }
-    public enum RANK_DOMINANT
-    {
-        STRENGHT,INTELLIGENCE,FLUENCY,CREATIVITY,BALANCED 
 
-    }
-    [BsonIgnoreExtraElements]
-    public class Rank
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+//     public class Rank
+//     {
 
-        [BsonElement("name")]
-        public string Name { get; set; }
+//         public int Id { get; set; }
 
-        [BsonElement("style")]
-        public GAMITUDE_STYLE Style { get; set; }
+//         public string Name { get; set; }
 
-        [BsonElement("tier")]
-        public RANK_TIER Tier { get; set; }//TODO Migrate to enum
+//         public GAMITUDE_STYLE Style { get; set; }
 
-        [BsonElement("dominant")]
-        public RANK_DOMINANT Dominant { get; set; }//TODO Migrate to enum
+//         public RANK_TIER Tier { get; set; }//TODO Migrate to enum
+
+//         public RANK_DOMINANT Dominant { get; set; }//TODO Migrate to enum
                  
-        [BsonElement("image")]
-        public string ImageUrl { get; set; }
+//         public string ImageUrl { get; set; }
 
-    }
+//     }
 
-}
+// }
