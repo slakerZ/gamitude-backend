@@ -138,29 +138,6 @@
 //             }
 
 //         }
-//         private Project updateProject(Project project, Project projectIn)
-//         {
-//             if (null != projectIn.Name)
-//             {
-//                 project.Name = projectIn.Name;
-//             }
-//             if (null != projectIn.PrimaryMethod.ToString())
-//             {
-//                 project.PrimaryMethod = projectIn.PrimaryMethod;
-//             }
-//             if (null != projectIn.ProjectStatus.ToString())
-//             {
-//                 project.ProjectStatus = projectIn.ProjectStatus;
-//             }
-//             if (null != projectIn.Stats)
-//             {
-//                project.Stats = projectIn.Stats;
-//             }
-//             if (null != projectIn.DominantStat)
-//             {
-//                project.DominantStat = projectIn.DominantStat;
-//             }
-//             return project;
-//         }
+
 //     }
 // }

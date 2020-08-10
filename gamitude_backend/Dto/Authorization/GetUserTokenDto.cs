@@ -1,5 +1,5 @@
 using System;
-using gamitude_backend.Model;
+using gamitude_backend.Models;
 using gamitude_backend.Dto.User;
 namespace gamitude_backend.Dto.Authorization
 {

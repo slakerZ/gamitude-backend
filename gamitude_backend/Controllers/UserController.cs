@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using gamitude_backend.Dto;
 using gamitude_backend.Dto.Authorization;
 using AutoMapper;
-using gamitude_backend.Model;
+using gamitude_backend.Models;
 
 namespace gamitude_backend.Controllers
 {

@@ -1,50 +1,71 @@
-// using gamitude_backend.Models;
-// using System.Collections.Generic;
-// using System.Linq;
-// using System;
-// using Microsoft.Extensions.Logging;
-// using AutoMapper;
-// using gamitude_backend.Data;
+using gamitude_backend.Models;
+using System.Collections.Generic;
+using System.Linq;
+using System;
+using Microsoft.Extensions.Logging;
+using AutoMapper;
+using gamitude_backend.Data;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
-// namespace gamitude_backend.Services
-// {
+namespace gamitude_backend.Services
+{
+    public interface IProjectService
+    {
+        Task<Project> getByIdAsync(int id);
+        Task<List<Project>> getByUserIdAsync(String userId);
+        Task<Project> createAsync(Project project);
+        Task<Project> updateAsync(Project updateProject);
+        Task deleteByIdAsync(int id);
+    }
+    public class ProjectService : IProjectService
+    {
+        private readonly ILogger<ProjectService> _logger;
+        private readonly IMapper _mapper;
+        private readonly DataContext _dbContext;
 
-//     //Add interface 
-//     public class ProjectService
-//     {
+        public ProjectService(ILogger<ProjectService> logger,
+            IMapper mapper,
+            DataContext dbContext)
+        {
+            _logger = logger;
+            _mapper = mapper;
+            _dbContext = dbContext;
+        }
 
-//         public ILogger<ProjectService> _logger { get; }
-//         public IMapper _mapper { get; }
-//         public DataContext _dbContext { get; }
+        public Task<Project> getByIdAsync(int id)
+        {
+            return _dbContext.projects.AsNoTracking().FirstOrDefaultAsync(p => p.id == id);
+        }
 
-//         public ProjectService(ILogger<ProjectService> logger,
-//             IMapper mapper,
-//             DataContext dbContext)
-//         {
-//             _logger = logger;
-//             _mapper = mapper;
-//             _dbContext = dbContext;
-//         }
+        public Task<List<Project>> getByUserIdAsync(String userId)
+        {
+            return _dbContext.projects.AsNoTracking().Where(p => p.userId == userId).ToListAsync();
 
-//         // public List<Project> GetProjectsByUserId(string userId) =>
-//         //     _Projects.Find<Project>(Project => Project.UserId == userId).ToList();
+        }
 
-//         // public Project Get(string id) =>
-//         //     _Projects.Find<Project>(Project => Project.Id == id).FirstOrDefault();
 
-//         // public Project Create(Project Project)
-//         // {
-//         //     _Projects.InsertOne(Project);
-//         //     return Project;
-//         // }
+        public async Task<Project> createAsync(Project project)
+        {
+            await _dbContext.projects.AddAsync(project);
+            await _dbContext.SaveChangesAsync();
+            return project;
+        }
 
-//         // public void Update(string id, Project newProject) =>
-//         //     _Projects.ReplaceOne(Project => Project.Id == id, newProject);
+        public async Task<Project> updateAsync(Project updateProject) 
+        {
+            var project = await _dbContext.projects.FirstOrDefaultAsync(p => p.id == updateProject.id);
+            _mapper.Map<Project,Project>(updateProject,project);
+            await _dbContext.SaveChangesAsync();
+            return project;
+        }
 
-//         // public void Remove(Project ProjectIn) =>
-//         //     _Projects.DeleteOne(Project => Project.Id == ProjectIn.Id);
+        public async Task deleteByIdAsync(int id)
+        {
+            var project = new Project{id=id};
+            _dbContext.projects.Remove(project);
+            await _dbContext.SaveChangesAsync();
+        }
 
-//         // public void Remove(string id) =>
-//         //     _Projects.DeleteOne(Project => Project.Id == id);
-//     }
-// }
+    }
+}

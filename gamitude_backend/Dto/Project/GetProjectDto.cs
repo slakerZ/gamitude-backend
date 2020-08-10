@@ -1,19 +1,13 @@
 using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using gamitude_backend.Models;
 
-namespace gamitude_backend.Models
+namespace gamitude_backend.Dto.Project
 {
-    public class Project : IBaseEntity
+
+    public class GetProjectDto
     {
         public int id { get; set; }
 
-        [MaxLength(255)]
-        public string userId { get; set; }
-        [ForeignKey("userId")]
-        public User user { get; set; }
-
-        [MaxLength(255)]
         public string name { get; set; }
 
         public METHOD? primaryMethod { get; set; }
@@ -28,6 +22,5 @@ namespace gamitude_backend.Models
 
         public DateTime? timeCreated { get; set; }
 
-        public DateTime? timeUpdated { get; set; }
     }
 }

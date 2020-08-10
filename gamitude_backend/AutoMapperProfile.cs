@@ -1,7 +1,8 @@
 using AutoMapper;
 using gamitude_backend.Dto.Authorization;
+using gamitude_backend.Dto.Project;
 using gamitude_backend.Dto.User;
-using gamitude_backend.Model;
+using gamitude_backend.Models;
 
 namespace gamitude_backend
 {
@@ -19,6 +20,12 @@ namespace gamitude_backend
             //UserToken
             CreateMap<UserToken, GetUserTokenDto>();
 
+            //Project          
+            CreateMap<CreateProjectDto, Project>();
+            CreateMap<Project, GetProjectDto>();
+            CreateMap<UpdateProjectDto, Project>();
+            CreateMap<Project, Project>() // helper for update
+                    .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

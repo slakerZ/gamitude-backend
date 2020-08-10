@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using gamitude_backend.Model;
+using gamitude_backend.Models;
 using Microsoft.AspNetCore.Identity;
 using gamitude_backend.Extensions;
 
@@ -15,6 +15,7 @@ namespace gamitude_backend.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
         public DbSet<UserToken> userTokens { get; set; }
+        public DbSet<Project> projects { get; set; }
 
 
         public override int SaveChanges(bool acceptAllChangesOnSuccess)

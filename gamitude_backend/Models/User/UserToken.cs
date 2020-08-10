@@ -1,9 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using gamitude_backend.Model;
 
-namespace gamitude_backend.Model
+namespace gamitude_backend.Models
 {
     public class UserToken : IBaseEntity
     {

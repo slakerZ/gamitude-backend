@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
-namespace gamitude_backend.Model
+namespace gamitude_backend.Models
 {
     public class User : IdentityUser , IBaseEntity
     {
@@ -15,6 +15,8 @@ namespace gamitude_backend.Model
         public DateTime? timeCreated { get ; set ; }
         
         public DateTime? timeUpdated { get ; set ; }
+
+        public List<Project> offers { get; set; } = new List<Project>();
 
     }
 }

@@ -1,6 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using gamitude_backend.Model;
+using gamitude_backend.Models;
 
 namespace gamitude_backend.Dto.User
 {

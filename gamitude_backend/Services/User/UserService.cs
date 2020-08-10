@@ -10,7 +10,7 @@ using gamitude_backend.Dto.Authorization;
 using gamitude_backend.Dto.User;
 using gamitude_backend.Exceptions;
 using gamitude_backend.Settings;
-using gamitude_backend.Model;
+using gamitude_backend.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

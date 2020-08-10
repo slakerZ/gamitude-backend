@@ -1,7 +1,7 @@
 
 
 using gamitude_backend.Data;
-using gamitude_backend.Model;
+using gamitude_backend.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 

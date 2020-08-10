@@ -1,5 +1,5 @@
 using System;
-using gamitude_backend.Model;
+using gamitude_backend.Models;
 
 namespace gamitude_backend.Dto.User
 {
