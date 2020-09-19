@@ -5,7 +5,6 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
-using gamitude_backend.Data;
 using gamitude_backend.Dto.Authorization;
 using gamitude_backend.Dto.User;
 using gamitude_backend.Exceptions;
@@ -33,14 +32,12 @@ namespace gamitude_backend.Services
         private readonly ILogger<UserService> _logger;
 
         //TODO make async
-        private readonly DataContext _dbContext;
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
 
-        public UserService(ILogger<UserService> logger, DataContext dbContext, UserManager<User> userManager, IMapper mapper)
+        public UserService(ILogger<UserService> logger, UserManager<User> userManager, IMapper mapper)
         {
             _logger = logger;
-            _dbContext = dbContext;
             _userManager = userManager;
             _mapper = mapper;
         }
@@ -81,7 +78,7 @@ namespace gamitude_backend.Services
 
         public async Task<User> updateAsync(User updateUser)
         {
-            var user = await _userManager.FindByIdAsync(updateUser.Id);
+            var user = await _userManager.FindByIdAsync(updateUser.Id.ToString());
             user = _mapper.Map<User, User>(updateUser, user);
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)

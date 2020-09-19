@@ -6,7 +6,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
-using gamitude_backend.Data;
 using gamitude_backend.Dto.Authorization;
 using gamitude_backend.Exceptions;
 using gamitude_backend.Settings;
@@ -16,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
 
 namespace gamitude_backend.Services
 {
@@ -27,7 +27,8 @@ namespace gamitude_backend.Services
     {
         //TODO make async
         private readonly IMapper _mapper;
-        private readonly DataContext _dbContext;
+        private readonly IMongoCollection<UserToken> _UsersToken;
+
         private readonly SignInManager<User> _signInManager;
         private readonly JwtSettings _jwtSettings;
         private readonly ILogger<AuthorizationService> _logger;
@@ -35,13 +36,16 @@ namespace gamitude_backend.Services
         public AuthorizationService(
             ILogger<AuthorizationService> logger,
             IMapper mapper,
-            DataContext dbContext,
+            IDatabaseSettings settings,
             IOptions<JwtSettings> jwtSettings,
             SignInManager<User> signInManager)
         {
+            var client = new MongoClient(settings.connectionString);
+            var database = client.GetDatabase(settings.databaseName);
+
+            _UsersToken = database.GetCollection<UserToken>(settings.usersTokenCollectionName);
             _logger = logger;
             _mapper = mapper;
-            _dbContext = dbContext;
             _signInManager = signInManager;
             _jwtSettings = jwtSettings.Value;
         }
@@ -60,17 +64,17 @@ namespace gamitude_backend.Services
             _logger.LogInformation("authentication successful");
             
             var user  = await _signInManager.UserManager.FindByNameAsync(login);
-            _logger.LogInformation("User:"+ user.name);
+            _logger.LogInformation("User:"+ user.Name);
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtSettings.secret);//TODO inject Config
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.secret);
             var Expires = DateTime.UtcNow.AddDays(1);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.Id),
-                    new Claim(ClaimTypes.NameIdentifier, user.Id)
+                    new Claim(ClaimTypes.Name, user.Name),
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
                 }),
                 Expires = Expires,
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -78,35 +82,37 @@ namespace gamitude_backend.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             UserToken userToken = new UserToken();
             userToken.token = tokenHandler.WriteToken(token);
-            userToken.userId = user.Id;
-            userToken.date_expires = Expires;
+            userToken.userId = user.Id.ToString();
+            userToken.dateExpires = Expires;
             return await createOrUpdateTokenAsync(userToken);
         }
 
-        private async Task<UserToken> createOrUpdateTokenAsync(UserToken newUserToken)
+        private async Task<UserToken> createOrUpdateTokenAsync(UserToken userToken)
         {
-            _logger.LogInformation("In createOrUpdateToken");
-            UserToken userToken = await _dbContext.userTokens.FirstOrDefaultAsync(u => u.userId == newUserToken.userId);
-            if (null != userToken)
+            _logger.LogInformation("In createOrUpdateTokenAsync");
+            UserToken user = await _UsersToken.Find(UserToken => UserToken.userId == userToken.userId).FirstOrDefaultAsync();
+            if (user == null)
             {
-                userToken.date_expires = newUserToken.date_expires;
-                userToken.token = newUserToken.token;
+                await _UsersToken.InsertOneAsync(userToken);
             }
             else
             {
-                userToken = newUserToken;
-                await _dbContext.userTokens.AddAsync(userToken);
+                userToken.id=user.id;
+                await _UsersToken.ReplaceOneAsync(UserToken => UserToken.userId == userToken.userId, userToken);
             }
-            await _dbContext.SaveChangesAsync();
-            return await _dbContext.userTokens.Include(o => o.user).FirstOrDefaultAsync(u => u.id == userToken.id);
+            return userToken;
         }
 
-        //TODO ask if user can have multiple tokens?? optimize query this makes 2 calls
-        private void revokeToken(String userId)
+        public Task RemoveAsync(UserToken userToken) 
         {
-            _logger.LogInformation("In createOrUpdateToken");
-            _dbContext.Remove(_dbContext.userTokens.Single(u => u.userId == userId));
-            _dbContext.SaveChanges();
+            _logger.LogInformation("In RemoveAsync userToken");
+            return _UsersToken.DeleteOneAsync(UserToken => UserToken.id == userToken.id);
+        }
+
+        public Task RemoveAsync(string id)
+        {
+            _logger.LogInformation("In RemoveAsync id");
+            return _UsersToken.DeleteOneAsync(UserToken => UserToken.id == id);
         }
     }
 }

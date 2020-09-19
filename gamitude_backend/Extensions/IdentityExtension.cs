@@ -1,6 +1,8 @@
 
 
-using gamitude_backend.Data;
+using System;
+using AspNetCore.Identity.Mongo;
+using AspNetCore.Identity.Mongo.Model;
 using gamitude_backend.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,15 +11,21 @@ namespace gamitude_backend.Extensions
 {
     public static class IdentityExtension
     {
-        public static void AddCustomIdentity(this IServiceCollection services)
+        public static void AddCustomIdentity(this IServiceCollection services,String connectionString,String dbName)
         {
-            services.AddIdentity<User, IdentityRole>(o =>
-                {
-                    o.Password.RequireUppercase = false;
-                    o.Password.RequireNonAlphanumeric = false;
-                    // o.User.RequireUniqueEmail = true;
-                })
-                .AddEntityFrameworkStores<DataContext>();
+
+            services.AddIdentityMongoDbProvider<User, MongoRole>(identityOptions =>
+            {
+                identityOptions.Password.RequiredLength = 6;
+                identityOptions.Password.RequireLowercase = false;
+                identityOptions.Password.RequireUppercase = false;
+                identityOptions.Password.RequireNonAlphanumeric = false;
+                identityOptions.Password.RequireDigit = false;
+            }, mongoIdentityOptions =>
+            {
+                mongoIdentityOptions.ConnectionString = $"{connectionString}/{dbName}";
+            }); 
+
         }
     }
 }

@@ -1,20 +1,26 @@
 
  
 
-// using System;
- 
+using System;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-// namespace gamitude_backend.Models 
-// {
+namespace gamitude_backend.Models 
+{
 
-//     public class UserRank
-//     {
-//         public int id { get; set; }
+    [BsonIgnoreExtraElements]
+    public class UserRank
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
                  
-//         public int userId { get; set; }
+        [BsonElement("userId")]
+        public string UserId { get; set; }
 
-//         public int rankId { get; set; }
+        [BsonElement("rankId")]
+        public string RankId { get; set; }
 
-//     }
+    }
 
-// }
+}

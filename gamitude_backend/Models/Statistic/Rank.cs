@@ -1,28 +1,37 @@
 
- 
-
-// using System;
- 
-
-// namespace gamitude_backend.Models 
-// {
 
 
-//     public class Rank
-//     {
+using System;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
-//         public int Id { get; set; }
+namespace gamitude_backend.Models
+{
 
-//         public string Name { get; set; }
 
-//         public GAMITUDE_STYLE Style { get; set; }
+    [BsonIgnoreExtraElements]
+    public class Rank
+    {
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
 
-//         public RANK_TIER Tier { get; set; }//TODO Migrate to enum
+        [BsonElement("name")]
+        public string Name { get; set; }
 
-//         public RANK_DOMINANT Dominant { get; set; }//TODO Migrate to enum
-                 
-//         public string ImageUrl { get; set; }
+        [BsonElement("style")]
+        public GAMITUDE_STYLE Style { get; set; }
 
-//     }
+        [BsonElement("tier")]
+        public RANK_TIER Tier { get; set; }//TODO Migrate to enum
 
-// }
+        [BsonElement("dominant")]
+        public RANK_DOMINANT Dominant { get; set; }//TODO Migrate to enum
+
+        [BsonElement("image")]
+        public string ImageUrl { get; set; }
+
+    }
+
+
+}

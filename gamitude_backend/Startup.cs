@@ -22,22 +22,22 @@ namespace gamitude_backend
     {
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            this.configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfiguration configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ReadSettings(Configuration);
-            Log.Debug(Configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>().connectionString);
-            Log.Information(Configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>().connectionString);
-            services.ConfigureDatabaseConnection(Configuration);
+            services.ReadSettings(configuration);
+            Log.Debug(configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>().connectionString);
+            Log.Information(configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>().connectionString);
 
-            services.AddCustomIdentity();
+            services.AddCustomIdentity(configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>().connectionString,
+                                                configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>().databaseName);
 
-            var key = Encoding.ASCII.GetBytes(Configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>().secret);
+            var key = Encoding.ASCII.GetBytes(configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>().secret);
             services.AddCustomAuthenticationConfiguration(key);
 
             services.AddServices();

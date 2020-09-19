@@ -4,67 +4,65 @@ using System.Linq;
 using System;
 using Microsoft.Extensions.Logging;
 using AutoMapper;
-using gamitude_backend.Data;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using gamitude_backend.Settings;
+using MongoDB.Driver;
 
 namespace gamitude_backend.Services
 {
     public interface IProjectService
     {
-        Task<Project> getByIdAsync(int id);
+        Task<Project> getByIdAsync(String id);
         Task<List<Project>> getByUserIdAsync(String userId);
-        Task<Project> createAsync(Project project);
-        Task<Project> updateAsync(Project updateProject);
-        Task deleteByIdAsync(int id);
+        Task createAsync(Project project);
+        Task updateAsync(String id, Project updateProject);
+        Task deleteByIdAsync(String id);
     }
     public class ProjectService : IProjectService
     {
-        private readonly ILogger<ProjectService> _logger;
-        private readonly IMapper _mapper;
-        private readonly DataContext _dbContext;
+        private readonly IMongoCollection<Project> _Projects;
 
-        public ProjectService(ILogger<ProjectService> logger,
-            IMapper mapper,
-            DataContext dbContext)
+
+        public ProjectService(IDatabaseSettings settings)
         {
-            _logger = logger;
-            _mapper = mapper;
-            _dbContext = dbContext;
+            var client = new MongoClient(settings.connectionString);
+            var database = client.GetDatabase(settings.databaseName);
+
+            _Projects = database.GetCollection<Project>(settings.projectsCollectionName);
         }
 
-        public Task<Project> getByIdAsync(int id)
+        public Task<Project> getByIdAsync(String id)
         {
-            return _dbContext.projects.AsNoTracking().FirstOrDefaultAsync(p => p.id == id);
+            return _Projects.Find<Project>(Project => Project.Id == id).FirstOrDefaultAsync();
         }
 
         public Task<List<Project>> getByUserIdAsync(String userId)
         {
-            return _dbContext.projects.AsNoTracking().Where(p => p.userId == userId).ToListAsync();
+            return _Projects.Find<Project>(Project => Project.UserId == userId).ToListAsync();
 
         }
 
-
-        public async Task<Project> createAsync(Project project)
+        public Task createAsync(Project Project)
         {
-            await _dbContext.projects.AddAsync(project);
-            await _dbContext.SaveChangesAsync();
-            return project;
+            return _Projects.InsertOneAsync(Project);
         }
 
-        public async Task<Project> updateAsync(Project updateProject) 
+        public Task updateAsync(String id, Project newProject)
         {
-            var project = await _dbContext.projects.FirstOrDefaultAsync(p => p.id == updateProject.id);
-            _mapper.Map<Project,Project>(updateProject,project);
-            await _dbContext.SaveChangesAsync();
-            return project;
+            return _Projects.ReplaceOneAsync(Project => Project.Id == id, newProject);
+
         }
 
-        public async Task deleteByIdAsync(int id)
+        public Task deleteByProjectAsync(Project ProjectIn)
         {
-            var project = new Project{id=id};
-            _dbContext.projects.Remove(project);
-            await _dbContext.SaveChangesAsync();
+            return _Projects.DeleteOneAsync(Project => Project.Id == ProjectIn.Id);
+        }
+
+        public Task deleteByIdAsync(string id)
+        {
+            return _Projects.DeleteOneAsync(Project => Project.Id == id);
+
         }
 
     }

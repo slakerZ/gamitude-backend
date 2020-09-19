@@ -2,21 +2,34 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using AspNetCore.Identity.Mongo.Model;
 using Microsoft.AspNetCore.Identity;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace gamitude_backend.Models
 {
-    public class User : IdentityUser , IBaseEntity
+    [BsonIgnoreExtraElements]
+    public class User : MongoUser
     {
         [PersonalData]
-        [MaxLength(255)]
-        public string name { get; set; }
+        [BsonElement("name")]
+        public string Name { get; set; }
 
-        public DateTime? timeCreated { get ; set ; }
-        
-        public DateTime? timeUpdated { get ; set ; }
+        [BsonElement("timeCreated")]
+        public DateTime? timeCreated { get; set; }
 
-        public List<Project> offers { get; set; } = new List<Project>();
+        [BsonElement("timeUpdated")]
+        public DateTime? timeUpdated { get; set; }
+
+
+        [BsonElement("rankSet")]
+        public string RankSet { get; set; }
+
+        [BsonElement("tier")]
+        public string Tier { get; set; }
+
+        [BsonElement("dateAdded")]
+        public DateTime DateAdded { get; set; }
 
     }
 }

@@ -1,31 +1,42 @@
 using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 namespace gamitude_backend.Models
 {
+    [BsonIgnoreExtraElements]
     public class Project : IBaseEntity
     {
-        public int id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; }
 
-        [MaxLength(255)]
-        public string userId { get; set; }
-        [ForeignKey("userId")]
-        public User user { get; set; }
+        [BsonElement("userId")]
+        public string UserId { get; set; }
 
-        [MaxLength(255)]
-        public string name { get; set; }
+        [BsonElement("name")]
+        public string Name { get; set; }
 
-        public METHOD? primaryMethod { get; set; }
+        [BsonElement("primaryMethod")]
+        public METHOD? PrimaryMethod { get; set; }
 
-        public STATUS? projectStatus { get; set; }
+        [BsonElement("projectStatus")]
+        public STATUS? ProjectStatus { get; set; }
 
-        public STATS? dominantStat { get; set; }
+        [BsonElement("dominantStat")]
+        public STATS? DominantStat { get; set; }
 
-        public STATS[] stats { get; set; }
+        [BsonElement("stats")]
+        public STATS[] Stats { get; set; }
 
-        public int totalTimeSpend { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        [BsonElement("projectUsages")]
+        public string[] ProjectUsages { get; set; }
 
+        [BsonElement("totalTimeSpend")]
+        public int TotalTimeSpend { get; set; }
+
+        [BsonElement("dateAdded")]
+        public DateTime DateAdded { get; set; }
         public DateTime? timeCreated { get; set; }
 
         public DateTime? timeUpdated { get; set; }

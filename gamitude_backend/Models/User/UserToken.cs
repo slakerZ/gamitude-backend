@@ -1,27 +1,27 @@
 using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 namespace gamitude_backend.Models
 {
-    public class UserToken : IBaseEntity
+    [BsonIgnoreExtraElements]
+    public class UserToken 
     {
-        public int id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string id { get; set; }
 
-        public String userId { get; set; }
-    
-        [ForeignKey("userId")]
-        public User user { get; set; }
+        [BsonElement("userId")]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string userId { get; set; }
 
-        [MaxLength(255)]
-        public String token { get; set; }
+        [BsonElement("token")]
+        public string token { get; set; }
 
-        public DateTime date_expires { get; set; }
+        [BsonElement("dateExpires")]
+        public DateTime dateExpires { get; set; }
 
-        public DateTime? timeCreated { get ; set ; }
-        
-        public DateTime? timeUpdated { get ; set ; }
-    }
+}
 
 
 }
