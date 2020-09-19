@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.Options;
 using gamitude_backend.Settings;
+using gamitude_backend.Configuration;
 
 namespace gamitude_backend.Dto.Energy
 {

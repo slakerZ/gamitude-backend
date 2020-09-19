@@ -21,7 +21,6 @@ namespace gamitude_backend.Models
         [BsonElement("timeUpdated")]
         public DateTime? timeUpdated { get; set; }
 
-
         [BsonElement("rankSet")]
         public string RankSet { get; set; }
 
