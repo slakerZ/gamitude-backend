@@ -18,18 +18,20 @@ using gamitude_backend.Models;
 namespace gamitude_backend.Controllers
 {
     [ApiController]
-    // [Authorize]
-    [Route("[controller]")]
+    [Authorize]
+    [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
         private readonly ILogger<UserController> _logger;
         private readonly IUserService _userService;
+        private readonly IUserRankService _userRankService;
         private readonly IMapper _mapper;
 
-        public UserController(ILogger<UserController> logger, IUserService userService, IMapper mapper)
+        public UserController(ILogger<UserController> logger, IUserService userService, IUserRankService userRankService, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
+            _userRankService = userRankService;
             _mapper = mapper;
         }
 
@@ -55,12 +57,14 @@ namespace gamitude_backend.Controllers
             };
         }
 
-
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ControllerResponse<GetUserDto>> create(CreateUserDto newUser)
         {
             _logger.LogInformation("In POST create");
             var user = await _userService.createAsync(_mapper.Map<User>(newUser), newUser.password);
+            await _userRankService.CreateAsync(user.Id.ToString());
+
             return new ControllerResponse<GetUserDto>
             {
                 data = _mapper.Map<GetUserDto>(user)

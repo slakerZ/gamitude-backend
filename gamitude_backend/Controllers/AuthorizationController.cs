@@ -12,7 +12,7 @@ using gamitude_backend.Dto.User;
 namespace gamitude_backend.Controllers
 {
 
-    [Route("[controller]/[action]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     public class AuthorizationController : ControllerBase
     {

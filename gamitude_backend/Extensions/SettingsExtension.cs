@@ -9,8 +9,7 @@ namespace gamitude_backend.Extensions
     {
         public static void ReadSettings(this IServiceCollection services, IConfiguration configuration)
         {
-
-            services.Configure<DatabaseSettings>(configuration.GetSection(nameof(DatabaseSettings)));
+            services.AddSingleton<IDatabaseSettings>(configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>());
             services.Configure<JwtSettings>(configuration.GetSection(nameof(JwtSettings)));
 
         }

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace gamitude_backend.Controllers
 {
-    [Route("api/auth/[controller]")]
+    [Route("api/[controller]")]
     [Route("/")]
     [ApiController]
     public class VersionController : ControllerBase

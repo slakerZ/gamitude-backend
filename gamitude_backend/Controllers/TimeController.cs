@@ -12,7 +12,7 @@ using gamitude_backend.Dto.TimeSpend;
 
 namespace gamitude_backend.Controllers
 {
-    [Route("api/stats/[controller]")]
+    [Route("api/[controller]")]
     [Authorize]
     [ApiController]
     public class TimeController : ControllerBase

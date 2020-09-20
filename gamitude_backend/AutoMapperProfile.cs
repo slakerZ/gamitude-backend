@@ -1,6 +1,8 @@
 using AutoMapper;
 using gamitude_backend.Dto.Authorization;
 using gamitude_backend.Dto.Project;
+using gamitude_backend.Dto.Rank;
+using gamitude_backend.Dto.TimeSpend;
 using gamitude_backend.Dto.User;
 using gamitude_backend.Models;
 
@@ -26,6 +28,13 @@ namespace gamitude_backend
             CreateMap<UpdateProjectDto, Project>();
             CreateMap<Project, Project>() // helper for update
                     .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            //TimeSpend
+            CreateMap<CreateTimeSpend, TimeSpend>();
+            CreateMap<TimeSpend, GetTimeSpend>();
+
+            //Rank
+            CreateMap<Rank, GetRank>();
         }
     }
 }

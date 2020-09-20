@@ -20,7 +20,7 @@ namespace gamitude_backend.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("api/stats/[controller]/[action]")]
+    [Route("api/[controller]/[action]")]
     public class UserRankController : ControllerBase
     {
         private readonly IMapper _mapper;
