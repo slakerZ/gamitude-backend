@@ -63,7 +63,7 @@ namespace gamitude_backend.Controllers
         {
             _logger.LogInformation("In POST create");
             var user = await _userService.createAsync(_mapper.Map<User>(newUser), newUser.password);
-            await _userRankService.CreateAsync(user.Id.ToString());
+            await _userRankService.CreateAsync(user.id.ToString());
 
             return new ControllerResponse<GetUserDto>
             {

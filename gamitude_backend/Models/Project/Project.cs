@@ -4,41 +4,50 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace gamitude_backend.Models
 {
     [BsonIgnoreExtraElements]
-    public class Project : IBaseEntity
+    public class Project
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public string id { get; set; }
 
         [BsonElement("userId")]
-        public string UserId { get; set; }
+        public string userId { get; set; }
+
+        [BsonElement("folderId")]
+        public String folderId { get; set; }
+
+        [BsonElement("defaultTimerId")]
+        public String defaultTimerId { get; set; }
 
         [BsonElement("name")]
-        public string Name { get; set; }
-
-        [BsonElement("primaryMethod")]
-        public METHOD? PrimaryMethod { get; set; }
-
-        [BsonElement("projectStatus")]
-        public STATUS? ProjectStatus { get; set; }
+        public string name { get; set; }
 
         [BsonElement("dominantStat")]
-        public STATS? DominantStat { get; set; }
+        public PROJECT_TYPE projectType { get; set; }
+
+        [BsonElement("dominantStat")]
+        public STATS? dominantStat { get; set; }
 
         [BsonElement("stats")]
-        public STATS[] Stats { get; set; }
+        public STATS[] stats { get; set; }
 
         [BsonRepresentation(BsonType.ObjectId)]
-        [BsonElement("projectUsages")]
-        public string[] ProjectUsages { get; set; }
+        [BsonElement("projectLog")]
+        public String[] projectLog { get; set; }
 
         [BsonElement("totalTimeSpend")]
-        public int TotalTimeSpend { get; set; }
+        public int timeSpend { get; set; }
 
-        [BsonElement("dateAdded")]
-        public DateTime DateAdded { get; set; }
-        public DateTime? timeCreated { get; set; }
+        [BsonElement("daysPerWeek")]
+        public int? daysPerWeek { get; set; }
 
-        public DateTime? timeUpdated { get; set; }
+        [BsonElement("hoursPerDay")]
+        public int? hoursPerDay { get; set; }
+
+        [BsonElement("dayInterval")]
+        public int? dayInterval { get; set; }
+
+        [BsonElement("dateCreated")]
+        public DateTime dateCreated { get; set; }
     }
 }

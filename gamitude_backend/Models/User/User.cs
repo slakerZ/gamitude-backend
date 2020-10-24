@@ -13,22 +13,16 @@ namespace gamitude_backend.Models
     {
         [PersonalData]
         [BsonElement("name")]
-        public string Name { get; set; }
+        public string name { get; set; }
 
-        [BsonElement("timeCreated")]
-        public DateTime? timeCreated { get; set; }
+        public Rank currentRank { get; set; }
+        public Theme currentTheme { get; set; }
 
-        [BsonElement("timeUpdated")]
-        public DateTime? timeUpdated { get; set; }
+        public List<Rank> purchasedRanks { get; set; }
+        public List<Theme> purchasedThemes { get; set; }
 
-        [BsonElement("rankSet")]
-        public string RankSet { get; set; }
-
-        [BsonElement("tier")]
-        public string Tier { get; set; }
-
-        [BsonElement("dateAdded")]
-        public DateTime DateAdded { get; set; }
+        [BsonElement("dateCreated")]
+        public DateTime dateCreated { get; set; }
 
     }
 }

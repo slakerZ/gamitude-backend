@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using gamitude_backend.Repositories;
 
 namespace gamitude_backend.Services
 {
@@ -34,16 +35,20 @@ namespace gamitude_backend.Services
         //TODO make async
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
+        private readonly IRankRepository _rankRepository;
 
-        public UserService(ILogger<UserService> logger, UserManager<User> userManager, IMapper mapper)
+        public UserService(ILogger<UserService> logger, UserManager<User> userManager, IMapper mapper,IRankRepository rankRepository)
         {
             _logger = logger;
             _userManager = userManager;
             _mapper = mapper;
+            _rankRepository = rankRepository;
         }
 
         public async Task<User> createAsync(User newUser, String password)
         {
+            newUser.currentRank = await _rankRepository.getRookieAsync();
+            newUser.purchasedRanks.Add(newUser.currentRank);
             var result = await _userManager.CreateAsync(newUser, password);
             if (result.Succeeded)
             {

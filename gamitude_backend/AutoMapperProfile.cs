@@ -29,9 +29,9 @@ namespace gamitude_backend
             CreateMap<Project, Project>() // helper for update
                     .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
-            //TimeSpend
-            CreateMap<CreateTimeSpend, TimeSpend>();
-            CreateMap<TimeSpend, GetTimeSpend>();
+            //ProjectLog
+            CreateMap<CreateProjectLog, ProjectLog>();
+            CreateMap<ProjectLog, GetProjectLog>();
 
             //Rank
             CreateMap<Rank, GetRank>();

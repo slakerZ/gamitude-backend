@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using gamitude_backend.Dto.Energy;
 using gamitude_backend.Dto.Rank;
-using gamitude_backend.Dto.Stats;
+using gamitude_backend.Dto.stats;
 using gamitude_backend.Dto.UserRank;
 using gamitude_backend.BusinessLogic;
 using gamitude_backend.Dto;
@@ -44,7 +44,7 @@ namespace gamitude_backend.Controllers
             try
             {
                 _logger.LogInformation("In GET rank");
-                string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name).ToString();
+                string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.name).ToString();
                 if (null != userId)
                 {
                     return new ControllerResponse<GetRank>
@@ -54,12 +54,12 @@ namespace gamitude_backend.Controllers
                 }
                 else
                 {
-                    _logger.LogError("In GET rank UserId error");
+                    _logger.LogError("In GET rank userId error");
 
                     return new ControllerResponse<GetRank>
                     {
                         data = null,
-                        message = "UserId error",
+                        message = "userId error",
                         success = false
                     };
                 }
@@ -88,12 +88,12 @@ namespace gamitude_backend.Controllers
             try
             {
 
-                if (null != createUserRank.UserId)
+                if (null != createUserRank.userId)
                 {
-                    await _userRankService.CreateAsync(createUserRank.UserId);
+                    await _userRankService.CreateAsync(createUserRank.userId);
                     return new ControllerResponse<String>
                     {
-                        data = createUserRank.UserId
+                        data = createUserRank.userId
                     };
                 }
                 else
@@ -101,7 +101,7 @@ namespace gamitude_backend.Controllers
                     return new ControllerResponse<String>
                     {
                         data = null,
-                        message = "UserId error",
+                        message = "userId error",
                         success = false
                     };
                 }

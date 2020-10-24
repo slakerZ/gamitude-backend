@@ -13,13 +13,13 @@ namespace gamitude_backend.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public String id { get; set; }
                  
         [BsonElement("userId")]
-        public string UserId { get; set; }
+        public String userId { get; set; }
 
         [BsonElement("rankId")]
-        public string RankId { get; set; }
+        public String rankId { get; set; }
 
     }
 

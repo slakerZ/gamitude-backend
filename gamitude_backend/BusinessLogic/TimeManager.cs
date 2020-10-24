@@ -24,7 +24,7 @@ namespace gamitude_backend.BusinessLogic
         /// </summary>
 
         /// <remarks>
-        /// Split this module to energy Manager and Stats Manager
+        /// Split this module to energy Manager and stats Manager
         /// </remarks>
         private readonly ILogger<TimeManager> _logger;
         private readonly IMapper _mapper;
@@ -57,7 +57,7 @@ namespace gamitude_backend.BusinessLogic
                 managersTasks.Add(Task.Run(() => manageStatsAsync(wages, timeSpend)));
                 managersTasks.Add(Task.Run(() => _timeSpendsService.CreateAsync(timeSpend)));
                 await Task.WhenAll(managersTasks);
-                await _rankManager.manageRank(timeSpend.UserId);
+                await _rankManager.manageRank(timeSpend.userId);
                 return _mapper.Map<GetTimeSpend>(timeSpend);
             }
             catch (Exception e)
@@ -69,16 +69,16 @@ namespace gamitude_backend.BusinessLogic
         private async Task manageEnergyAsync(Dictionary<STATS, int> wages, TimeSpend timeSpend)
         {
             DailyEnergy dailyEnergy = calculateEnergy(wages, timeSpend);
-            dailyEnergy.UserId = timeSpend.UserId;
-            dailyEnergy.Date = DateTime.UtcNow.Date;
+            dailyEnergy.userId = timeSpend.userId;
+            dailyEnergy.date = DateTime.UtcNow.date;
             _logger.LogInformation(dailyEnergy.ToString());
             await _dailyEnergyService.CreateOrAddAsync(dailyEnergy);
         }
         private async Task manageStatsAsync(Dictionary<STATS, int> wages, TimeSpend timeSpend)
         {
             DailyStats dailyStats = calculateStats(wages, timeSpend);
-            dailyStats.UserId = timeSpend.UserId;
-            dailyStats.Date = DateTime.UtcNow.Date;
+            dailyStats.userId = timeSpend.userId;
+            dailyStats.date = DateTime.UtcNow.date;
             await _dailyStatsService.CreateOrAddAsync(dailyStats);
         }
         private DailyEnergy calculateEnergy(Dictionary<STATS, int> wages, TimeSpend timeSpend)
@@ -102,10 +102,10 @@ namespace gamitude_backend.BusinessLogic
             int sum = wages.Sum(x => x.Value);
             return new DailyEnergy
             {
-                Body = duration * wages.GetValueOrDefault(STATS.STRENGTH) / sum,
-                Soul = duration * wages.GetValueOrDefault(STATS.FLUENCY) / sum,
-                Emotions = duration * wages.GetValueOrDefault(STATS.CREATIVITY) / sum,
-                Mind = duration * wages.GetValueOrDefault(STATS.INTELLIGENCE) / sum
+                body = duration * wages.GetValueOrDefault(STATS.STRENGTH) / sum,
+                soul = duration * wages.GetValueOrDefault(STATS.FLUENCY) / sum,
+                emotions = duration * wages.GetValueOrDefault(STATS.CREATIVITY) / sum,
+                mind = duration * wages.GetValueOrDefault(STATS.INTELLIGENCE) / sum
             };
         }
 
@@ -115,10 +115,10 @@ namespace gamitude_backend.BusinessLogic
             int sum = wages.Sum(x => x.Value);
             return new DailyEnergy
             {
-                Body = duration * wages.GetValueOrDefault(STATS.STRENGTH) / sum,
-                Soul = duration * wages.GetValueOrDefault(STATS.FLUENCY) / sum,
-                Emotions = duration * wages.GetValueOrDefault(STATS.CREATIVITY) / sum,
-                Mind = duration * wages.GetValueOrDefault(STATS.INTELLIGENCE) / sum
+                body = duration * wages.GetValueOrDefault(STATS.STRENGTH) / sum,
+                soul = duration * wages.GetValueOrDefault(STATS.FLUENCY) / sum,
+                emotions = duration * wages.GetValueOrDefault(STATS.CREATIVITY) / sum,
+                mind = duration * wages.GetValueOrDefault(STATS.INTELLIGENCE) / sum
             };
 
         }
@@ -143,10 +143,10 @@ namespace gamitude_backend.BusinessLogic
             int sum = wages.Sum(x => x.Value);
             return new DailyStats
             {
-                Strength = duration * wages.GetValueOrDefault(STATS.STRENGTH) / sum,
-                Creativity = duration * wages.GetValueOrDefault(STATS.CREATIVITY) / sum,
-                Fluency = duration * wages.GetValueOrDefault(STATS.FLUENCY) / sum,
-                Intelligence = duration * wages.GetValueOrDefault(STATS.INTELLIGENCE) / sum
+                strength = duration * wages.GetValueOrDefault(STATS.STRENGTH) / sum,
+                creativity = duration * wages.GetValueOrDefault(STATS.CREATIVITY) / sum,
+                fluency = duration * wages.GetValueOrDefault(STATS.FLUENCY) / sum,
+                intelligence = duration * wages.GetValueOrDefault(STATS.INTELLIGENCE) / sum
             };
         }
 
@@ -156,10 +156,10 @@ namespace gamitude_backend.BusinessLogic
             int sum = wages.Sum(x => x.Value);
             return new DailyStats
             {
-                Strength = duration * wages.GetValueOrDefault(STATS.STRENGTH) / sum,
-                Creativity = duration * wages.GetValueOrDefault(STATS.CREATIVITY) / sum,
-                Fluency = duration * wages.GetValueOrDefault(STATS.FLUENCY) / sum,
-                Intelligence = duration * wages.GetValueOrDefault(STATS.INTELLIGENCE) / sum
+                strength = duration * wages.GetValueOrDefault(STATS.STRENGTH) / sum,
+                creativity = duration * wages.GetValueOrDefault(STATS.CREATIVITY) / sum,
+                fluency = duration * wages.GetValueOrDefault(STATS.FLUENCY) / sum,
+                intelligence = duration * wages.GetValueOrDefault(STATS.INTELLIGENCE) / sum
             };
         }
 

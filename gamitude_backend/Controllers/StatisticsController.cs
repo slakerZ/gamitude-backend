@@ -6,9 +6,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using gamitude_backend.Dto.Energy;
-using gamitude_backend.Dto.Stats;
+using gamitude_backend.Dto.stats;
 using gamitude_backend.Dto;
 using gamitude_backend.Services;
+using AutoMapper;
 
 namespace gamitude_backend.Controllers
 {
@@ -19,13 +20,19 @@ namespace gamitude_backend.Controllers
     {
 
         private readonly ILogger<StatisticsController> _logger;
+        private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDailyEnergyService _dailyEnergyService;
-        private readonly IDailyStatsService _dailyStatsService;
+        private readonly IStatsService _dailyStatsService;
 
-        public StatisticsController(ILogger<StatisticsController> logger, IHttpContextAccessor httpContextAccessor, IDailyEnergyService dailyEnergyService, IDailyStatsService dailyStatsService)
+        public StatisticsController(ILogger<StatisticsController> logger,
+         IMapper mapper, 
+         IHttpContextAccessor httpContextAccessor, 
+         IDailyEnergyService dailyEnergyService,
+          IStatsService dailyStatsService)
         {
             _logger = logger;
+            _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _dailyEnergyService = dailyEnergyService;
             _dailyStatsService = dailyStatsService;
@@ -33,7 +40,7 @@ namespace gamitude_backend.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<ControllerResponse<GetLastWeekAvgStatsDto>>> stats()
+        public async Task<ActionResult<ControllerResponse<GetStatsDto>>> stats()
         {
             try
             {
@@ -41,19 +48,19 @@ namespace gamitude_backend.Controllers
                 string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name).ToString();
                 if (null != userId)
                 {
-                    return new ControllerResponse<GetLastWeekAvgStatsDto>
+                    return new ControllerResponse<GetStatsDto>
                     {
-                        data = await _dailyStatsService.GetLastWeekAvgStatsByUserIdAsync(userId)
+                        data = _mapper.Map<GetStatsDto>(await _dailyStatsService.getByUserIdAsync(userId))
                     };
                 }
                 else
                 {
-                    _logger.LogError("In GET GetStats UserId error");
+                    _logger.LogError("In GET GetStats userId error");
 
-                    return new ControllerResponse<GetLastWeekAvgStatsDto>
+                    return new ControllerResponse<GetStatsDto>
                     {
                         data = null,
-                        message = "UserId error",
+                        message = "userId error",
                         success = false
                     };
                 }
@@ -63,7 +70,7 @@ namespace gamitude_backend.Controllers
             {
                 _logger.LogError("Error cached in StatisticsController GET GetStats {error}", e);
 
-                return new ControllerResponse<GetLastWeekAvgStatsDto>
+                return new ControllerResponse<GetStatsDto>
                 {
                     data = null,
                     message = "something went wrong, sorry:(",
@@ -89,12 +96,12 @@ namespace gamitude_backend.Controllers
                 }
                 else
                 {
-                    _logger.LogError("In GET GetEnergy UserId error");
+                    _logger.LogError("In GET GetEnergy userId error");
 
                     return new ControllerResponse<GetLastWeekAvgEnergyDto>
                     {
                         data = null,
-                        message = "UserId error",
+                        message = "userId error",
                         success = false
                     };
                 }

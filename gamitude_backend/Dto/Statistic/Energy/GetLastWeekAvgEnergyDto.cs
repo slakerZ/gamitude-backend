@@ -7,31 +7,31 @@ namespace gamitude_backend.Dto.Energy
 {
     public class GetLastWeekAvgEnergyDto
     {
-        public int Emotions { get; set; }
+        public int emotions { get; set; }
 
-        public int Soul { get; set; }
+        public int soul { get; set; }
 
-        public int Body { get; set; }
+        public int body { get; set; }
 
-        public int Mind { get; set; }
+        public int mind { get; set; }
         public int dayCount;
         /// <summary>
         /// Calculates the avg adds rest of the week as Max if empty
         /// </summary>
         public GetLastWeekAvgEnergyDto weekAvg()
         {
-            this.Emotions = (this.Emotions + ((7 - this.dayCount) * StaticValues.dayLenght)) / 7;
-            this.Soul = (this.Soul + ((7 - this.dayCount) * StaticValues.dayLenght)) / 7;
-            this.Body = (this.Body + ((7 - this.dayCount) * StaticValues.dayLenght)) / 7;
-            this.Mind = (this.Mind + ((7 - this.dayCount) * StaticValues.dayLenght)) / 7;
+            this.emotions = (this.emotions + ((7 - this.dayCount) * StaticValues.workDayLength)) / 7;
+            this.soul = (this.soul + ((7 - this.dayCount) * StaticValues.workDayLength)) / 7;
+            this.body = (this.body + ((7 - this.dayCount) * StaticValues.workDayLength)) / 7;
+            this.mind = (this.mind + ((7 - this.dayCount) * StaticValues.workDayLength)) / 7;
             return this;
         }
         public GetLastWeekAvgEnergyDto scaleToPercent()
         {
-            this.Body = (this.Body * 100) / StaticValues.dayLenght;
-            this.Soul = (this.Soul * 100) / StaticValues.dayLenght;
-            this.Emotions = (this.Emotions * 100) / StaticValues.dayLenght;
-            this.Mind = (this.Mind * 100) / StaticValues.dayLenght;
+            this.body = (this.body * 100) / StaticValues.workDayLength;
+            this.soul = (this.soul * 100) / StaticValues.workDayLength;
+            this.emotions = (this.emotions * 100) / StaticValues.workDayLength;
+            this.mind = (this.mind * 100) / StaticValues.workDayLength;
             return this;
         }
     }

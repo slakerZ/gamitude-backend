@@ -15,43 +15,43 @@ namespace gamitude_backend.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public string id { get; set; }
 
         [BsonElement("userId")]
-        public string UserId { get; set; }
+        public string userId { get; set; }
 
         [BsonElement("mind")]
-        public int Mind { get; set; }
+        public int mind { get; set; }
 
         [BsonElement("soul")]
-        public int Soul { get; set; }
+        public int soul { get; set; }
 
         [BsonElement("body")]
-        public int Body { get; set; }
+        public int body { get; set; }
 
         [BsonElement("emotions")]
-        public int Emotions { get; set; }
+        public int emotions { get; set; }
 
-        [BsonElement("date")]
-        public DateTime Date { get; set; }
+        [BsonElement("dateCreated")]
+        public DateTime dateCreated { get; set; }
         public DailyEnergy init()
         {
-            this.Body = StaticValues.dayLenght;
-            this.Emotions = StaticValues.dayLenght;
-            this.Soul = StaticValues.dayLenght;
-            this.Mind = StaticValues.dayLenght;
+            this.body = StaticValues.workDayLength;
+            this.emotions = StaticValues.workDayLength;
+            this.soul = StaticValues.workDayLength;
+            this.mind = StaticValues.workDayLength;
             return this;
         }
         public DailyEnergy validate()
         {
-            if (this.Body > StaticValues.dayLenght) this.Body = StaticValues.dayLenght;
-            else if (this.Body < 0) this.Body = 0;
-            if (this.Soul > StaticValues.dayLenght) this.Soul = StaticValues.dayLenght;
-            else if (this.Soul < 0) this.Soul = 0;
-            if (this.Emotions > StaticValues.dayLenght) this.Emotions = StaticValues.dayLenght;
-            else if (this.Emotions < 0) this.Emotions = 0;
-            if (this.Mind > StaticValues.dayLenght) this.Mind = StaticValues.dayLenght;
-            else if (this.Mind < 0) this.Mind = 0;
+            if (this.body > StaticValues.workDayLength) this.body = StaticValues.workDayLength;
+            else if (this.body < 0) this.body = 0;
+            if (this.soul > StaticValues.workDayLength) this.soul = StaticValues.workDayLength;
+            else if (this.soul < 0) this.soul = 0;
+            if (this.emotions > StaticValues.workDayLength) this.emotions = StaticValues.workDayLength;
+            else if (this.emotions < 0) this.emotions = 0;
+            if (this.mind > StaticValues.workDayLength) this.mind = StaticValues.workDayLength;
+            else if (this.mind < 0) this.mind = 0;
             return this;
         }
     }

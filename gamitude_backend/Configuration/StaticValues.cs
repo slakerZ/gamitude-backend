@@ -4,7 +4,7 @@ namespace gamitude_backend.Configuration
 {
     public static class StaticValues
     {
-        public static int dayLenght { get; set; } = 720;
+        public static int workDayLength { get; set; } = 8*60;
         // public static int powerMultiplier { get; set; } = 3;
     }
 

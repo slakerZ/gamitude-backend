@@ -31,11 +31,13 @@ namespace gamitude_backend
         public void ConfigureServices(IServiceCollection services)
         {
             services.ReadSettings(configuration);
-            Log.Debug(configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>().connectionString);
-            Log.Information(configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>().connectionString);
+            var dbSettings = configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>();
 
-            services.AddCustomIdentity(configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>().connectionString,
-                                                configuration.GetSection(nameof(DatabaseSettings)).Get<DatabaseSettings>().databaseName);
+            Log.Debug(dbSettings.connectionString);
+
+            services.addDatabase(dbSettings);
+            services.AddCustomIdentity(dbSettings.connectionString,
+                                                dbSettings.databaseName);
 
             var key = Encoding.ASCII.GetBytes(configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>().secret);
             services.AddCustomAuthenticationConfiguration(key);

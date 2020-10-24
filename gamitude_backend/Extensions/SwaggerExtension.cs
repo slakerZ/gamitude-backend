@@ -74,20 +74,20 @@ namespace gamitude_backend.Extensions
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             var schema = new KeyValuePair<string, OpenApiMediaType>
-                            (
-                                "application/json",
-                                new OpenApiMediaType
-                                {
-                                    Schema = new OpenApiSchema
-                                    {
-                                        Reference = new OpenApiReference
-                                        {
-                                            Type = ReferenceType.Schema,
-                                            Id = nameof(ControllerErrorResponse)
-                                        }
-                                    }
-                                }
-                            );
+            (
+                "application/json",
+                new OpenApiMediaType
+                {
+                    Schema = new OpenApiSchema
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.Schema,
+                            Id = nameof(ControllerErrorResponse)
+                        }
+                    }
+                }
+            );
 
             var authAttributes = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
                 .Union(context.MethodInfo.GetCustomAttributes(true))

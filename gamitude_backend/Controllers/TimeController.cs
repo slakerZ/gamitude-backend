@@ -40,11 +40,11 @@ namespace gamitude_backend.Controllers
             try
             {
 
-                string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name).ToString();
+                string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.name).ToString();
                 if (null != userId)
                 {
                     TimeSpend timeSpend = _mapper.Map<TimeSpend>(createTimeSpend);
-                    timeSpend.UserId = userId;
+                    timeSpend.userId = userId;
                     return new ControllerResponse<GetTimeSpend>
                     {
                         data = await _timeManager.manageTime(timeSpend)
@@ -55,7 +55,7 @@ namespace gamitude_backend.Controllers
                     return new ControllerResponse<GetTimeSpend>
                     {
                         data = null,
-                        message = "UserId error",
+                        message = "userId error",
                         success = false
                     };
                 }

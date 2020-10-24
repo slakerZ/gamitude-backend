@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace gamitude_backend.Controllers
 {
@@ -22,11 +23,13 @@ namespace gamitude_backend.Controllers
 
         private readonly IProjectService _projectService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMapper _mapper;
 
-        public ProjectsController(IProjectService projectService, IHttpContextAccessor httpContextAccessor)
+        public ProjectsController(IProjectService projectService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _projectService = projectService;
             _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -56,7 +59,7 @@ namespace gamitude_backend.Controllers
             {
                 var project = await _projectService.getByIdAsync(id);
 
-                if (project.UserId != userId)
+                if (project.userId != userId)
                 {
                     return Unauthorized("Project dont belong to user");
                 }
@@ -79,8 +82,8 @@ namespace gamitude_backend.Controllers
 
             if (null != userId)
             {
-                project.UserId = userId;
-                project.DateAdded = DateTime.UtcNow;
+                project.userId = userId;
+                project.dateCreated = DateTime.UtcNow;
                 await _projectService.createAsync(project);
 
                 return Created("Create", project);
@@ -107,11 +110,11 @@ namespace gamitude_backend.Controllers
                 {
                     return NotFound("Project not found");
                 }
-                if (project.UserId != userId)
+                if (project.userId != userId)
                 {
                     return Unauthorized("Project dont belong to user");
                 }
-                project = updateProject(project, projectIn);
+                project = _mapper.Map<Project, Project>(projectIn, project);
 
                 await _projectService.updateAsync(id, project);
                 return Ok(project);
@@ -138,12 +141,12 @@ namespace gamitude_backend.Controllers
                 {
                     return NotFound();
                 }
-                if (project.UserId != userId)
+                if (project.userId != userId)
                 {
                     return Unauthorized("Project dont belong to user");
                 }
 
-                await _projectService.deleteByIdAsync(project.Id);
+                await _projectService.deleteByIdAsync(project.id);
                 return Ok();
 
             }
@@ -154,30 +157,5 @@ namespace gamitude_backend.Controllers
             }
 
         }
-        private Project updateProject(Project project, Project projectIn)
-        {
-            if (null != projectIn.Name)
-            {
-                project.Name = projectIn.Name;
-            }
-            if (null != projectIn.PrimaryMethod.ToString())
-            {
-                project.PrimaryMethod = projectIn.PrimaryMethod;
-            }
-            if (null != projectIn.ProjectStatus.ToString())
-            {
-                project.ProjectStatus = projectIn.ProjectStatus;
-            }
-            if (null != projectIn.Stats)
-            {
-                project.Stats = projectIn.Stats;
-            }
-            if (null != projectIn.DominantStat)
-            {
-                project.DominantStat = projectIn.DominantStat;
-            }
-            return project;
-        }
-
     }
 }

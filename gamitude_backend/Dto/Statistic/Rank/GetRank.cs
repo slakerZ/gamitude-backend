@@ -4,7 +4,7 @@ namespace gamitude_backend.Dto.Rank
 {
     public class GetRank
     {
-        public string Name { get; set; }
+        public string name { get; set; }
 
         public GAMITUDE_STYLE Style { get; set; }
 
@@ -12,6 +12,6 @@ namespace gamitude_backend.Dto.Rank
 
         public RANK_DOMINANT Dominant { get; set; }
                  
-        public string ImageUrl { get; set; }
+        public string imageUrl { get; set; }
     }
 }

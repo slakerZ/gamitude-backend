@@ -4,7 +4,7 @@ namespace gamitude_backend.Dto.UserRank
 {
     public class CreateUserRank
     {
-        public string UserId { get; set; }
+        public string userId { get; set; }
 
     }
 }

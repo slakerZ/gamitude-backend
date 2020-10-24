@@ -1,0 +1,10 @@
+- Move mongo driver to singleton service
+- Refactor controllers to use same exception middleware
+- Add exception handling in middleware for mongo
+- Change ranks to minutes
+- Add check for project retrieval when retrieving with project id if belongs to user 
+- User list of bought ranks 
+- Projects in folders not status
+
+
+- Api unit tests

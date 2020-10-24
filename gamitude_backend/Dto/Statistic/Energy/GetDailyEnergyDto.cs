@@ -7,19 +7,19 @@ namespace gamitude_backend.Dto.Energy
 {
     public class GetDailyEnergyDto
     {
-        public int Emotions { get; set; }  = StaticValues.dayLenght;
+        public int emotions { get; set; }  = StaticValues.workDayLength;
 
-        public int Soul { get; set; } = StaticValues.dayLenght;
+        public int soul { get; set; } = StaticValues.workDayLength;
 
-        public int Body { get; set; } = StaticValues.dayLenght;
+        public int body { get; set; } = StaticValues.workDayLength;
 
-        public int Mind { get; set; } = StaticValues.dayLenght;
+        public int mind { get; set; } = StaticValues.workDayLength;
         public GetDailyEnergyDto scaleToPercent()
         {
-            this.Body = (this.Body * 100) / StaticValues.dayLenght;
-            this.Soul = (this.Soul * 100) / StaticValues.dayLenght;
-            this.Emotions = (this.Emotions * 100) / StaticValues.dayLenght;
-            this.Mind = (this.Mind * 100) / StaticValues.dayLenght;
+            this.body = (this.body * 100) / StaticValues.workDayLength;
+            this.soul = (this.soul * 100) / StaticValues.workDayLength;
+            this.emotions = (this.emotions * 100) / StaticValues.workDayLength;
+            this.mind = (this.mind * 100) / StaticValues.workDayLength;
             return this;
         }
     }

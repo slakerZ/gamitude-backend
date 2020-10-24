@@ -7,16 +7,14 @@ namespace gamitude_backend.Extensions
     {
         public static void AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IFolderService,FolderService>();
-            services.AddScoped<IProjectLogService,ProjectLogService>();
-            services.AddScoped<IProjectService,ProjectService>();
-            services.AddScoped<IProjectTaskService,ProjectTaskService>();
-            services.AddScoped<IRankService,RankService>();
-            services.AddScoped<IDailyEnergyService,DailyEnergyService>();
-            services.AddScoped<IStatsService,StatsService>();
             services.AddScoped<IUserService,UserService>();
             services.AddScoped<IAuthorizationService,AuthorizationService>();
+            services.AddScoped<IUserRankService,UserRankService>();
+            services.AddScoped<IRankService,RankService>();
+            services.AddScoped<IStatsService,StatsService>();
+            services.AddScoped<IDailyEnergyService,DailyEnergyService>();
             services.AddScoped<IProjectService,ProjectService>();
+
         }
     }
 }
