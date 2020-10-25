@@ -11,18 +11,21 @@ namespace gamitude_backend.Models
         public string id { get; set; }
 
         [BsonElement("userId")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string userId { get; set; }
 
         [BsonElement("folderId")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public String folderId { get; set; }
 
         [BsonElement("defaultTimerId")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public String defaultTimerId { get; set; }
 
         [BsonElement("name")]
         public string name { get; set; }
 
-        [BsonElement("dominantStat")]
+        [BsonElement("projectType")]
         public PROJECT_TYPE projectType { get; set; }
 
         [BsonElement("dominantStat")]
@@ -30,10 +33,6 @@ namespace gamitude_backend.Models
 
         [BsonElement("stats")]
         public STATS[] stats { get; set; }
-
-        [BsonRepresentation(BsonType.ObjectId)]
-        [BsonElement("projectLog")]
-        public String[] projectLog { get; set; }
 
         [BsonElement("totalTimeSpend")]
         public int timeSpend { get; set; }

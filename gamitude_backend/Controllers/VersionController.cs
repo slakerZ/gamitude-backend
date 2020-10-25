@@ -8,7 +8,7 @@ namespace gamitude_backend.Controllers
     [ApiController]
     public class VersionController : ControllerBase
     {
-        private String version = "Gamitude Backend Alpha v1.1";
+        private String version = "Gamitude Backend v2.0";
 
         public VersionController()
         {

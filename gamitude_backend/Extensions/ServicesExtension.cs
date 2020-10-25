@@ -8,15 +8,15 @@ namespace gamitude_backend.Extensions
         public static void AddServices(this IServiceCollection services)
         {
             services.AddScoped<IFolderService,FolderService>();
-            services.AddScoped<IProjectLogService,ProjectLogService>();
             services.AddScoped<IProjectService,ProjectService>();
+            services.AddScoped<IProjectLogService,ProjectLogService>();
             services.AddScoped<IProjectTaskService,ProjectTaskService>();
             services.AddScoped<IRankService,RankService>();
             services.AddScoped<IDailyEnergyService,DailyEnergyService>();
             services.AddScoped<IStatsService,StatsService>();
             services.AddScoped<IUserService,UserService>();
+            services.AddScoped<IUserRankService,UserRankService>();
             services.AddScoped<IAuthorizationService,AuthorizationService>();
-            services.AddScoped<IProjectService,ProjectService>();
         }
     }
 }

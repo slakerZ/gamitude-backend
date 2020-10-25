@@ -6,6 +6,7 @@ namespace gamitude_backend.Data
 {
     public interface IDatabaseCollections
     {
+        IMongoDatabase database { get; set; }
         IMongoCollection<Folder> folders { get; set; }
         IMongoCollection<Project> projects { get; set; }
         IMongoCollection<ProjectLog> projectLogs { get; set; }
@@ -16,13 +17,16 @@ namespace gamitude_backend.Data
         IMongoCollection<Stats> stats { get; set; }
         IMongoCollection<Timer> timers { get; set; }
         IMongoCollection<UserToken> userTokens { get; set; }
-        IMongoCollection<UserRank> userRanks { get; set; }
+        IMongoCollection<UserRanks> userRanks { get; set; }
+        IMongoCollection<UserRank> userRank { get; set; }
+        IMongoCollection<UserThemes> userThemes { get; set; }
+        IMongoCollection<UserTheme> userTheme { get; set; }
     }
 
 
     public class MongoCollections : IDatabaseCollections
     {
-        private readonly IMongoDatabase _database;
+        public IMongoDatabase database { get; set; }
         public IMongoCollection<Folder> folders { get; set; }
         public IMongoCollection<Project> projects { get; set; }
         public IMongoCollection<ProjectLog> projectLogs { get; set; }
@@ -33,12 +37,15 @@ namespace gamitude_backend.Data
         public IMongoCollection<Stats> stats { get; set; }
         public IMongoCollection<Timer> timers { get; set; }
         public IMongoCollection<UserToken> userTokens { get; set; }
-        public IMongoCollection<UserRank> userRanks { get; set; }
+        public IMongoCollection<UserRanks> userRanks { get; set; }
+        public IMongoCollection<UserRank> userRank { get; set; }
+        public IMongoCollection<UserThemes> userThemes { get; set; }
+        public IMongoCollection<UserTheme> userTheme { get; set; }
 
         public MongoCollections(IDatabaseSettings settings)
         {
             var client = new MongoClient(settings.connectionString);
-            var database = client.GetDatabase(settings.databaseName);
+            database = client.GetDatabase(settings.databaseName);
 
             folders = database.GetCollection<Folder>(settings.foldersCollectionName);
             projects = database.GetCollection<Project>(settings.projectsCollectionName);
@@ -46,11 +53,14 @@ namespace gamitude_backend.Data
             projectTasks = database.GetCollection<ProjectTask>(settings.projectTasksCollectionName);
             ranks = database.GetCollection<Rank>(settings.ranksCollectionName);
             themes = database.GetCollection<Theme>(settings.themesCollectionName);
-            dailyEnergies = database.GetCollection<DailyEnergy>(settings.dailyEnergyCollectionName);
+            dailyEnergies = database.GetCollection<DailyEnergy>(settings.dailyEnergiesCollectionName);
             stats = database.GetCollection<Stats>(settings.statsCollectionName);
             timers = database.GetCollection<Timer>(settings.timersCollectionName);
             userTokens = database.GetCollection<UserToken>(settings.usersTokenCollectionName);
-            userRanks = database.GetCollection<UserRank>(settings.userRankCollectionName);
+            userRanks = database.GetCollection<UserRanks>(settings.usersRanksCollectionName);
+            userRank = database.GetCollection<UserRank>(settings.usersRankCollectionName);
+            userThemes = database.GetCollection<UserThemes>(settings.usersThemesCollectionName);
+            userTheme = database.GetCollection<UserTheme>(settings.usersThemeCollectionName);
         }
     }
 }

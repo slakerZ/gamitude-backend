@@ -11,12 +11,15 @@ namespace gamitude_backend.Models
         public string id { get; set; }
 
         [BsonElement("projectId")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string projectId { get; set; }
 
         [BsonElement("projectTaskId")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string projectTaskId { get; set; }
 
         [BsonElement("userId")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string userId { get; set; }
 
         [BsonElement("log")]

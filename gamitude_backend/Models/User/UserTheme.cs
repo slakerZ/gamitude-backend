@@ -10,7 +10,7 @@ namespace gamitude_backend.Models
 {
 
     [BsonIgnoreExtraElements]
-    public class UserRank
+    public class UserTheme
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -20,9 +20,9 @@ namespace gamitude_backend.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public String userId { get; set; }
 
-        [BsonElement("rankId")]
+        [BsonElement("themeId")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public String rankId { get; set; }
+        public String themeId { get; set; }
 
     }
 

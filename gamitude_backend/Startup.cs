@@ -42,6 +42,7 @@ namespace gamitude_backend
             var key = Encoding.ASCII.GetBytes(configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>().secret);
             services.AddCustomAuthenticationConfiguration(key);
 
+            services.AddRepositories();
             services.AddServices();
             services.AddCustomControllersConfiguration();
             services.AddCustomLocalizationConfiguration();
@@ -57,14 +58,20 @@ namespace gamitude_backend
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseCors(x => x
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
+            }
+            else
+            {
+                app.UseSecurityHeaders();
             }
             // app.UseCustomLocalization();
+
             app.UseStaticFiles();
             // app.UseHttpsRedirection();
-            app.UseCors(x => x
-                .AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader());
+
 
             app.UseCustomSwagger();
             app.UseAuthentication();

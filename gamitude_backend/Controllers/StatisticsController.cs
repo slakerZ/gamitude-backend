@@ -26,8 +26,8 @@ namespace gamitude_backend.Controllers
         private readonly IStatsService _dailyStatsService;
 
         public StatisticsController(ILogger<StatisticsController> logger,
-         IMapper mapper, 
-         IHttpContextAccessor httpContextAccessor, 
+         IMapper mapper,
+         IHttpContextAccessor httpContextAccessor,
          IDailyEnergyService dailyEnergyService,
           IStatsService dailyStatsService)
         {
@@ -42,82 +42,33 @@ namespace gamitude_backend.Controllers
         [HttpGet]
         public async Task<ActionResult<ControllerResponse<GetStatsDto>>> stats()
         {
-            try
+
+            _logger.LogInformation("In GET GetStats");
+            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+
+
+            return Ok(new ControllerResponse<GetStatsDto>
             {
-                _logger.LogInformation("In GET GetStats");
-                string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name).ToString();
-                if (null != userId)
-                {
-                    return new ControllerResponse<GetStatsDto>
-                    {
-                        data = _mapper.Map<GetStatsDto>(await _dailyStatsService.getByUserIdAsync(userId))
-                    };
-                }
-                else
-                {
-                    _logger.LogError("In GET GetStats userId error");
+                data = _mapper.Map<GetStatsDto>(await _dailyStatsService.getByUserIdAsync(userId))
+            });
 
-                    return new ControllerResponse<GetStatsDto>
-                    {
-                        data = null,
-                        message = "userId error",
-                        success = false
-                    };
-                }
-
-            }
-            catch (System.Exception e)
-            {
-                _logger.LogError("Error cached in StatisticsController GET GetStats {error}", e);
-
-                return new ControllerResponse<GetStatsDto>
-                {
-                    data = null,
-                    message = "something went wrong, sorry:(",
-                    success = false
-                };
-            }
         }
 
         [HttpGet]
         public async Task<ActionResult<ControllerResponse<GetLastWeekAvgEnergyDto>>> energy()
         {
-            try
+
+            _logger.LogInformation("In GET GetEnergy");
+
+            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name).ToString();
+
+            return Ok(new ControllerResponse<GetLastWeekAvgEnergyDto>
             {
-                _logger.LogInformation("In GET GetEnergy");
+                data = await _dailyEnergyService.GetLastWeekAvgEnergyByUserIdAsync(userId)
+            });
 
-                string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name).ToString();
-                if (null != userId)
-                {
-                    return new ControllerResponse<GetLastWeekAvgEnergyDto>
-                    {
-                        data = await _dailyEnergyService.GetLastWeekAvgEnergyByUserIdAsync(userId)
-                    };
-                }
-                else
-                {
-                    _logger.LogError("In GET GetEnergy userId error");
 
-                    return new ControllerResponse<GetLastWeekAvgEnergyDto>
-                    {
-                        data = null,
-                        message = "userId error",
-                        success = false
-                    };
-                }
 
-            }
-            catch (System.Exception e)
-            {
-                _logger.LogError("Error cached in StatisticsController GET GetEnergy {error}", e);
-
-                return new ControllerResponse<GetLastWeekAvgEnergyDto>
-                {
-                    data = null,
-                    message = "something went wrong, sorry:(",
-                    success = false
-                };
-            }
         }
     }
 }

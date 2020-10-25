@@ -18,6 +18,7 @@ namespace gamitude_backend.Models
         public string id { get; set; }
 
         [BsonElement("userId")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string userId { get; set; }
 
         [BsonElement("mind")]

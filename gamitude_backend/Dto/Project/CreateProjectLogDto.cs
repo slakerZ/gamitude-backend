@@ -1,11 +1,9 @@
 using System;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-namespace gamitude_backend.Models
+using gamitude_backend.Models;
+namespace gamitude_backend.Dto.Project
 {
-    public class GetProjectLog
+    public class CreateProjectLogDto
     {
-
         public string log { get; set; }
 
         public int timeSpend { get; set; }
@@ -13,8 +11,6 @@ namespace gamitude_backend.Models
         public STATS? dominantStat { get; set; }
 
         public STATS[] stats { get; set; }
-
-        public DateTime dateCreated { get; set; }
 
     }
 }

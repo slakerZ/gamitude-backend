@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using gamitude_backend.Repositories;
+using MongoDB.Driver;
 
 namespace gamitude_backend.Services
 {
@@ -31,27 +32,54 @@ namespace gamitude_backend.Services
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
+        private readonly IDatabaseSettings _databaseSettings;
 
         //TODO make async
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
         private readonly IRankRepository _rankRepository;
+        private readonly IUserRankRepository _userRankRepository;
+        private readonly IUserRanksRepository _userRanksRepository;
 
-        public UserService(ILogger<UserService> logger, UserManager<User> userManager, IMapper mapper,IRankRepository rankRepository)
+        public UserService(ILogger<UserService> logger,
+        IDatabaseSettings databaseSettings,
+         UserManager<User> userManager,
+          IMapper mapper,
+          IRankRepository rankRepository,
+          IUserRankRepository userRankRepository,
+          IUserRanksRepository userRanksRepository)
         {
             _logger = logger;
+            _databaseSettings = databaseSettings;
             _userManager = userManager;
             _mapper = mapper;
             _rankRepository = rankRepository;
+            _userRankRepository = userRankRepository;
+            _userRanksRepository = userRanksRepository;
         }
-
+        private async Task initializeUser(User user)
+        {
+            await initializeUser(user);
+            //TODO add initializeUserTheme
+        }
+        private async Task initializeUserRank(User user)
+        {
+            var rookieRank = await _rankRepository.getRookieAsync();
+            var userRanks = new UserRanks { userId = user.Id.ToString() };
+            userRanks.rankIds.Append(rookieRank.id);
+            await _userRanksRepository.createAsync(userRanks);
+            await _userRankRepository.createOrUpdateAsync(new UserRank
+            {
+                userId = user.Id.ToString(),
+                rankId = rookieRank.id
+            });
+        }
         public async Task<User> createAsync(User newUser, String password)
         {
-            newUser.currentRank = await _rankRepository.getRookieAsync();
-            newUser.purchasedRanks.Add(newUser.currentRank);
             var result = await _userManager.CreateAsync(newUser, password);
             if (result.Succeeded)
             {
+                await initializeUser(newUser);
                 return newUser;
             }
             else

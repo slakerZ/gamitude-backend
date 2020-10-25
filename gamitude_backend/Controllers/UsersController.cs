@@ -20,82 +20,79 @@ namespace gamitude_backend.Controllers
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
-        private readonly ILogger<UserController> _logger;
+        private readonly ILogger<UsersController> _logger;
         private readonly IUserService _userService;
-        private readonly IUserRankService _userRankService;
         private readonly IMapper _mapper;
 
-        public UserController(ILogger<UserController> logger, IUserService userService, IUserRankService userRankService, IMapper mapper)
+        public UsersController(ILogger<UsersController> logger, IUserService userService, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
-            _userRankService = userRankService;
             _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ControllerResponse<List<GetUserDto>>> all(int offset = 0 ,int limit = 20)
+        public async Task<ActionResult<ControllerResponse<List<GetUserDto>>>> all(int offset = 0 ,int limit = 20)
         {
             _logger.LogInformation("In GET all");
             var users = await _userService.getAllAsync(offset,limit);
-            return new ControllerResponse<List<GetUserDto>>
+            return Ok( new ControllerResponse<List<GetUserDto>>
             {
                 data = users.Select(o => _mapper.Map<GetUserDto>(o)).ToList()
-            };
+            });
         }
 
         [HttpGet("{id}")]
-        public async Task<ControllerResponse<GetUserDto>> id(String id)
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> id(String id)
         {
             _logger.LogInformation("In GET id");
             var user = await _userService.getByIdAsync(id);
-            return new ControllerResponse<GetUserDto>
+            return Ok(new ControllerResponse<GetUserDto>
             {
                 data = _mapper.Map<GetUserDto>(user)
-            };
+            });
         }
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<ControllerResponse<GetUserDto>> create(CreateUserDto newUser)
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> create(CreateUserDto newUser)
         {
             _logger.LogInformation("In POST create");
             var user = await _userService.createAsync(_mapper.Map<User>(newUser), newUser.password);
-            await _userRankService.CreateAsync(user.id.ToString());
 
-            return new ControllerResponse<GetUserDto>
+            return Created(new Uri($"{Request.Path}/{user.Id}", UriKind.Relative),new ControllerResponse<GetUserDto>
             {
                 data = _mapper.Map<GetUserDto>(user)
-            };
+            });
         }
 
         [HttpPut]
-        public async Task<ControllerResponse<GetUserDto>> update(UpdateUserDto updateUser)
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> update(UpdateUserDto updateUser)
         {
             _logger.LogInformation("In PUT update");
             var user = await _userService.updateAsync(_mapper.Map<User>(updateUser));
-            return new ControllerResponse<GetUserDto>
+            return Ok( new ControllerResponse<GetUserDto>
             {
                 data = _mapper.Map<GetUserDto>(user)
-            };
+            });
         }
 
         [HttpPut("password")]
-        public async Task<ControllerResponse<GetUserDto>> updatePassword(ChangePasswordUserDto passwordUserDto)
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> updatePassword(ChangePasswordUserDto passwordUserDto)
         {
             _logger.LogInformation("In PUT changePassword");
             await _userService.changePasswordAsync(passwordUserDto.id, passwordUserDto.oldPassword,passwordUserDto.newPassword);
-            return new ControllerResponse<GetUserDto>();
+            return Ok(new ControllerResponse<GetUserDto>());
 
         }
         [HttpDelete("{id}")]
-        public async Task<ControllerResponse<GetUserDto>> delete(String id)
+        public async Task<ActionResult> delete(String id)
         {
             _logger.LogInformation("In DELETE delete");
             await _userService.deleteByIdAsync(id);
-            return new ControllerResponse<GetUserDto>();
+            return NoContent();
         }
     }
 }

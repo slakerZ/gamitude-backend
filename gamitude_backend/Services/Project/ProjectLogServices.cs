@@ -11,7 +11,8 @@ namespace gamitude_backend.Services
 {
     public interface IProjectLogService : IProjectLogRepository
     {
-
+        Task<ProjectLog> processCreateProjectLog(ProjectLog projectLog);
+        Task processDeleteProjectLog(String projectLogId);
     }
     public class ProjectLogService : ProjectLogRepository, IProjectLogService
     {
@@ -23,5 +24,14 @@ namespace gamitude_backend.Services
             _projectLogs = dbCollections.projectLogs;
         }
 
+        public Task<ProjectLog> processCreateProjectLog(ProjectLog projectLog)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task processDeleteProjectLog(string projectLogId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

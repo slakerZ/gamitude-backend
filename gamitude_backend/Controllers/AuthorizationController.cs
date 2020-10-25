@@ -29,14 +29,14 @@ namespace gamitude_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ControllerResponse<GetUserTokenDto>> login(LoginUserDto user)
+        public async Task<ActionResult<ControllerResponse<GetUserTokenDto>>> login(LoginUserDto user)
         {
             _logger.LogInformation("In POST login");
             var userToken = await _authoriaztionService.authorizeUserAsync(user.login, user.password);
-            return new ControllerResponse<GetUserTokenDto>
+            return Ok( new ControllerResponse<GetUserTokenDto>
             {
                 data = _mapper.Map<GetUserTokenDto>(userToken)
-            };
+            });
         }
     }
 }

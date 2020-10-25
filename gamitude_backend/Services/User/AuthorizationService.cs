@@ -64,7 +64,7 @@ namespace gamitude_backend.Services
             _logger.LogInformation("authentication successful");
             
             var user  = await _signInManager.UserManager.FindByNameAsync(login);
-            _logger.LogInformation("User:"+ user.name);
+            _logger.LogInformation("User:"+ user.UserName);
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.secret);
@@ -73,7 +73,7 @@ namespace gamitude_backend.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, user.name),
+                    new Claim(ClaimTypes.Name, user.UserName),
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
                 }),
                 Expires = Expires,

@@ -15,10 +15,12 @@ namespace gamitude_backend
     {
         public static void Main(string[] args)
         {
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var isDevelopment = environment == Environments.Development;
 
             var configuration = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile(isDevelopment ? "appsettings.Development.json" : "appsettings.json")
                 .Build();
 
             Log.Logger = new LoggerConfiguration()
@@ -42,7 +44,10 @@ namespace gamitude_backend
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .UseSerilog()
+                .UseSerilog((hostContext, loggerConfig) => 
+                {
+                    loggerConfig.ReadFrom.Configuration(hostContext.Configuration);
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

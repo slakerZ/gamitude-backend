@@ -1,6 +1,8 @@
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Driver;
+
 namespace gamitude_backend.Models
 {
     [BsonIgnoreExtraElements]
@@ -11,6 +13,7 @@ namespace gamitude_backend.Models
         public String id { get; set; }
 
         [BsonElement("userId")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public String userId { get; set; }
 
         [BsonElement("name")]

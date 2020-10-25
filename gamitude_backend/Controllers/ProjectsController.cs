@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
+using gamitude_backend.Dto;
+using System.Net;
+using Microsoft.Extensions.Logging;
 
 namespace gamitude_backend.Controllers
 {
@@ -19,143 +22,106 @@ namespace gamitude_backend.Controllers
     [ApiController]
     public class ProjectsController : ControllerBase
     {
+        private readonly ILogger<ProjectsController> _logger;
+
         //TODO stats verification if Dominant in stats
 
         private readonly IProjectService _projectService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
-        public ProjectsController(IProjectService projectService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+        public ProjectsController(ILogger<ProjectsController> logger,IProjectService projectService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
+            _logger = logger;
             _projectService = projectService;
             _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Project>>> Get()
+        public async Task<ControllerResponse<List<Project>>> get()
         {
 
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
-
-            if (null != userId)
+            return new ControllerResponse<List<Project>>
             {
-                return await _projectService.getByUserIdAsync(userId);
-            }
-            else
-            {
-                return NotFound("User Failure");
-            }
+                data = await _projectService.getByUserIdAsync(userId)
+            };
 
         }
 
         [HttpGet("{id:length(24)}", Name = "GetProject")]
-        public async Task<ActionResult<Project>> Get(string id)
+        public async Task<ActionResult<ControllerResponse<Project>>> get(string id)
         {
 
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
-            if (null != userId)
+            var project = await _projectService.getByIdAsync(id);
+            if(project == null)
             {
-                var project = await _projectService.getByIdAsync(id);
-
-                if (project.userId != userId)
-                {
-                    return Unauthorized("Project dont belong to user");
-                }
-
-                return project;
-
+                return NotFound();
             }
-            else
+            if (project.userId != userId)
             {
-                return NotFound("User Failure");
-
+                throw new UnauthorizedAccessException("Project don't belong to you");
             }
+            return Ok( new ControllerResponse<Project>
+            {
+                data = project
+            });
 
         }
 
         [HttpPost]
-        public async Task<ActionResult<Project>> Create(Project project)
+        public async Task<ActionResult<ControllerResponse<Project>>> create(Project project)
         {
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
-
-            if (null != userId)
+            project.userId = userId;
+            project.dateCreated = DateTime.UtcNow;
+            await _projectService.createAsync(project);
+            return Created(new Uri($"{Request.Path}/{project.id}", UriKind.Relative), new ControllerResponse<Project>
             {
-                project.userId = userId;
-                project.dateCreated = DateTime.UtcNow;
-                await _projectService.createAsync(project);
-
-                return Created("Create", project);
-
-            }
-            else
-            {
-                return NotFound("User Failure");
-
-            }
+                data = project
+            });
 
         }
 
 
         [HttpPut("{id:length(24)}")]
-        public async Task<ActionResult<Project>> Update(string id, Project projectIn)
+        public async Task<ActionResult<ControllerResponse<Project>>> update(string id, Project projectIn)
         {
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
-            if (null != userId)
-            {
-                var project = await _projectService.getByIdAsync(id);
-                if (project == null)
-                {
-                    return NotFound("Project not found");
-                }
-                if (project.userId != userId)
-                {
-                    return Unauthorized("Project dont belong to user");
-                }
-                project = _mapper.Map<Project, Project>(projectIn, project);
+            var project = await _projectService.getByIdAsync(id);
 
-                await _projectService.updateAsync(id, project);
-                return Ok(project);
-            }
-            else
+            if (project.userId != userId)
             {
-                return NotFound("User Token Failure");
-
+                throw new UnauthorizedAccessException("Project don't belong to you");
             }
+            project = _mapper.Map<Project, Project>(projectIn, project);
+            await _projectService.updateAsync(id, project);
+            return Ok(new ControllerResponse<Project>
+            {
+                data = project
+            });
+
         }
 
 
         [HttpDelete("{id:length(24)}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<ActionResult> delete(string id)
         {
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
-            if (null != userId)
+            var project = await _projectService.getByIdAsync(id);
+
+            if (project.userId != userId)
             {
-
-                var project = await _projectService.getByIdAsync(id);
-
-                if (project == null)
-                {
-                    return NotFound();
-                }
-                if (project.userId != userId)
-                {
-                    return Unauthorized("Project dont belong to user");
-                }
-
-                await _projectService.deleteByIdAsync(project.id);
-                return Ok();
-
-            }
-            else
-            {
-                return NotFound("User token Failure");
-
+                throw new UnauthorizedAccessException("Project don't belong to you");
             }
 
+            await _projectService.deleteByIdAsync(project.id);
+            return NoContent();
         }
     }
 }

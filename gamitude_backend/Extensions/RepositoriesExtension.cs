@@ -1,20 +1,24 @@
-using gamitude_backend.Services;
+using gamitude_backend.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace gamitude_backend.Extensions
 {
-    public static class ServicesExtension
+    public static class RepositoriesExtension
     {
-        public static void AddServices(this IServiceCollection services)
+        public static void AddRepositories(this IServiceCollection services)
         {
-            services.AddScoped<IUserService,UserService>();
-            services.AddScoped<IAuthorizationService,AuthorizationService>();
-            services.AddScoped<IUserRankService,UserRankService>();
-            services.AddScoped<IRankService,RankService>();
-            services.AddScoped<IStatsService,StatsService>();
-            services.AddScoped<IDailyEnergyService,DailyEnergyService>();
-            services.AddScoped<IProjectService,ProjectService>();
-
+            services.AddScoped<IFolderRepository,FolderRepository>();
+            services.AddScoped<IProjectRepository,ProjectRepository>();
+            services.AddScoped<IProjectLogRepository,ProjectLogRepository>();
+            services.AddScoped<IProjectTaskRepository,ProjectTaskRepository>();
+            services.AddScoped<IRankRepository,RankRepository>();
+            services.AddScoped<IThemeRepository,ThemeRepository>();
+            services.AddScoped<IDailyEnergyRepository,DailyEnergyRepository>();
+            services.AddScoped<IStatsRepository,StatsRepository>();
+            services.AddScoped<IUserRankRepository,UserRankRepository>();
+            services.AddScoped<IUserRanksRepository,UserRanksRepository>();
+            services.AddScoped<IUserThemeRepository,UserThemeRepository>();
+            services.AddScoped<IUserThemesRepository,UserThemesRepository>();
         }
     }
 }

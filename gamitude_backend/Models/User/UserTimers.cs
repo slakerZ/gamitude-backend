@@ -1,29 +1,24 @@
-
- 
-
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 
-namespace gamitude_backend.Models 
+namespace gamitude_backend.Models
 {
-
     [BsonIgnoreExtraElements]
-    public class UserRank
+    public class UserTimers
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public String id { get; set; }
-                 
+        public string id { get; set; }
+
         [BsonElement("userId")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public String userId { get; set; }
+        public string userId { get; set; }
 
-        [BsonElement("rankId")]
+        [BsonElement("timers")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public String rankId { get; set; }
+        public String[] timers { get; set; } = new String[]{};
 
     }
-
 }

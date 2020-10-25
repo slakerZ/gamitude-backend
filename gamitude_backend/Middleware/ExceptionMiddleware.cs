@@ -13,6 +13,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 
 namespace gamitude_backend.Middleware
 {
@@ -46,15 +47,21 @@ namespace gamitude_backend.Middleware
                 _logger.LogError($"Something went wrong: {ex}");
                 message = handleIdentityExceptionAsync(httpContext, ex);
             }
-            catch (SqlException ex)
+            catch (MongoException ex)
             {
                 _logger.LogError($"Something went wrong: {ex}");
-                message = handleSqlExceptionAsync(httpContext, ex);
+                message = handleMongoExceptionAsync(httpContext, ex);
             }
             catch (ArgumentException ex)
             {
                 _logger.LogError($"Something went wrong: {ex}");
                 message = handleArgumentExceptionAsync(httpContext, ex);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogError($"Something went wrong: {ex}");
+                message = handleUnauthorizedAccessExceptionAsync(httpContext, ex);
+
             }
             catch (Exception ex)
             {
@@ -72,45 +79,12 @@ namespace gamitude_backend.Middleware
 
         }
 
-        public String handleSqlExceptionAsync(HttpContext context, SqlException ex)
+        public String handleMongoExceptionAsync(HttpContext context, MongoException ex)
         {
-            // String message = "something went wrong";
-            // String message = _localizer["defaultErrorMessage"];
-            var message = ex.Message + "  InnerException" + ex.InnerException.Message; // ------------------------------------------FOR DEVELOPMENT PURPOSE
-            // _httpContextAccessor.HttpContext.Response.StatusCode = 400;
+            var message = ex.Message + "  InnerException" + ex?.InnerException.Message; // ------------------------------------------FOR DEVELOPMENT PURPOSE
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-            // exs.HResult;
-            // var a =  exs.Message.Split('`');
-            //TODO ADD POSTGRES CODES
             _logger.LogError(ex.ToString());
-
-            //TODO ADD TRANSLATION FOR COLUMN NAMES ??
-            switch (ex.Number)
-            {
-                //TODO ADD MSSQL error handling
-                // case 23503:   //Foreign key violation (no object with coresponding id)
-                //     {
-                //         var m_array = Regex.Matches(exs.Detail, "(?<=\\().*?(?=\\))");   //Match error details for words in brackets
-                //         message = _localizer["23503SQL1"] //Create error message for coresponding id
-                //                     + " '" + _localizer[m_array.First().Value.snakeToCamelCase()] + "' "  //column name
-                //                     + _localizer["23503SQL2"] 
-                //                     + " '" + m_array.Last().Value + "'.";  //value
-                //         break;
-                //     }
-                // case 23505: //Unique violation (sth already exists)
-                //     {
-                //         var m_array = Regex.Matches(exs.Detail, "(?<=\\().*?(?=\\))");   //Match error details for words in brackets
-                //         message = _localizer["23505SQL1"] //Create error message for coresponding value
-                //                     + " '" + m_array.Last().Value + "' " // value
-                //                     + _localizer["23505SQL2"] 
-                //                     + "'" + m_array.First().Value.snakeToCamelCase() + "'."; // column name
-                //         break;
-                //     }
-                // case 1062: message = _localizer["1062SQL1"] + " " + exs.Message.Split('\'').GetValue(1).ToString() + " " + _localizer["1062SQL2"]; break;
-                default: message = ex.Errors.ToString() + ex.Message + ex.HelpLink; break;//TODO remove on production--------!!!!!!!!!!!!!!!!!!!!!!!!!
-            }
-
             return message;
 
         }
@@ -120,6 +94,16 @@ namespace gamitude_backend.Middleware
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            var message = ex.Message;
+            // var message = _localizer["defaultErrorMessage"];
+            return message;
+
+        }
+
+        public String handleUnauthorizedAccessExceptionAsync(HttpContext context, UnauthorizedAccessException ex)
+        {
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             var message = ex.Message;
             // var message = _localizer["defaultErrorMessage"];
             return message;

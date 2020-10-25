@@ -2,7 +2,6 @@ using AutoMapper;
 using gamitude_backend.Dto.Authorization;
 using gamitude_backend.Dto.Project;
 using gamitude_backend.Dto.Rank;
-using gamitude_backend.Dto.TimeSpend;
 using gamitude_backend.Dto.User;
 using gamitude_backend.Models;
 
@@ -30,8 +29,8 @@ namespace gamitude_backend
                     .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             //ProjectLog
-            CreateMap<CreateProjectLog, ProjectLog>();
-            CreateMap<ProjectLog, GetProjectLog>();
+            CreateMap<CreateProjectLogDto, ProjectLog>();
+            CreateMap<ProjectLog, GetProjectLogDto>();
 
             //Rank
             CreateMap<Rank, GetRank>();

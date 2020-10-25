@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace gamitude_backend.Extensions
@@ -20,7 +21,7 @@ namespace gamitude_backend.Extensions
             app.UseSwaggerUI(c =>
             {
                 c.DefaultModelsExpandDepth(0);
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Gamitude V1");
+                c.SwaggerEndpoint("/swagger/v2/swagger.json", "Gamitude V2");
                 c.RoutePrefix = "api/swagger";
             });
         }
@@ -30,7 +31,7 @@ namespace gamitude_backend.Extensions
             {
                 c.UseAllOfToExtendReferenceSchemas();
                 c.OperationFilter<AuthResponsesOperationFilter>();
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Gamitude API", Version = "v1" });
+                c.SwaggerDoc("v2", new OpenApiInfo { Title = "Gamitude API", Version = "v2" });
                 c.SchemaFilter<SwaggerSchemaFilter>();
                 c.DocumentFilter<CustomModelDocumentFilter<ControllerErrorResponse>>();
 
@@ -93,6 +94,8 @@ namespace gamitude_backend.Extensions
                 .Union(context.MethodInfo.GetCustomAttributes(true))
                 .OfType<AuthorizeAttribute>();
             var apiParameters = context.ApiDescription.ParameterDescriptions;
+            
+            // Log.Information(context.MethodInfo.Name); TODO add new return codes 
 
             if (authAttributes.Any())
             {

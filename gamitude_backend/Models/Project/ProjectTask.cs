@@ -11,6 +11,7 @@ namespace gamitude_backend.Models
         public string id { get; set; }
 
         [BsonElement("projectId")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string projectId { get; set; }
 
         [BsonElement("description")]
