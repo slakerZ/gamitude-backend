@@ -15,7 +15,7 @@ namespace gamitude_backend.Repositories
     public interface IStatsRepository
     {
         Task<Stats> getByIdAsync(String id);
-        Task<List<Stats>> getByUserIdAsync(String userId);
+        Task<Stats> getByUserIdAsync(String userId);
         Task createAsync(Stats stats);
         Task updateAsync(String id, Stats updateStats);
         Task deleteByIdAsync(String id);
@@ -35,9 +35,9 @@ namespace gamitude_backend.Repositories
             return _stats.Find<Stats>(Stats => Stats.id == id).FirstOrDefaultAsync();
         }
 
-        public Task<List<Stats>> getByUserIdAsync(String userId)
+        public Task<Stats> getByUserIdAsync(String userId)
         {
-            return _stats.Find<Stats>(Stats => Stats.userId == userId).ToListAsync();
+            return _stats.Find<Stats>(Stats => Stats.userId == userId).FirstOrDefaultAsync();
 
         }
 
@@ -48,7 +48,7 @@ namespace gamitude_backend.Repositories
 
         public Task updateAsync(String id, Stats newStats)
         {
-            return _stats.ReplaceOneAsync(Stats => Stats.id == id, newStats);
+            return _stats.ReplaceOneAsync(Stats => Stats.id == id, newStats,new ReplaceOptions{IsUpsert=true});
 
         }
 

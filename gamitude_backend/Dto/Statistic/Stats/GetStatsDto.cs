@@ -7,13 +7,13 @@ namespace gamitude_backend.Dto.stats
     public class GetStatsDto
     {
 
-        public int strength { get; set; }
+        public long strength { get; set; }
 
-        public int intelligence { get; set; }
+        public long intelligence { get; set; }
 
-        public int fluency { get; set; }
+        public long fluency { get; set; }
 
-        public int creativity { get; set; }
+        public long creativity { get; set; }
 
     }
 }

@@ -18,7 +18,6 @@ namespace gamitude_backend.Services
     public interface IDailyEnergyService : IDailyEnergyRepository
     {
         Task<GetLastWeekAvgEnergyDto> GetLastWeekAvgEnergyByUserIdAsync(String userId);
-        Task<DailyEnergy> CreateOrAddAsync(DailyEnergy dailyEnergy);
 
     }
 
@@ -53,43 +52,5 @@ namespace gamitude_backend.Services
 
             return energy.weekAvg().scaleToPercent();
         }
-
-        public async Task<DailyEnergy> CreateOrAddAsync(DailyEnergy dailyEnergy)
-        {
-            try
-            {
-                var oldDEnergy = await _DailyEnergy.Find(o => o.dateCreated == dailyEnergy.dateCreated && o.userId == dailyEnergy.userId).SingleOrDefaultAsync();
-                if (null == oldDEnergy)
-                {//Create
-                    await _DailyEnergy.InsertOneAsync(mergeDailyEnergy(dailyEnergy, new DailyEnergy().init()).validate());
-                }
-                else
-                {//Update   //TODO use mapper for adding
-                    dailyEnergy.id = oldDEnergy.id;
-                    dailyEnergy = mergeDailyEnergy(dailyEnergy, oldDEnergy);
-                    await updateAsync(dailyEnergy.id, dailyEnergy.validate());
-                }
-                return dailyEnergy;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("Error cached in DailyEnergyServices CreateOrUpdateAsync {error}", e);
-                return null;
-            }
-
-        }
-
-        /// <summary>
-        /// Helper function for summing DailyEnergy could be later replaced with automapper
-        /// </summary>
-        private DailyEnergy mergeDailyEnergy(DailyEnergy dailyEnergy, DailyEnergy oldDEnergy)
-        {
-            dailyEnergy.body += oldDEnergy.body;
-            dailyEnergy.emotions += oldDEnergy.emotions;
-            dailyEnergy.mind += oldDEnergy.mind;
-            dailyEnergy.soul += oldDEnergy.soul;
-            return dailyEnergy;
-        }
-
     }
 }

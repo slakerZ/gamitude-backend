@@ -2,6 +2,7 @@
  
 
 using System;
+using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
@@ -22,7 +23,7 @@ namespace gamitude_backend.Models
 
         [BsonElement("rankIds")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public String[] rankIds { get; set; } = new String[]{};
+        public List<String> rankIds { get; set; } = new List<String>();
 
     }
 

@@ -32,7 +32,7 @@ namespace gamitude_backend.Services
         public async Task<Rank> getCurrentByUserIdAsync(string id)
         {
             var userRank = await  _userRankRepository.getByUserIdAsync(id);
-            return await getByIdAsync(userRank.id);
+            return await getByIdAsync(userRank.rankId);
         }
         public async Task<IReadOnlyList<Rank>> getAllByUserIdAsync(string id)
         {

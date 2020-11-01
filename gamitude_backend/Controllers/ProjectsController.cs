@@ -14,6 +14,8 @@ using AutoMapper;
 using gamitude_backend.Dto;
 using System.Net;
 using Microsoft.Extensions.Logging;
+using gamitude_backend.Dto.Project;
+using System.Linq;
 
 namespace gamitude_backend.Controllers
 {
@@ -39,19 +41,20 @@ namespace gamitude_backend.Controllers
         }
 
         [HttpGet]
-        public async Task<ControllerResponse<List<Project>>> get()
+        public async Task<ActionResult<ControllerResponse<List<GetProjectDto>>>> get()
         {
 
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
-            return new ControllerResponse<List<Project>>
+            var projects = await _projectService.getByUserIdAsync(userId);
+            return Ok(new ControllerResponse<List<GetProjectDto>>
             {
-                data = await _projectService.getByUserIdAsync(userId)
-            };
+                data = projects.Select(project => _mapper.Map<GetProjectDto>(project)).ToList()
+            });
 
         }
 
         [HttpGet("{id:length(24)}", Name = "GetProject")]
-        public async Task<ActionResult<ControllerResponse<Project>>> get(string id)
+        public async Task<ActionResult<ControllerResponse<GetProjectDto>>> get(string id)
         {
 
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
@@ -65,30 +68,31 @@ namespace gamitude_backend.Controllers
             {
                 throw new UnauthorizedAccessException("Project don't belong to you");
             }
-            return Ok( new ControllerResponse<Project>
+            return Ok( new ControllerResponse<GetProjectDto>
             {
-                data = project
+                data = _mapper.Map<GetProjectDto>(project)
             });
 
         }
 
         [HttpPost]
-        public async Task<ActionResult<ControllerResponse<Project>>> create(Project project)
+        public async Task<ActionResult<ControllerResponse<GetProjectDto>>> create(CreateProjectDto createProject)
         {
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+            var project = _mapper.Map<Project>(createProject);
             project.userId = userId;
             project.dateCreated = DateTime.UtcNow;
             await _projectService.createAsync(project);
-            return Created(new Uri($"{Request.Path}/{project.id}", UriKind.Relative), new ControllerResponse<Project>
+            return Created(new Uri($"{Request.Path}/{project.id}", UriKind.Relative), new ControllerResponse<GetProjectDto>
             {
-                data = project
+                data = _mapper.Map<GetProjectDto>(project)
             });
 
         }
 
 
         [HttpPut("{id:length(24)}")]
-        public async Task<ActionResult<ControllerResponse<Project>>> update(string id, Project projectIn)
+        public async Task<ActionResult<ControllerResponse<GetProjectDto>>> update(string id, UpdateProjectDto projectIn)
         {
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
@@ -98,11 +102,11 @@ namespace gamitude_backend.Controllers
             {
                 throw new UnauthorizedAccessException("Project don't belong to you");
             }
-            project = _mapper.Map<Project, Project>(projectIn, project);
+            project = _mapper.Map<UpdateProjectDto, Project>(projectIn, project);
             await _projectService.updateAsync(id, project);
-            return Ok(new ControllerResponse<Project>
+            return Ok(new ControllerResponse<GetProjectDto>
             {
-                data = project
+                data = _mapper.Map<GetProjectDto>(project)
             });
 
         }

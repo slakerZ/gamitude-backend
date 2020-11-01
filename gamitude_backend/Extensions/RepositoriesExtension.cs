@@ -19,6 +19,7 @@ namespace gamitude_backend.Extensions
             services.AddScoped<IUserRanksRepository,UserRanksRepository>();
             services.AddScoped<IUserThemeRepository,UserThemeRepository>();
             services.AddScoped<IUserThemesRepository,UserThemesRepository>();
+            services.AddScoped<ITimerRepository,TimerRepository>();
         }
     }
 }

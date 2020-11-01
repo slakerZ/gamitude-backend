@@ -2,6 +2,7 @@
 
 
 using System;
+using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
@@ -22,7 +23,7 @@ namespace gamitude_backend.Models
 
         [BsonElement("themes")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public String[] themes { get; set; } = new String[] { };
+        public List<String> themes { get; set; } = new List<String>();
 
     }
 

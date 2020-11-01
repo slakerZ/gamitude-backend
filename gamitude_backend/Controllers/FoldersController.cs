@@ -14,6 +14,8 @@ using AutoMapper;
 using gamitude_backend.Dto;
 using System.Net;
 using Microsoft.Extensions.Logging;
+using gamitude_backend.Dto.Folder;
+using System.Linq;
 
 namespace gamitude_backend.Controllers
 {
@@ -30,7 +32,7 @@ namespace gamitude_backend.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
-        public FoldersController(ILogger<FoldersController> logger,IFolderService folderService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+        public FoldersController(ILogger<FoldersController> logger, IFolderService folderService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _logger = logger;
             _folderService = folderService;
@@ -39,25 +41,26 @@ namespace gamitude_backend.Controllers
         }
 
         [HttpGet]
-        public async Task<ControllerResponse<List<Folder>>> get()
+        public async Task<ActionResult<ControllerResponse<List<GetFolderDto>>>> get()
         {
 
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
-            return new ControllerResponse<List<Folder>>
+            var folders = await _folderService.getByUserIdAsync(userId);
+            return Ok(new ControllerResponse<List<GetFolderDto>>
             {
-                data = await _folderService.getByUserIdAsync(userId)
-            };
+                data = folders.Select(folder => _mapper.Map<GetFolderDto>(folder)).ToList()
+            });
 
         }
 
         [HttpGet("{id:length(24)}", Name = "GetFolder")]
-        public async Task<ActionResult<ControllerResponse<Folder>>> get(string id)
+        public async Task<ActionResult<ControllerResponse<GetFolderDto>>> get(string id)
         {
 
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
             var folder = await _folderService.getByIdAsync(id);
-            if(folder == null)
+            if (folder == null)
             {
                 return NotFound();
             }
@@ -65,30 +68,31 @@ namespace gamitude_backend.Controllers
             {
                 throw new UnauthorizedAccessException("Folder don't belong to you");
             }
-            return Ok( new ControllerResponse<Folder>
+            return Ok(new ControllerResponse<GetFolderDto>
             {
-                data = folder
+                data = _mapper.Map<GetFolderDto>(folder)
             });
 
         }
 
         [HttpPost]
-        public async Task<ActionResult<ControllerResponse<Folder>>> create(Folder folder)
+        public async Task<ActionResult<ControllerResponse<GetFolderDto>>> create(CreateFolderDto createFolder)
         {
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+            var folder = _mapper.Map<Folder>(createFolder);
             folder.userId = userId;
             folder.dateCreated = DateTime.UtcNow;
             await _folderService.createAsync(folder);
-            return Created(new Uri($"{Request.Path}/{folder.id}", UriKind.Relative), new ControllerResponse<Folder>
+            return Created(new Uri($"{Request.Path}/{folder.id}", UriKind.Relative), new ControllerResponse<GetFolderDto>
             {
-                data = folder
+                data = _mapper.Map<GetFolderDto>(folder)
             });
 
         }
 
 
         [HttpPut("{id:length(24)}")]
-        public async Task<ActionResult<ControllerResponse<Folder>>> update(string id, Folder folderIn)
+        public async Task<ActionResult<ControllerResponse<GetFolderDto>>> update(string id, UpdateFolderDto folderIn)
         {
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
@@ -98,11 +102,11 @@ namespace gamitude_backend.Controllers
             {
                 throw new UnauthorizedAccessException("Folder don't belong to you");
             }
-            folder = _mapper.Map<Folder, Folder>(folderIn, folder);
+            folder = _mapper.Map<UpdateFolderDto, Folder>(folderIn, folder);
             await _folderService.updateAsync(id, folder);
-            return Ok(new ControllerResponse<Folder>
+            return Ok(new ControllerResponse<GetFolderDto>
             {
-                data = folder
+                data = _mapper.Map<GetFolderDto>(folder)
             });
 
         }

@@ -21,16 +21,16 @@ namespace gamitude_backend.Models
         public string userId { get; set; }
 
         [BsonElement("strength")]
-        public long strength { get; set; }
+        public long strength { get; set; } = 0;
 
         [BsonElement("intelligence")]
-        public long intelligence { get; set; }
+        public long intelligence { get; set; } = 0;
 
         [BsonElement("fluency")]
-        public long fluency { get; set; }
+        public long fluency { get; set; } = 0;
 
         [BsonElement("creativity")]
-        public long creativity { get; set; }
+        public long creativity { get; set; } = 0;
 
 
     }

@@ -1,6 +1,9 @@
 using gamitude_backend.Models;
 using gamitude_backend.Settings;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Core.Events;
+using Serilog;
 
 namespace gamitude_backend.Data
 {
@@ -44,7 +47,17 @@ namespace gamitude_backend.Data
 
         public MongoCollections(IDatabaseSettings settings)
         {
-            var client = new MongoClient(settings.connectionString);
+            var mongoConnectionUrl = new MongoUrl(settings.connectionString);
+            var mongoClientSettings = MongoClientSettings.FromUrl(mongoConnectionUrl);
+            // mongoClientSettings.ClusterConfigurator = cb =>
+            // {
+            //     cb.Subscribe<CommandStartedEvent>(e =>
+            //     {
+            //         Log.Information($"{e.CommandName} - {e.Command.ToJson()}");
+            //     });
+            // };
+
+            var client = new MongoClient(mongoClientSettings);
             database = client.GetDatabase(settings.databaseName);
 
             folders = database.GetCollection<Folder>(settings.foldersCollectionName);

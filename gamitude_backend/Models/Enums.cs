@@ -3,7 +3,7 @@ namespace gamitude_backend.Models
     public enum STATS {STRENGTH,INTELLIGENCE,CREATIVITY,FLUENCY};
     public enum METHOD {POMODORO,NINETY};
     public enum STATUS {ACTIVE,ONHOLD,DONE};
-    public enum PROJECT_TYPE {None,STATS,ENERGY};
+    public enum PROJECT_TYPE {None,STATS,ENERGY,BREAK};
     public enum GAMITUDE_STYLE
     {
         DEFAULT,WINTER,BUSINESS,LOL

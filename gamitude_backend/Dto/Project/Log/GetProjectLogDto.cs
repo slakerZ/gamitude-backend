@@ -4,6 +4,7 @@ namespace gamitude_backend.Dto.Project
 {
     public class GetProjectLogDto
     {
+        public string id { get; set; }
 
         public string log { get; set; }
 

@@ -42,7 +42,8 @@ namespace gamitude_backend.Controllers
         public async Task<ActionResult<ControllerResponse<List<GetRank>>>> get(int page = 1,int limit = 20,String sortBy="name")
         {
             _logger.LogInformation("In GET rank");
-            var ranks = await _rankService.getAllAsync(page,limit,sortBy);
+            var ranks = await _rankService.getAsync();
+            // var ranks = await _rankService.getAllAsync(page,limit,sortBy);
             return new ControllerResponse<List<GetRank>>
             {
                 data = ranks.Select(o => _mapper.Map<GetRank>(o)).ToList()

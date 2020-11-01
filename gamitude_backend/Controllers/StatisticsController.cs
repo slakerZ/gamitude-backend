@@ -60,14 +60,12 @@ namespace gamitude_backend.Controllers
 
             _logger.LogInformation("In GET GetEnergy");
 
-            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name).ToString();
+            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
             return Ok(new ControllerResponse<GetLastWeekAvgEnergyDto>
             {
                 data = await _dailyEnergyService.GetLastWeekAvgEnergyByUserIdAsync(userId)
             });
-
-
 
         }
     }

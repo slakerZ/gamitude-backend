@@ -33,7 +33,7 @@ namespace gamitude_backend.Repositories
             return _userRank.Find<UserRank>(UserRank => UserRank.id == id).FirstOrDefaultAsync();
         }
 
-        public Task<UserRank> getByUserIdAsync(string userId)
+        public Task<UserRank> getByUserIdAsync(String userId)
         {
             return _userRank.Find<UserRank>(userRank => userRank.userId == userId).FirstOrDefaultAsync();
         }

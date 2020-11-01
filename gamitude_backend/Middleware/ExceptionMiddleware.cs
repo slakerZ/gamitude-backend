@@ -81,10 +81,13 @@ namespace gamitude_backend.Middleware
 
         public String handleMongoExceptionAsync(HttpContext context, MongoException ex)
         {
-            var message = ex.Message + "  InnerException" + ex?.InnerException.Message; // ------------------------------------------FOR DEVELOPMENT PURPOSE
+            var message = "Huston we got a database problem";
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-            _logger.LogError(ex.ToString());
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                message = ex.ToString();// ------------------------------------------FOR DEVELOPMENT PURPOSE
+            }
             return message;
 
         }
@@ -130,12 +133,16 @@ namespace gamitude_backend.Middleware
 
         public String handleExceptionAsync(HttpContext context, Exception ex)
         {
+            var message = "Huston we got an undefined problem";
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             // message = "something went wrong"
             // message = _localizer["defaultErrorMessage"];
 
-            var message = ex.ToString();// ------------------------------------------FOR DEVELOPMENT PURPOSE
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                message = ex.ToString();// ------------------------------------------FOR DEVELOPMENT PURPOSE
+            }
             return message;
         }
     }

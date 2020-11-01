@@ -16,9 +16,10 @@ namespace gamitude_backend.Repositories
     public interface IRankRepository
     {
         Task<Rank> getByIdAsync(String id);
-        Task<List<Rank>> getByIdAsync(String[] ids);
+        Task<List<Rank>> getByIdAsync(List<String> ids);
         Task<IReadOnlyList<Rank>> getAllAsync(int page = 1, int limit = 20, String sortBy = "name");
         Task<Rank> getRookieAsync();
+        Task<List<Rank>> getAsync();
         Task createAsync(Rank rank);
         Task updateAsync(String id, Rank updateRank);
         Task deleteByIdAsync(String id);
@@ -37,7 +38,11 @@ namespace gamitude_backend.Repositories
         {
             return _ranks.Find<Rank>(Rank => Rank.id == id).FirstOrDefaultAsync();
         }
-        public Task<List<Rank>> getByIdAsync(String[] ids)
+        public Task<List<Rank>> getAsync()
+        {
+            return _ranks.Find<Rank>(FilterDefinition<Rank>.Empty).ToListAsync();
+        }
+        public Task<List<Rank>> getByIdAsync(List<String> ids)
         {
             return _ranks.Find<Rank>(Rank => ids.Contains(Rank.id)).ToListAsync();
         }
@@ -71,10 +76,10 @@ namespace gamitude_backend.Repositories
 
         public Task<IReadOnlyList<Rank>> getAllAsync(int page = 1, int limit = 20, String sortBy = "name")
         {
-            return _ranks.AggregateByPage(Builders<Rank>.Filter.Empty,
+            return _ranks.AggregateByPage<Rank>(Builders<Rank>.Filter.Empty,
                                             Builders<Rank>.Sort.Ascending(x => x.GetType()
                                                                                 .GetProperty(sortBy)
-                                                                                .GetValue(x, null)),page,limit);
+                                                                                .GetValue(x, null)), page, limit);
         }
 
     }

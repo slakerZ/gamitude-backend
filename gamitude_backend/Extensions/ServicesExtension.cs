@@ -15,6 +15,7 @@ namespace gamitude_backend.Extensions
             services.AddScoped<IDailyEnergyService,DailyEnergyService>();
             services.AddScoped<IStatsService,StatsService>();
             services.AddScoped<IUserService,UserService>();
+            services.AddScoped<ITimerService,TimerService>();
             services.AddScoped<IUserRankService,UserRankService>();
             services.AddScoped<IAuthorizationService,AuthorizationService>();
         }

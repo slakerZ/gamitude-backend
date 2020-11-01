@@ -61,6 +61,7 @@ namespace gamitude_backend.Controllers
         {
             _logger.LogInformation("In POST create");
             var user = await _userService.createAsync(_mapper.Map<User>(newUser), newUser.password);
+            _logger.LogInformation("after create");
 
             return Created(new Uri($"{Request.Path}/{user.Id}", UriKind.Relative),new ControllerResponse<GetUserDto>
             {

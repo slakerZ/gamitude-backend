@@ -15,8 +15,10 @@ namespace gamitude_backend.Repositories
     public interface IDailyEnergyRepository
     {
         Task<DailyEnergy> getByIdAsync(String id);
+        Task<DailyEnergy> getByDateAndUserIdAsync(DateTime date, String userId);
         Task<List<DailyEnergy>> getByUserIdAsync(String userId);
         Task createAsync(DailyEnergy dailyEnergy);
+        Task createOrUpdateAsync(DailyEnergy dailyEnergy);
         Task updateAsync(String id, DailyEnergy updateDailyEnergy);
         Task deleteByIdAsync(String id);
     }
@@ -34,6 +36,11 @@ namespace gamitude_backend.Repositories
         {
             return _DailyEnergies.Find<DailyEnergy>(DailyEnergy => DailyEnergy.id == id).FirstOrDefaultAsync();
         }
+        public Task<DailyEnergy> getByDateAndUserIdAsync(DateTime date, String userId)
+        {
+            return _DailyEnergies.Find(o => o.dateCreated == date.Date && o.userId == userId).SingleOrDefaultAsync();
+
+        }
 
         public Task<List<DailyEnergy>> getByUserIdAsync(String userId)
         {
@@ -43,7 +50,7 @@ namespace gamitude_backend.Repositories
 
         public Task createAsync(DailyEnergy DailyEnergy)
         {
-            return _DailyEnergies.InsertOneAsync(DailyEnergy);
+            return _DailyEnergies.InsertOneAsync(DailyEnergy.validate());
         }
 
         public Task updateAsync(String id, DailyEnergy newDailyEnergy)
@@ -62,6 +69,26 @@ namespace gamitude_backend.Repositories
             return _DailyEnergies.DeleteOneAsync(DailyEnergy => DailyEnergy.id == id);
 
         }
+        public Task createOrUpdateAsync(DailyEnergy dailyEnergy)
+        {
+            if (dailyEnergy.id != null)
+            {
+                return updateAsync(dailyEnergy.id, dailyEnergy.validate());
+            }
+            return createAsync(dailyEnergy);
 
+        }
+
+        /// <summary>
+        /// Helper function for summing DailyEnergy could be later replaced with automapper
+        /// </summary>
+        private DailyEnergy mergeDailyEnergy(DailyEnergy dailyEnergy, DailyEnergy oldDEnergy)
+        {
+            dailyEnergy.body += oldDEnergy.body;
+            dailyEnergy.emotions += oldDEnergy.emotions;
+            dailyEnergy.mind += oldDEnergy.mind;
+            dailyEnergy.soul += oldDEnergy.soul;
+            return dailyEnergy;
+        }
     }
 }

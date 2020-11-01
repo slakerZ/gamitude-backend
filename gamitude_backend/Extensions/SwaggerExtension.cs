@@ -6,6 +6,7 @@ using System.Reflection;
 using gamitude_backend.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -93,9 +94,48 @@ namespace gamitude_backend.Extensions
             var authAttributes = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
                 .Union(context.MethodInfo.GetCustomAttributes(true))
                 .OfType<AuthorizeAttribute>();
+            var getAttributes = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
+                .Union(context.MethodInfo.GetCustomAttributes(true))
+                .OfType<HttpGetAttribute>();
+            var postAttributes = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
+                .Union(context.MethodInfo.GetCustomAttributes(true))
+                .OfType<HttpPostAttribute>();
+            var putAttributes = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
+                .Union(context.MethodInfo.GetCustomAttributes(true))
+                .OfType<HttpPutAttribute>();
+            var deleteAttributes = context.MethodInfo.DeclaringType.GetCustomAttributes(true)
+                .Union(context.MethodInfo.GetCustomAttributes(true))
+                .OfType<HttpDeleteAttribute>();
             var apiParameters = context.ApiDescription.ParameterDescriptions;
-            
+
             // Log.Information(context.MethodInfo.Name); TODO add new return codes 
+            if (getAttributes.Any())
+            {
+                if(apiParameters.Count > 0)
+                operation.Responses.Add("404", new OpenApiResponse
+                {
+                    Description = "Not Found",
+                    Content = { schema }
+                });
+            }
+
+            if (postAttributes.Any())
+            {
+                operation.Responses.Add("201", new OpenApiResponse
+                {
+                    Description = "Created",
+                    Content = { schema }
+                });
+            }
+
+            if (deleteAttributes.Any())
+            {
+                operation.Responses.Add("204", new OpenApiResponse
+                {
+                    Description = "Success No Content Deleted",
+                    Content = { schema }
+                });
+            }
 
             if (authAttributes.Any())
             {
@@ -105,6 +145,7 @@ namespace gamitude_backend.Extensions
                     Content = { schema }
                 });
             }
+
             if (apiParameters.Count > 0)
             {
                 operation.Responses.Add("400", new OpenApiResponse
@@ -113,6 +154,7 @@ namespace gamitude_backend.Extensions
                     Content = { schema }
                 });
             }
+
         }
     }
     public class CustomModelDocumentFilter<T> : IDocumentFilter where T : class

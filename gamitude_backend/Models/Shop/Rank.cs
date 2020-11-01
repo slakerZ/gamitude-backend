@@ -40,6 +40,15 @@ namespace gamitude_backend.Models
         [BsonElement("rookie")]
         public Boolean rookie { get; set; }
 
+        [BsonElement("style")]
+        public GAMITUDE_STYLE Style { get; set; }
+
+        [BsonElement("tier")]
+        public RANK_TIER Tier { get; set; }//TODO Migrate to enum
+
+        [BsonElement("dominant")]
+        public RANK_DOMINANT Dominant { get; set; }//TODO Migrate to enum
+
     }
 
 

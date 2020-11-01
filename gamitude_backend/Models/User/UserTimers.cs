@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
@@ -18,7 +19,7 @@ namespace gamitude_backend.Models
 
         [BsonElement("timers")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public String[] timers { get; set; } = new String[]{};
+        public List<String> timers { get; set; } = new List<String>();
 
     }
 }

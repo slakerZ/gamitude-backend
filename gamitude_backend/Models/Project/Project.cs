@@ -26,7 +26,7 @@ namespace gamitude_backend.Models
         public string name { get; set; }
 
         [BsonElement("projectType")]
-        public PROJECT_TYPE projectType { get; set; }
+        public PROJECT_TYPE? projectType { get; set; }
 
         [BsonElement("dominantStat")]
         public STATS? dominantStat { get; set; }
@@ -35,7 +35,10 @@ namespace gamitude_backend.Models
         public STATS[] stats { get; set; }
 
         [BsonElement("totalTimeSpend")]
-        public int timeSpend { get; set; }
+        public int totalTimeSpend { get; set; } = 0;
+
+        [BsonElement("totalTimeSpendBreak")]
+        public int timeSpendBreak { get; set; } = 0;
 
         [BsonElement("daysPerWeek")]
         public int? daysPerWeek { get; set; }
