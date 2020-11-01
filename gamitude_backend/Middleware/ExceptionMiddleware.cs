@@ -39,27 +39,27 @@ namespace gamitude_backend.Middleware
             }
             catch (LoginException ex)
             {
-                _logger.LogError($"Something went wrong: {ex}");
+                _logger.LogWarning($"Login Exception: {ex}");
                 message = handleLoginExceptionAsync(httpContext, ex);
             }
             catch (IdentityException ex)
             {
-                _logger.LogError($"Something went wrong: {ex}");
+                _logger.LogWarning($"IdentityException: {ex}");
                 message = handleIdentityExceptionAsync(httpContext, ex);
             }
             catch (MongoException ex)
             {
-                _logger.LogError($"Something went wrong: {ex}");
+                _logger.LogError($"MongoException: {ex}");
                 message = handleMongoExceptionAsync(httpContext, ex);
             }
             catch (ArgumentException ex)
             {
-                _logger.LogError($"Something went wrong: {ex}");
+                _logger.LogError($"ArgumentException: {ex}");
                 message = handleArgumentExceptionAsync(httpContext, ex);
             }
             catch (UnauthorizedAccessException ex)
             {
-                _logger.LogError($"Something went wrong: {ex}");
+                _logger.LogWarning($"UnauthorizedAccessException: {ex}");
                 message = handleUnauthorizedAccessExceptionAsync(httpContext, ex);
 
             }
