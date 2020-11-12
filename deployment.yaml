@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gamitude_backend
+  labels:
+    app: gamitude_backend
+    project: gamitude
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gamitude_backend
+  template:
+    metadata:
+      labels:
+        app: gamitude_backend
+    spec:
+      containers:
+        - name: gamitude_backend
+          image: GAMITUDE_BACKEND_IMAGE
+          env:
+            - name: DatabaseSettings__ConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: database-string
+                  key: connection_string
+            - name: AppSettings__Secret
+              valueFrom:
+                secretKeyRef:
+                  name: token-string
+                  key: token_string
+          ports:
+            - name: gamitude_backend-http
+              containerPort: 80
+          livenessProbe: # Used by deployment controller
+            httpGet:
+              path: /api/version
+              port: 80
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 60
+            successThreshold: 1
+            failureThreshold: 5
+            initialDelaySeconds: 50
+          readinessProbe: # Used by Ingress/GCLB
+            httpGet:
+              path: /api/version
+              port: 80
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 60
+            successThreshold: 1
+            failureThreshold: 5
+            initialDelaySeconds: 50
+          resources:
+            limits:
+              memory: 600Mi
+              cpu: 300m
+            requests:
+              memory: 300Mi
+              cpu: 150m

@@ -1,0 +1,59 @@
+resources:
+- repo: self
+  fetchDepth: 1
+queue:
+  name: Hosted Ubuntu 1604
+trigger:
+- master
+variables:
+  TargetFramework: 'netcoreapp3.1'
+  RestoreBuildProjects: 'gamitude_backend/*.csproj'
+  BuildConfiguration: 'Release'
+  DockerImageName: 'gentle-ally-270120/gamitude_backend'
+steps:
+- task: DotNetCoreCLI@2
+  displayName: Restore
+  inputs:
+    command: restore
+    projects: '$(RestoreBuildProjects)'
+    feedsToUse: select
+    includeNuGetOrg: true # Required when feedsToUse == Select
+    #feedsToUse: config
+    #nugetConfigPath: ./nuget/
+- task: DotNetCoreCLI@2
+  displayName: Build
+  inputs:
+    projects: '$(RestoreBuildProjects)'
+    arguments: '--configuration $(BuildConfiguration) --framework=$(TargetFramework)'
+    
+- task: DotNetCoreCLI@2
+  displayName: Publish
+  inputs:
+    command: publish
+    publishWebProjects: True
+    arguments: '--configuration $(BuildConfiguration) --framework=$(TargetFramework)'
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+- task: CmdLine@1
+  displayName: 'Lock image version in deployment.yaml'
+  inputs:
+    filename: /bin/bash
+    arguments: '-c "awk ''{gsub(\"GAMITUDE_BACKEND_IMAGE\", \"gcr.io/$(DockerImageName):$(Build.BuildId)\", $0); print}'' deployment.yaml > $(build.artifactstagingdirectory)/deployment.yaml"'
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)'
+- task: Docker@0
+  displayName: 'Build image'
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerRegistryConnection: 'gcr-gamitude-pipeline'
+    imageName: '$(DockerImageName):$(Build.BuildId)'
+- task: Docker@0
+  displayName: 'Publish image'
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerRegistryConnection: 'gcr-gamitude-pipeline'
+    action: 'Push an image'
+    imageName: '$(DockerImageName):$(Build.BuildId)'
