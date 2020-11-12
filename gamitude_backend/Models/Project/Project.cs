@@ -16,11 +16,11 @@ namespace gamitude_backend.Models
 
         [BsonElement("folderId")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public String folderId { get; set; }
+        public string folderId { get; set; }
 
         [BsonElement("defaultTimerId")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public String defaultTimerId { get; set; }
+        public string defaultTimerId { get; set; }
 
         [BsonElement("name")]
         public string name { get; set; }

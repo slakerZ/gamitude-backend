@@ -5,9 +5,9 @@ namespace gamitude_backend.Dto.Authorization
 {
     public class GetUserTokenDto
     {
-        public String userId { get; set; }
+        public string userId { get; set; }
 
-        public String token { get; set; }
+        public string token { get; set; }
 
         public GetUserDto user { get; set; }
         

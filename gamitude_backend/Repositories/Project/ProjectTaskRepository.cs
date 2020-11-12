@@ -1,8 +1,6 @@
 using gamitude_backend.Models;
 using System.Collections.Generic;
-using System;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using gamitude_backend.Data;
 
@@ -10,11 +8,11 @@ namespace gamitude_backend.Repositories
 {
     public interface IProjectTaskRepository
     {
-        Task<ProjectTask> getByIdAsync(String id);
-        Task<List<ProjectTask>> getByProjectIdAsync(String userId);
+        Task<ProjectTask> getByIdAsync(string id);
+        Task<List<ProjectTask>> getByProjectIdAsync(string userId);
         Task createAsync(ProjectTask projectTask);
-        Task updateAsync(String id, ProjectTask updateProjectTask);
-        Task deleteByIdAsync(String id);
+        Task updateAsync(string id, ProjectTask updateProjectTask);
+        Task deleteByIdAsync(string id);
     }
     public class ProjectTaskRepository : IProjectTaskRepository
     {
@@ -26,12 +24,12 @@ namespace gamitude_backend.Repositories
             _ProjectTasks = dbCollections.projectTasks;
         }
 
-        public Task<ProjectTask> getByIdAsync(String id)
+        public Task<ProjectTask> getByIdAsync(string id)
         {
             return _ProjectTasks.Find<ProjectTask>(ProjectTask => ProjectTask.id == id).FirstOrDefaultAsync();
         }
 
-        public Task<List<ProjectTask>> getByProjectIdAsync(String projectId)
+        public Task<List<ProjectTask>> getByProjectIdAsync(string projectId)
         {
             return _ProjectTasks.Find<ProjectTask>(ProjectTask => ProjectTask.projectId == projectId).ToListAsync();
 
@@ -42,7 +40,7 @@ namespace gamitude_backend.Repositories
             return _ProjectTasks.InsertOneAsync(ProjectTask);
         }
 
-        public Task updateAsync(String id, ProjectTask newProjectTask)
+        public Task updateAsync(string id, ProjectTask newProjectTask)
         {
             return _ProjectTasks.ReplaceOneAsync(ProjectTask => ProjectTask.id == id, newProjectTask);
 

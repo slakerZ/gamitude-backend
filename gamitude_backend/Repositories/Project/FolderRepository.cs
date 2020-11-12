@@ -5,7 +5,7 @@ using System;
 using Microsoft.Extensions.Logging;
 using AutoMapper;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+
 using gamitude_backend.Settings;
 using MongoDB.Driver;
 using gamitude_backend.Data;
@@ -14,11 +14,11 @@ namespace gamitude_backend.Repositories
 {
     public interface IFolderRepository
     {
-        Task<Folder> getByIdAsync(String id);
-        Task<List<Folder>> getByUserIdAsync(String userId);
+        Task<Folder> getByIdAsync(string id);
+        Task<List<Folder>> getByUserIdAsync(string userId);
         Task createAsync(Folder folder);
-        Task updateAsync(String id, Folder updateFolder);
-        Task deleteByIdAsync(String id);
+        Task updateAsync(string id, Folder updateFolder);
+        Task deleteByIdAsync(string id);
     }
     public class FolderRepository : IFolderRepository
     {
@@ -30,12 +30,12 @@ namespace gamitude_backend.Repositories
             _Folders = dbCollections.folders;
         }
 
-        public Task<Folder> getByIdAsync(String id)
+        public Task<Folder> getByIdAsync(string id)
         {
             return _Folders.Find<Folder>(Folder => Folder.id == id).FirstOrDefaultAsync();
         }
 
-        public Task<List<Folder>> getByUserIdAsync(String userId)
+        public Task<List<Folder>> getByUserIdAsync(string userId)
         {
             return _Folders.Find<Folder>(Folder => Folder.userId == userId).ToListAsync();
 
@@ -46,7 +46,7 @@ namespace gamitude_backend.Repositories
             return _Folders.InsertOneAsync(Folder);
         }
 
-        public Task updateAsync(String id, Folder newFolder)
+        public Task updateAsync(string id, Folder newFolder)
         {
             return _Folders.ReplaceOneAsync(Folder => Folder.id == id, newFolder);
 

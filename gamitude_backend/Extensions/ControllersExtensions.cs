@@ -31,7 +31,7 @@ namespace gamitude_backend.Extensions
                     {
                         var result = new ObjectResult(new ControllerErrorResponse
                         {
-                            message = String.Join(' ', context.ModelState.Values.SelectMany(x => x.Errors.Select(x => x.ErrorMessage)).ToList())
+                            message = string.Join(' ', context.ModelState.Values.SelectMany(x => x.Errors.Select(x => x.ErrorMessage)).ToList())
                         });
                         result.StatusCode = (int)HttpStatusCode.BadRequest;
                         return result;

@@ -17,7 +17,7 @@ namespace gamitude_backend.Services
 
     public interface IDailyEnergyService : IDailyEnergyRepository
     {
-        Task<GetLastWeekAvgEnergyDto> GetLastWeekAvgEnergyByUserIdAsync(String userId);
+        Task<GetLastWeekAvgEnergyDto> GetLastWeekAvgEnergyByUserIdAsync(string userId);
 
     }
 
@@ -35,7 +35,7 @@ namespace gamitude_backend.Services
         /// <summary>
         /// Gets last weeks energy counting the days for further calculations
         /// </summary>
-        public async Task<GetLastWeekAvgEnergyDto> GetLastWeekAvgEnergyByUserIdAsync(String userId)
+        public async Task<GetLastWeekAvgEnergyDto> GetLastWeekAvgEnergyByUserIdAsync(string userId)
         {
             GetLastWeekAvgEnergyDto energy = await _DailyEnergy.AsQueryable()
                  .Where(o => o.userId == userId && o.dateCreated > DateTime.UtcNow.Date.AddDays(-7))

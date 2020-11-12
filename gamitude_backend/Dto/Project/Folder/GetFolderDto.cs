@@ -6,15 +6,15 @@ namespace gamitude_backend.Dto.Folder
 
     public class GetFolderDto
     {
-        public String id { get; set; }
+        public string id { get; set; }
 
-        public String userId { get; set; }
+        public string userId { get; set; }
 
-        public String name { get; set; }
+        public string name { get; set; }
 
-        public String description { get; set; }
+        public string description { get; set; }
 
-        public String icon { get; set; }
+        public string icon { get; set; } = "";
 
         public DateTime dateCreated { get; set; }
     }

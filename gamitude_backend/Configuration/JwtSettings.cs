@@ -4,10 +4,10 @@ namespace gamitude_backend.Settings
 {
     public class JwtSettings : IJwtSettings
     {
-        public String secret { get; set; }
+        public string secret { get; set; }
     }
     public interface IJwtSettings
     {
-        String secret { get; set; }
+        string secret { get; set; }
     }
 }

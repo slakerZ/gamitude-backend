@@ -1,5 +1,3 @@
-using System;
-using System.ComponentModel.DataAnnotations;
 using gamitude_backend.Models;
 
 namespace gamitude_backend.Dto.Project
@@ -9,9 +7,9 @@ namespace gamitude_backend.Dto.Project
     {
         public string name { get; set; }
 
-        public String folderId { get; set; }
+        public string folderId { get; set; }
 
-        public String defaultTimerId { get; set; }
+        public string defaultTimerId { get; set; }
 
         public PROJECT_TYPE? projectType { get; set; }
 

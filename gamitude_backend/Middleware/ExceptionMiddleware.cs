@@ -3,14 +3,10 @@
 using System;
 using System.Linq;
 using System.Net;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using gamitude_backend.Dto;
 using gamitude_backend.Exceptions;
-using gamitude_backend.Extensions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
@@ -32,7 +28,7 @@ namespace gamitude_backend.Middleware
 
         public async Task InvokeAsync(HttpContext httpContext)
         {
-            String message = null;
+            string message = null;
             try
             {
                 await _next(httpContext);
@@ -79,7 +75,7 @@ namespace gamitude_backend.Middleware
 
         }
 
-        public String handleMongoExceptionAsync(HttpContext context, MongoException ex)
+        public string handleMongoExceptionAsync(HttpContext context, MongoException ex)
         {
             var message = "Huston we got a database problem";
             context.Response.ContentType = "application/json";
@@ -93,7 +89,7 @@ namespace gamitude_backend.Middleware
         }
 
         // Used for handling login exceptions maybe create LoginException?? 
-        public String handleArgumentExceptionAsync(HttpContext context, ArgumentException ex)
+        public string handleArgumentExceptionAsync(HttpContext context, ArgumentException ex)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
@@ -103,7 +99,7 @@ namespace gamitude_backend.Middleware
 
         }
 
-        public String handleUnauthorizedAccessExceptionAsync(HttpContext context, UnauthorizedAccessException ex)
+        public string handleUnauthorizedAccessExceptionAsync(HttpContext context, UnauthorizedAccessException ex)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
@@ -113,7 +109,7 @@ namespace gamitude_backend.Middleware
 
         }
 
-        public String handleLoginExceptionAsync(HttpContext context, LoginException ex)
+        public string handleLoginExceptionAsync(HttpContext context, LoginException ex)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
@@ -123,7 +119,7 @@ namespace gamitude_backend.Middleware
 
         //For latter upgrade
         //http://www.ziyad.info/en/articles/20-Localizing_Identity_Error_Messages
-        public String handleIdentityExceptionAsync(HttpContext context, IdentityException ex)
+        public string handleIdentityExceptionAsync(HttpContext context, IdentityException ex)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
@@ -131,7 +127,7 @@ namespace gamitude_backend.Middleware
             return message;
         }
 
-        public String handleExceptionAsync(HttpContext context, Exception ex)
+        public string handleExceptionAsync(HttpContext context, Exception ex)
         {
             var message = "Huston we got an undefined problem";
             context.Response.ContentType = "application/json";

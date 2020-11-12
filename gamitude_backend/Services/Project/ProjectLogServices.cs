@@ -2,7 +2,7 @@ using gamitude_backend.Models;
 using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+
 using MongoDB.Driver;
 using gamitude_backend.Data;
 using gamitude_backend.Repositories;
@@ -14,7 +14,7 @@ namespace gamitude_backend.Services
     public interface IProjectLogService : IProjectLogRepository
     {
         Task<ProjectLog> processCreateProjectLog(ProjectLog projectLog);
-        Task processDeleteProjectLog(String projectLogId, String userId);
+        Task processDeleteProjectLog(string projectLogId, string userId);
     }
     public class ProjectLogService : ProjectLogRepository, IProjectLogService
     {
@@ -117,7 +117,7 @@ namespace gamitude_backend.Services
             {
                 case (PROJECT_TYPE.ENERGY):
                     return updateEnergiesWithWages(op, dailyEnergy, wages, projectLog.timeSpend >> 1);
-                case (PROJECT_TYPE.STATS):
+                case (PROJECT_TYPE.STAT):
                     return updateEnergiesWithWages(op, dailyEnergy, wages, projectLog.timeSpend * -1);
                 case (PROJECT_TYPE.BREAK):
                     return updateEnergiesWithWages(op, dailyEnergy, wages, projectLog.timeSpend >> 1);
@@ -144,7 +144,7 @@ namespace gamitude_backend.Services
             {
                 case (PROJECT_TYPE.ENERGY):
                     return updateStatsWithWages(op, stats, wages, projectLog.timeSpend >> 2);
-                case (PROJECT_TYPE.STATS):
+                case (PROJECT_TYPE.STAT):
                     return updateStatsWithWages(op, stats, wages, projectLog.timeSpend);
                 case (PROJECT_TYPE.BREAK):
                     return updateStatsWithWages(op, stats, wages, 0);

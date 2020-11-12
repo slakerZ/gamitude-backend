@@ -1,12 +1,7 @@
 using gamitude_backend.Models;
 using System.Collections.Generic;
-using System.Linq;
 using System;
-using Microsoft.Extensions.Logging;
-using AutoMapper;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using gamitude_backend.Settings;
 using MongoDB.Driver;
 using gamitude_backend.Data;
 
@@ -14,13 +9,13 @@ namespace gamitude_backend.Repositories
 {
     public interface IDailyEnergyRepository
     {
-        Task<DailyEnergy> getByIdAsync(String id);
-        Task<DailyEnergy> getByDateAndUserIdAsync(DateTime date, String userId);
-        Task<List<DailyEnergy>> getByUserIdAsync(String userId);
+        Task<DailyEnergy> getByIdAsync(string id);
+        Task<DailyEnergy> getByDateAndUserIdAsync(DateTime date, string userId);
+        Task<List<DailyEnergy>> getByUserIdAsync(string userId);
         Task createAsync(DailyEnergy dailyEnergy);
         Task createOrUpdateAsync(DailyEnergy dailyEnergy);
-        Task updateAsync(String id, DailyEnergy updateDailyEnergy);
-        Task deleteByIdAsync(String id);
+        Task updateAsync(string id, DailyEnergy updateDailyEnergy);
+        Task deleteByIdAsync(string id);
     }
     public class DailyEnergyRepository : IDailyEnergyRepository
     {
@@ -32,17 +27,17 @@ namespace gamitude_backend.Repositories
             _DailyEnergies = dbCollections.dailyEnergies;
         }
 
-        public Task<DailyEnergy> getByIdAsync(String id)
+        public Task<DailyEnergy> getByIdAsync(string id)
         {
             return _DailyEnergies.Find<DailyEnergy>(DailyEnergy => DailyEnergy.id == id).FirstOrDefaultAsync();
         }
-        public Task<DailyEnergy> getByDateAndUserIdAsync(DateTime date, String userId)
+        public Task<DailyEnergy> getByDateAndUserIdAsync(DateTime date, string userId)
         {
             return _DailyEnergies.Find(o => o.dateCreated == date.Date && o.userId == userId).SingleOrDefaultAsync();
 
         }
 
-        public Task<List<DailyEnergy>> getByUserIdAsync(String userId)
+        public Task<List<DailyEnergy>> getByUserIdAsync(string userId)
         {
             return _DailyEnergies.Find<DailyEnergy>(DailyEnergy => DailyEnergy.userId == userId).ToListAsync();
 
@@ -53,7 +48,7 @@ namespace gamitude_backend.Repositories
             return _DailyEnergies.InsertOneAsync(DailyEnergy.validate());
         }
 
-        public Task updateAsync(String id, DailyEnergy newDailyEnergy)
+        public Task updateAsync(string id, DailyEnergy newDailyEnergy)
         {
             return _DailyEnergies.ReplaceOneAsync(DailyEnergy => DailyEnergy.id == id, newDailyEnergy);
 

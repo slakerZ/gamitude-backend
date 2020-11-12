@@ -20,10 +20,7 @@ namespace gamitude_backend.Data
         IMongoCollection<Stats> stats { get; set; }
         IMongoCollection<Timer> timers { get; set; }
         IMongoCollection<UserToken> userTokens { get; set; }
-        IMongoCollection<UserRanks> userRanks { get; set; }
-        IMongoCollection<UserRank> userRank { get; set; }
-        IMongoCollection<UserThemes> userThemes { get; set; }
-        IMongoCollection<UserTheme> userTheme { get; set; }
+        IMongoCollection<User> users { get; set; }
     }
 
 
@@ -40,10 +37,7 @@ namespace gamitude_backend.Data
         public IMongoCollection<Stats> stats { get; set; }
         public IMongoCollection<Timer> timers { get; set; }
         public IMongoCollection<UserToken> userTokens { get; set; }
-        public IMongoCollection<UserRanks> userRanks { get; set; }
-        public IMongoCollection<UserRank> userRank { get; set; }
-        public IMongoCollection<UserThemes> userThemes { get; set; }
-        public IMongoCollection<UserTheme> userTheme { get; set; }
+        public IMongoCollection<User> users { get; set; }
 
         public MongoCollections(IDatabaseSettings settings)
         {
@@ -70,10 +64,7 @@ namespace gamitude_backend.Data
             stats = database.GetCollection<Stats>(settings.statsCollectionName);
             timers = database.GetCollection<Timer>(settings.timersCollectionName);
             userTokens = database.GetCollection<UserToken>(settings.usersTokenCollectionName);
-            userRanks = database.GetCollection<UserRanks>(settings.usersRanksCollectionName);
-            userRank = database.GetCollection<UserRank>(settings.usersRankCollectionName);
-            userThemes = database.GetCollection<UserThemes>(settings.usersThemesCollectionName);
-            userTheme = database.GetCollection<UserTheme>(settings.usersThemeCollectionName);
+            users = database.GetCollection<User>(settings.usersCollectionName);
         }
     }
 }

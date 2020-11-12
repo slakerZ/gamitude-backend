@@ -1,12 +1,6 @@
 using gamitude_backend.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System;
-using Microsoft.Extensions.Logging;
-using AutoMapper;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using gamitude_backend.Settings;
 using MongoDB.Driver;
 using gamitude_backend.Data;
 using gamitude_backend.Extensions;
@@ -15,14 +9,14 @@ namespace gamitude_backend.Repositories
 {
     public interface IRankRepository
     {
-        Task<Rank> getByIdAsync(String id);
-        Task<List<Rank>> getByIdAsync(List<String> ids);
-        Task<IReadOnlyList<Rank>> getAllAsync(int page = 1, int limit = 20, String sortBy = "name");
+        Task<Rank> getByIdAsync(string id);
+        Task<List<Rank>> getByIdAsync(List<string> ids);
+        Task<IReadOnlyList<Rank>> getAllAsync(int page = 1, int limit = 20, string sortBy = "name");
         Task<Rank> getRookieAsync();
         Task<List<Rank>> getAsync();
         Task createAsync(Rank rank);
-        Task updateAsync(String id, Rank updateRank);
-        Task deleteByIdAsync(String id);
+        Task updateAsync(string id, Rank updateRank);
+        Task deleteByIdAsync(string id);
     }
     public class RankRepository : IRankRepository
     {
@@ -34,7 +28,7 @@ namespace gamitude_backend.Repositories
             _ranks = dbCollections.ranks;
         }
 
-        public Task<Rank> getByIdAsync(String id)
+        public Task<Rank> getByIdAsync(string id)
         {
             return _ranks.Find<Rank>(Rank => Rank.id == id).FirstOrDefaultAsync();
         }
@@ -42,7 +36,7 @@ namespace gamitude_backend.Repositories
         {
             return _ranks.Find<Rank>(FilterDefinition<Rank>.Empty).ToListAsync();
         }
-        public Task<List<Rank>> getByIdAsync(List<String> ids)
+        public Task<List<Rank>> getByIdAsync(List<string> ids)
         {
             return _ranks.Find<Rank>(Rank => ids.Contains(Rank.id)).ToListAsync();
         }
@@ -52,7 +46,7 @@ namespace gamitude_backend.Repositories
             return _ranks.InsertOneAsync(Rank);
         }
 
-        public Task updateAsync(String id, Rank newRank)
+        public Task updateAsync(string id, Rank newRank)
         {
             return _ranks.ReplaceOneAsync(Rank => Rank.id == id, newRank);
 
@@ -74,7 +68,7 @@ namespace gamitude_backend.Repositories
             return _ranks.Find<Rank>(o => o.rookie == true).FirstOrDefaultAsync();
         }
 
-        public Task<IReadOnlyList<Rank>> getAllAsync(int page = 1, int limit = 20, String sortBy = "name")
+        public Task<IReadOnlyList<Rank>> getAllAsync(int page = 1, int limit = 20, string sortBy = "name")
         {
             return _ranks.AggregateByPage<Rank>(Builders<Rank>.Filter.Empty,
                                             Builders<Rank>.Sort.Ascending(x => x.GetType()

@@ -1,12 +1,6 @@
 using gamitude_backend.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System;
-using Microsoft.Extensions.Logging;
-using AutoMapper;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using gamitude_backend.Settings;
 using MongoDB.Driver;
 using gamitude_backend.Data;
 
@@ -14,11 +8,11 @@ namespace gamitude_backend.Repositories
 {
     public interface ITimerRepository
     {
-        Task<Timer> getByIdAsync(String id);
-        Task<List<Timer>> getByUserIdAsync(String userId);
+        Task<Timer> getByIdAsync(string id);
+        Task<List<Timer>> getByUserIdAsync(string userId);
         Task createAsync(Timer folder);
-        Task updateAsync(String id, Timer updateTimer);
-        Task deleteByIdAsync(String id);
+        Task updateAsync(string id, Timer updateTimer);
+        Task deleteByIdAsync(string id);
     }
     public class TimerRepository : ITimerRepository
     {
@@ -30,12 +24,12 @@ namespace gamitude_backend.Repositories
             _Timers = dbCollections.timers;
         }
 
-        public Task<Timer> getByIdAsync(String id)
+        public Task<Timer> getByIdAsync(string id)
         {
             return _Timers.Find<Timer>(Timer => Timer.id == id).FirstOrDefaultAsync();
         }
 
-        public Task<List<Timer>> getByUserIdAsync(String userId)
+        public Task<List<Timer>> getByUserIdAsync(string userId)
         {
             return _Timers.Find<Timer>(Timer => Timer.userId == userId).ToListAsync();
 
@@ -46,7 +40,7 @@ namespace gamitude_backend.Repositories
             return _Timers.InsertOneAsync(Timer);
         }
 
-        public Task updateAsync(String id, Timer newTimer)
+        public Task updateAsync(string id, Timer newTimer)
         {
             return _Timers.ReplaceOneAsync(Timer => Timer.id == id, newTimer);
 

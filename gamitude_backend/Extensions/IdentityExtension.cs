@@ -11,7 +11,7 @@ namespace gamitude_backend.Extensions
 {
     public static class IdentityExtension
     {
-        public static void AddCustomIdentity(this IServiceCollection services,String connectionString,String dbName)
+        public static void AddCustomIdentity(this IServiceCollection services,string connectionString,string dbName)
         {
 
             services.AddIdentityMongoDbProvider<User, MongoRole>(identityOptions =>

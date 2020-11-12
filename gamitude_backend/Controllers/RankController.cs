@@ -39,7 +39,7 @@ namespace gamitude_backend.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<ControllerResponse<List<GetRank>>>> get(int page = 1,int limit = 20,String sortBy="name")
+        public async Task<ActionResult<ControllerResponse<List<GetRank>>>> get(int page = 1,int limit = 20,string sortBy="name")
         {
             _logger.LogInformation("In GET rank");
             var ranks = await _rankService.getAsync();

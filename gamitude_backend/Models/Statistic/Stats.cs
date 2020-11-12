@@ -1,13 +1,5 @@
-using System;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Options;
-
-
-using gamitude_backend.Settings;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
-using gamitude_backend.Configuration;
-
 namespace gamitude_backend.Models
 {
     [BsonIgnoreExtraElements]

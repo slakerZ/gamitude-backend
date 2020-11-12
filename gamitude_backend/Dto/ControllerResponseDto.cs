@@ -1,10 +1,4 @@
-using System;
-using System.Linq;
-using System.Net;
 using System.Text.Json;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace gamitude_backend.Dto
 {

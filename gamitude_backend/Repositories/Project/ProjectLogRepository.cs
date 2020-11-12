@@ -1,8 +1,6 @@
 using gamitude_backend.Models;
 using System.Collections.Generic;
-using System;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using gamitude_backend.Data;
 
@@ -10,11 +8,11 @@ namespace gamitude_backend.Repositories
 {
     public interface IProjectLogRepository
     {
-        Task<ProjectLog> getByIdAsync(String id);
-        Task<List<ProjectLog>> getByUserIdAsync(String userId);
+        Task<ProjectLog> getByIdAsync(string id);
+        Task<List<ProjectLog>> getByUserIdAsync(string userId);
         System.Threading.Tasks.Task createAsync(ProjectLog projectLog);
-        System.Threading.Tasks.Task updateAsync(String id, ProjectLog updateProjectLog);
-        System.Threading.Tasks.Task deleteByIdAsync(String id);
+        System.Threading.Tasks.Task updateAsync(string id, ProjectLog updateProjectLog);
+        System.Threading.Tasks.Task deleteByIdAsync(string id);
     }
     public class ProjectLogRepository : IProjectLogRepository
     {
@@ -26,17 +24,17 @@ namespace gamitude_backend.Repositories
             _ProjectLogs = dbCollections.projectLogs;
         }
 
-        public Task<ProjectLog> getByIdAsync(String id)
+        public Task<ProjectLog> getByIdAsync(string id)
         {
             return _ProjectLogs.Find<ProjectLog>(ProjectLog => ProjectLog.id == id).FirstOrDefaultAsync();
         }
 
-        public Task<List<ProjectLog>> getByUserIdAsync(String userId)
+        public Task<List<ProjectLog>> getByUserIdAsync(string userId)
         {
             return _ProjectLogs.Find<ProjectLog>(ProjectLog => ProjectLog.userId == userId).ToListAsync();
         }
 
-        public Task<List<ProjectLog>> getByProjectIdAsync(String projectId)
+        public Task<List<ProjectLog>> getByProjectIdAsync(string projectId)
         {
             return _ProjectLogs.Find<ProjectLog>(ProjectLog => ProjectLog.projectId == projectId).ToListAsync();
         }
@@ -46,7 +44,7 @@ namespace gamitude_backend.Repositories
             return _ProjectLogs.InsertOneAsync(ProjectLog);
         }
 
-        public System.Threading.Tasks.Task updateAsync(String id, ProjectLog newProjectLog)
+        public System.Threading.Tasks.Task updateAsync(string id, ProjectLog newProjectLog)
         {
             return _ProjectLogs.ReplaceOneAsync(ProjectLog => ProjectLog.id == id, newProjectLog);
 

@@ -1,6 +1,4 @@
-using System;
 using System.ComponentModel.DataAnnotations;
-using gamitude_backend.Models;
 
 namespace gamitude_backend.Dto.User
 {
@@ -8,12 +6,12 @@ namespace gamitude_backend.Dto.User
     public class ChangePasswordUserDto
     {
         [Required(ErrorMessage="idRequired")]
-        public String id { get; set; }
+        public string id { get; set; }
         
         [Required(ErrorMessage="passwordRequired")]
-        public String oldPassword { get; set; }
+        public string oldPassword { get; set; }
         [Required(ErrorMessage="passwordRequired")]
-        public String newPassword { get; set; }
+        public string newPassword { get; set; }
 
     }
 }

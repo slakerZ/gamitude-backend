@@ -1,46 +1,40 @@
 using gamitude_backend.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using Microsoft.Extensions.Logging;
-using AutoMapper;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using gamitude_backend.Settings;
 using MongoDB.Driver;
 using gamitude_backend.Data;
+using MongoDB.Bson;
 
 namespace gamitude_backend.Repositories
 {
     public interface IUserRankRepository
     {
-        Task<UserRank> getByIdAsync(String id);
-        Task<UserRank> getByUserIdAsync(String userId);
-        Task createOrUpdateAsync(UserRank rank);
+        Task<string> getByUserIdAsync(string userId);
+        Task createOrUpdateAsync(string userId, string rankId);
     }
     public class UserRankRepository : IUserRankRepository
     {
-        private readonly IMongoCollection<UserRank> _userRank;
+        private readonly IMongoCollection<User> _users;
 
 
         public UserRankRepository(IDatabaseCollections dbCollections)
         {
-            _userRank = dbCollections.userRank;
+            _users = dbCollections.users;
         }
 
-        public Task<UserRank> getByIdAsync(String id)
+        public async Task<string> getByUserIdAsync(string userId)
         {
-            return _userRank.Find<UserRank>(UserRank => UserRank.id == id).FirstOrDefaultAsync();
+            var projection = Builders<User>.Projection.Include("currentRankId").Exclude("_id");
+            var filter = Builders<User>.Filter.Eq("_id",  new ObjectId(userId));
+            var result = await _users.Find(filter).Project(projection).FirstOrDefaultAsync();
+            result.TryGetValue("currentRankId", out var rank);
+            return rank.ToString();
         }
 
-        public Task<UserRank> getByUserIdAsync(String userId)
+        public Task createOrUpdateAsync(string userId, string rankId)
         {
-            return _userRank.Find<UserRank>(userRank => userRank.userId == userId).FirstOrDefaultAsync();
-        }
-
-         public Task createOrUpdateAsync(UserRank UserRank)
-        {
-            return _userRank.ReplaceOneAsync(o => o.id == UserRank.id, UserRank, new ReplaceOptions{IsUpsert=true});
+            var filter = Builders<User>.Filter.Eq("_id", new ObjectId(userId));
+            var update = Builders<User>.Update.Set("currentRankId", new ObjectId(rankId));
+            return _users.UpdateOneAsync(filter, update);
         }
     }
 }

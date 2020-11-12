@@ -1,12 +1,5 @@
 using gamitude_backend.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using Microsoft.Extensions.Logging;
-using AutoMapper;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using gamitude_backend.Settings;
 using MongoDB.Driver;
 using gamitude_backend.Data;
 
@@ -14,10 +7,10 @@ namespace gamitude_backend.Repositories
 {
     public interface IThemeRepository
     {
-        Task<Theme> getByIdAsync(String id);
+        Task<Theme> getByIdAsync(string id);
         Task createAsync(Theme theme);
-        Task updateAsync(String id, Theme updateTheme);
-        Task deleteByIdAsync(String id);
+        Task updateAsync(string id, Theme updateTheme);
+        Task deleteByIdAsync(string id);
     }
     public class ThemeRepository : IThemeRepository
     {
@@ -29,7 +22,7 @@ namespace gamitude_backend.Repositories
             _Themes = dbCollections.themes;
         }
 
-        public Task<Theme> getByIdAsync(String id)
+        public Task<Theme> getByIdAsync(string id)
         {
             return _Themes.Find<Theme>(Theme => Theme.id == id).FirstOrDefaultAsync();
         }
@@ -39,7 +32,7 @@ namespace gamitude_backend.Repositories
             return _Themes.InsertOneAsync(Theme);
         }
 
-        public Task updateAsync(String id, Theme newTheme)
+        public Task updateAsync(string id, Theme newTheme)
         {
             return _Themes.ReplaceOneAsync(Theme => Theme.id == id, newTheme);
 

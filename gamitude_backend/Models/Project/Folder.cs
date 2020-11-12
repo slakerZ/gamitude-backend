@@ -1,7 +1,6 @@
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Driver;
 
 namespace gamitude_backend.Models
 {
@@ -10,20 +9,20 @@ namespace gamitude_backend.Models
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public String id { get; set; }
+        public string id { get; set; }
 
         [BsonElement("userId")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public String userId { get; set; }
+        public string userId { get; set; }
 
         [BsonElement("name")]
-        public String name { get; set; }
+        public string name { get; set; }
 
         [BsonElement("description")]
-        public String description { get; set; }
+        public string description { get; set; }
 
         [BsonElement("icon")]
-        public String icon { get; set; }
+        public string icon { get; set; } = "";
 
         [BsonElement("dateCreated")]
         public DateTime dateCreated { get; set; }

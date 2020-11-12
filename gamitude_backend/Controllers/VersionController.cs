@@ -8,7 +8,7 @@ namespace gamitude_backend.Controllers
     [ApiController]
     public class VersionController : ControllerBase
     {
-        private String version = "Gamitude Backend v2.0";
+        private string version = "Gamitude Backend v2.0";
 
         public VersionController()
         {
@@ -16,7 +16,7 @@ namespace gamitude_backend.Controllers
         }
 
         [HttpGet]
-        public ActionResult<String> Version()
+        public ActionResult<string> Version()
         {
 
             return Created("Version", version);

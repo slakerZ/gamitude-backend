@@ -11,7 +11,7 @@ using gamitude_backend.Exceptions;
 using gamitude_backend.Settings;
 using gamitude_backend.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -21,7 +21,7 @@ namespace gamitude_backend.Services
 {
     public interface IAuthorizationService
     {
-        Task<UserToken> authorizeUserAsync(String login,String password);
+        Task<UserToken> authorizeUserAsync(string login,string password);
     }
     public class AuthorizationService : IAuthorizationService
     {
@@ -51,7 +51,7 @@ namespace gamitude_backend.Services
         }
 
 
-        public async Task<UserToken> authorizeUserAsync(String login,String password)
+        public async Task<UserToken> authorizeUserAsync(string login,string password)
         {
             _logger.LogInformation("In authorizeUserAsync");
 

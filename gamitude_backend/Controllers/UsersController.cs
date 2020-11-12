@@ -7,11 +7,7 @@ using gamitude_backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-
-using Microsoft.EntityFrameworkCore;
 using gamitude_backend.Dto;
-using gamitude_backend.Dto.Authorization;
 using AutoMapper;
 using gamitude_backend.Models;
 
@@ -33,19 +29,8 @@ namespace gamitude_backend.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<ControllerResponse<List<GetUserDto>>>> all(int offset = 0 ,int limit = 20)
-        {
-            _logger.LogInformation("In GET all");
-            var users = await _userService.getAllAsync(offset,limit);
-            return Ok( new ControllerResponse<List<GetUserDto>>
-            {
-                data = users.Select(o => _mapper.Map<GetUserDto>(o)).ToList()
-            });
-        }
-
         [HttpGet("{id}")]
-        public async Task<ActionResult<ControllerResponse<GetUserDto>>> id(String id)
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> id(string id)
         {
             _logger.LogInformation("In GET id");
             var user = await _userService.getByIdAsync(id);
@@ -89,7 +74,7 @@ namespace gamitude_backend.Controllers
 
         }
         [HttpDelete("{id}")]
-        public async Task<ActionResult> delete(String id)
+        public async Task<ActionResult> delete(string id)
         {
             _logger.LogInformation("In DELETE delete");
             await _userService.deleteByIdAsync(id);

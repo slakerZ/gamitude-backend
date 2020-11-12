@@ -6,13 +6,13 @@ namespace gamitude_backend.Dto.Project
 
     public class GetProjectDto
     {
-        public String id { get; set; }
+        public string id { get; set; }
 
-        public String name { get; set; }
-        
-        public String folderId { get; set; }
+        public string name { get; set; }
 
-        public String defaultTimerId { get; set; }
+        public string folderId { get; set; }
+
+        public string defaultTimerId { get; set; }
 
         public PROJECT_TYPE? projectType { get; set; }
 

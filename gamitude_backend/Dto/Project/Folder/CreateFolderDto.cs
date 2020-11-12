@@ -8,11 +8,12 @@ namespace gamitude_backend.Dto.Folder
     public class CreateFolderDto
     {
         [Required]
-        public String name { get; set; }
+        public string name { get; set; }
 
-        public String description { get; set; }
+        public string description { get; set; }
 
-        public String icon { get; set; }
+        [Required]
+        public string icon { get; set; }
 
     }
 }

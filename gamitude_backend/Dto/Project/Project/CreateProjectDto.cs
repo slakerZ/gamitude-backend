@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using gamitude_backend.Models;
 
@@ -12,14 +11,17 @@ namespace gamitude_backend.Dto.Project
         public string name { get; set; }
 
         [Required]
-        public String folderId { get; set; }
+        public string folderId { get; set; }
 
-        public String defaultTimerId { get; set; }
+        public string defaultTimerId { get; set; }
 
+        [Required]
         public PROJECT_TYPE? projectType { get; set; }
 
+        [Required]
         public STATS? dominantStat { get; set; }
 
+        [Required]
         public STATS[] stats { get; set; }
 
         public int? daysPerWeek { get; set; }

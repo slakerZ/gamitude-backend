@@ -1,7 +1,3 @@
-
-
-
-using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -38,7 +34,7 @@ namespace gamitude_backend.Models
         public string imageUrl { get; set; }
 
         [BsonElement("rookie")]
-        public Boolean rookie { get; set; }
+        public bool rookie { get; set; }
 
         [BsonElement("style")]
         public GAMITUDE_STYLE Style { get; set; }

@@ -2,18 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
-using gamitude_backend.Dto.Authorization;
-using gamitude_backend.Dto.User;
 using gamitude_backend.Exceptions;
 using gamitude_backend.Settings;
 using gamitude_backend.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using gamitude_backend.Repositories;
 using MongoDB.Driver;
 
@@ -21,13 +17,12 @@ namespace gamitude_backend.Services
 {
     public interface IUserService
     {
-        Task<List<User>> getAllAsync(int offset, int limit);
-        Task<User> getByIdAsync(String id);
-        Task<User> createAsync(User newUser, String password);
-        Task<User> getByUserNameAsync(String userName);
-        Task changePasswordAsync(String id, String oldPassword, String newPassword);
+        Task<User> getByIdAsync(string id);
+        Task<User> createAsync(User newUser, string password);
+        Task<User> getByUserNameAsync(string userName);
+        Task changePasswordAsync(string id, string oldPassword, string newPassword);
         Task<User> updateAsync(User updateUser);
-        Task deleteByIdAsync(String id);
+        Task deleteByIdAsync(string id);
     }
     public class UserService : IUserService
     {
@@ -38,87 +33,86 @@ namespace gamitude_backend.Services
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
         private readonly IRankRepository _rankRepository;
-        private readonly IUserRankRepository _userRankRepository;
         private readonly IStatsRepository _statsRepository;
         private readonly IFolderRepository _folderRepository;
         private readonly ITimerRepository _timerRepository;
-        private readonly IUserRanksRepository _userRanksRepository;
 
         public UserService(ILogger<UserService> logger,
         IDatabaseSettings databaseSettings,
          UserManager<User> userManager,
           IMapper mapper,
           IRankRepository rankRepository,
-          IUserRankRepository userRankRepository,
           IStatsRepository statsRepository,
           IFolderRepository folderRepository,
-          ITimerRepository timerRepository,
-          IUserRanksRepository userRanksRepository)
+          ITimerRepository timerRepository)
         {
             _logger = logger;
             _databaseSettings = databaseSettings;
             _userManager = userManager;
             _mapper = mapper;
             _rankRepository = rankRepository;
-            _userRankRepository = userRankRepository;
             _statsRepository = statsRepository;
             _folderRepository = folderRepository;
             _timerRepository = timerRepository;
-            _userRanksRepository = userRanksRepository;
         }
+
         private Task initializeUser(User user)
         {
-            List<Task> processTasks = new List<Task>();
-            processTasks.Add(Task.Run(() => initializeUserRank(user)));
-            processTasks.Add(Task.Run(() => initializeUserStats(user)));
-            processTasks.Add(Task.Run(() => initializeUserFolder(user)));
-            processTasks.Add(Task.Run(() => initializeUserTimer(user)));
+            List<Task> processTasks = new List<Task>
+            {
+                Task.Run(() => initializeUserStats(user)),
+                Task.Run(() => initializeUserFolder(user)),
+                Task.Run(() => initializeUserTimer(user))
+            };
             //TODO add initializeUserTheme
             return Task.WhenAll(processTasks);
         }
-        private async Task initializeUserRank(User user)
+
+        private async Task initializeUserStats(User user)
         {
             await _statsRepository.createAsync(new Stats
             {
                 userId = user.Id.ToString()
             });
         }
+
         private Task initializeUserTimer(User user)
         {
-            List<Task> processTasks = new List<Task>();
-            processTasks.Add(Task.Run(() => _timerRepository.createAsync(new Timer{userId=user.Id.ToString(), name = "90/30",breakTime=30,overTime=5,workTime=90})));
-            processTasks.Add(Task.Run(() => _timerRepository.createAsync(new Timer{userId=user.Id.ToString(), name = "Pomodoro",breakTime=5,overTime=5,workTime=25})));
-            processTasks.Add(Task.Run(() => _timerRepository.createAsync(new Timer{userId=user.Id.ToString(), name = "Just Five",breakTime=5,overTime=5,workTime=5})));
-            
+            List<Task> processTasks = new List<Task>
+            {
+                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(), timerType=TIMER_TYPE.TIMER, name = "90/30", breakTime = 30, overTime = 5, workTime = 90 })),
+                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(), timerType=TIMER_TYPE.TIMER, name = "Pomodoro", breakTime = 5, overTime = 5, workTime = 25 })),
+                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(), timerType=TIMER_TYPE.TIMER, name = "Just Five", breakTime = 5, overTime = 5, workTime = 5 }))
+            };
+
             return Task.WhenAll(processTasks);
 
         }
 
         private Task initializeUserFolder(User user)
         {
-            List<Task> processTasks = new List<Task>();
-            processTasks.Add(Task.Run(() => _folderRepository.createAsync(new Folder{userId=user.Id.ToString(), name = "Active"})));
-            processTasks.Add(Task.Run(() => _folderRepository.createAsync(new Folder{userId=user.Id.ToString(), name = "Inactive "})));
-            processTasks.Add(Task.Run(() => _folderRepository.createAsync(new Folder{userId=user.Id.ToString(), name = "Done"})));
-            
+            List<Task> processTasks = new List<Task>
+            {
+                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(), name = "Active", description = "Folder for active projects" })),
+                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(), name = "Inactive", description = "Folder for inactive projects" })),
+                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(), name = "Done", description = "Folder for finished projects" }))
+            };
+
             return Task.WhenAll(processTasks);
 
         }
 
-        private async Task initializeUserStats(User user)
+        private async Task<User> initializeUserRank(User user)
         {
             var rookieRank = await _rankRepository.getRookieAsync();
-            var userRanks = new UserRanks { userId = user.Id.ToString() };
-            userRanks.rankIds.Add(rookieRank.id);
-            await _userRanksRepository.createAsync(userRanks);
-            await _userRankRepository.createOrUpdateAsync(new UserRank
-            {
-                userId = user.Id.ToString(),
-                rankId = rookieRank.id
-            });
+            user.currentRankId = rookieRank.id;
+            user.purchasedRankIds.Add(rookieRank.id);
+            return user;
         }
-        public async Task<User> createAsync(User newUser, String password)
+
+        public async Task<User> createAsync(User newUser, string password)
         {
+            newUser = await initializeUserRank(newUser);
             var result = await _userManager.CreateAsync(newUser, password);
             if (result.Succeeded)
             {
@@ -132,22 +126,12 @@ namespace gamitude_backend.Services
             }
         }
 
-        public async Task<List<User>> getAllAsync(int offset, int limit)
-        {
-            var users = await _userManager.Users
-                .OrderByDescending(o => o.Id)
-                .Skip(offset)
-                .Take(limit)
-                .ToListAsync();
-            return users;
-        }
-
-        public Task<User> getByIdAsync(String id)
+        public Task<User> getByIdAsync(string id)
         {
             return _userManager.FindByIdAsync(id);
         }
 
-        public Task<User> getByUserNameAsync(String userName)
+        public Task<User> getByUserNameAsync(string userName)
         {
             return _userManager.FindByNameAsync(userName);
         }
@@ -167,7 +151,8 @@ namespace gamitude_backend.Services
                 throw new IdentityException(s);
             }
         }
-        public async Task changePasswordAsync(String id, String oldPassword, String newPassword)
+
+        public async Task changePasswordAsync(string id, string oldPassword, string newPassword)
         {
             var user = await _userManager.FindByIdAsync(id);
             var result = await _userManager.ChangePasswordAsync(user, oldPassword, newPassword);
@@ -178,7 +163,7 @@ namespace gamitude_backend.Services
             }
         }
 
-        public async Task deleteByIdAsync(String id)
+        public async Task deleteByIdAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
             var result = await _userManager.DeleteAsync(user);

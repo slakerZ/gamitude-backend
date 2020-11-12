@@ -1,8 +1,4 @@
 using gamitude_backend.Models;
-using System.Collections.Generic;
-using System;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using gamitude_backend.Data;
 using gamitude_backend.Repositories;

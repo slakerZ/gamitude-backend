@@ -1,65 +1,42 @@
 using gamitude_backend.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using Microsoft.Extensions.Logging;
-using AutoMapper;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using gamitude_backend.Settings;
 using MongoDB.Driver;
 using gamitude_backend.Data;
+using MongoDB.Bson;
 
 namespace gamitude_backend.Repositories
 {
     public interface IUserThemeRepository
     {
-        Task<UserTheme> getByIdAsync(String id);
-        Task<UserTheme> getByUserIdAsync(String userId);
-        Task createAsync(UserTheme rank);
-        Task updateAsync(String id, UserTheme updateUserTheme);
-        Task deleteByIdAsync(String id);
+        Task<string> getByUserIdAsync(string userId);
+        Task createOrUpdateAsync(string userId, string themeId);
     }
     public class UserThemeRepository : IUserThemeRepository
     {
-        private readonly IMongoCollection<UserTheme> _userTheme;
+        private readonly IMongoCollection<User> _users;
 
 
         public UserThemeRepository(IDatabaseCollections dbCollections)
         {
-            _userTheme = dbCollections.userTheme;
+            _users = dbCollections.users;
         }
 
-        public Task<UserTheme> getByIdAsync(String id)
+        public async Task<string> getByUserIdAsync(string userId)
         {
-            return _userTheme.Find<UserTheme>(UserTheme => UserTheme.id == id).FirstOrDefaultAsync();
-        }
 
-        public Task createAsync(UserTheme UserTheme)
-        {
-            return _userTheme.InsertOneAsync(UserTheme);
-        }
-
-        public Task updateAsync(String id, UserTheme newUserTheme)
-        {
-            return _userTheme.ReplaceOneAsync(UserTheme => UserTheme.id == id, newUserTheme);
+            var projection = Builders<User>.Projection.Include("currentThemeId").Exclude("_id");
+            var filter = Builders<User>.Filter.Eq("_id", new ObjectId(userId));
+            var result = await _users.Find(filter).Project(projection).FirstOrDefaultAsync();
+            result.TryGetValue("currentThemeId", out var theme);
+            return theme.ToString();
 
         }
 
-        public Task deleteByUserThemeAsync(UserTheme UserThemeIn)
+        public Task createOrUpdateAsync(string userId, string themeId)
         {
-            return _userTheme.DeleteOneAsync(UserTheme => UserTheme.id == UserThemeIn.id);
-        }
-
-        public Task deleteByIdAsync(string id)
-        {
-            return _userTheme.DeleteOneAsync(UserTheme => UserTheme.id == id);
-
-        }
-
-        public Task<UserTheme> getByUserIdAsync(string userId)
-        {
-            return _userTheme.Find<UserTheme>(userTheme => userTheme.userId == userId).FirstOrDefaultAsync();
+            var filter = Builders<User>.Filter.Eq("_id", new ObjectId(userId));
+            var update = Builders<User>.Update.Set("currentThemeId", new ObjectId(themeId));
+            return _users.UpdateOneAsync(filter, update);
         }
     }
 }

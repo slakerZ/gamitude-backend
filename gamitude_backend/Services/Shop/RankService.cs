@@ -13,8 +13,8 @@ namespace gamitude_backend.Services
 
     public interface IRankService : IRankRepository
     {
-        Task<Rank> getCurrentByUserIdAsync(String id);
-        Task<IReadOnlyList<Rank>> getAllByUserIdAsync(String id);
+        Task<Rank> getCurrentByUserIdAsync(string id);
+        Task<IReadOnlyList<Rank>> getAllByUserIdAsync(string id);
     }
 
     public class RankService : RankRepository, IRankService
@@ -23,7 +23,7 @@ namespace gamitude_backend.Services
         private readonly IUserRankRepository _userRankRepository;
         private readonly IUserRanksRepository _userRanksRepository;
 
-        public RankService(IDatabaseCollections dbCollections,IUserRankRepository userRankRepository, IUserRanksRepository userRanksRepository) : base(dbCollections)
+        public RankService(IDatabaseCollections dbCollections, IUserRankRepository userRankRepository, IUserRanksRepository userRanksRepository) : base(dbCollections)
         {
             _ranks = dbCollections.ranks;
             _userRankRepository = userRankRepository;
@@ -31,13 +31,14 @@ namespace gamitude_backend.Services
         }
         public async Task<Rank> getCurrentByUserIdAsync(string id)
         {
-            var userRank = await  _userRankRepository.getByUserIdAsync(id);
-            return await getByIdAsync(userRank.rankId);
+            var userRankId = await _userRankRepository.getByUserIdAsync(id);
+            var rank = await getByIdAsync(userRankId);
+            return rank;
         }
         public async Task<IReadOnlyList<Rank>> getAllByUserIdAsync(string id)
         {
-            var userRanks = await  _userRanksRepository.getByUserIdAsync(id);
-            return await getByIdAsync(userRanks.rankIds);
+            var userRankIds = await _userRanksRepository.getByUserIdAsync(id);
+            return await getByIdAsync(userRankIds);
         }
     }
 }

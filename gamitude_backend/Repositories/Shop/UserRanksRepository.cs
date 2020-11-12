@@ -1,65 +1,51 @@
 using gamitude_backend.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System;
-using Microsoft.Extensions.Logging;
-using AutoMapper;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using gamitude_backend.Settings;
 using MongoDB.Driver;
 using gamitude_backend.Data;
+using MongoDB.Bson;
+using System.Linq;
 
 namespace gamitude_backend.Repositories
 {
     public interface IUserRanksRepository
     {
-        Task<UserRanks> getByIdAsync(String id);
-        Task<UserRanks> getByUserIdAsync(String userId);
-        Task createAsync(UserRanks rank);
-        Task updateAsync(String id, UserRanks updateUserRanks);
-        Task deleteByIdAsync(String id);
+        Task<List<string>> getByUserIdAsync(string userId);
+        Task addAsync(string userId, string rankId);
+        Task addListAsync(string userId, List<string> rankIds);
     }
     public class UserRanksRepository : IUserRanksRepository
     {
-        private readonly IMongoCollection<UserRanks> _userRanks;
+        private readonly IMongoCollection<User> _users;
 
 
         public UserRanksRepository(IDatabaseCollections dbCollections)
         {
-            _userRanks = dbCollections.userRanks;
+            _users = dbCollections.users;
         }
 
-        public Task<UserRanks> getByIdAsync(String id)
+        public Task addAsync(string userId, string rankId)
         {
-            return _userRanks.Find<UserRanks>(UserRanks => UserRanks.id == id).FirstOrDefaultAsync();
+            var filter = Builders<User>.Filter.Eq("_id", userId);
+            var update = Builders<User>.Update.AddToSet("purchasedRankIds", new ObjectId(rankId));
+            return _users.UpdateOneAsync(filter, update);
         }
 
-        public Task createAsync(UserRanks UserRanks)
+        public Task addListAsync(string userId, List<string> rankIds)
         {
-            return _userRanks.InsertOneAsync(UserRanks);
+            var filter = Builders<User>.Filter.Eq("_id", new ObjectId(userId));
+            var update = Builders<User>.Update.AddToSet("purchasedRankIds", rankIds.Select(o => new ObjectId(o)).ToList());
+            return _users.UpdateOneAsync(filter, update);
         }
 
-        public Task updateAsync(String id, UserRanks newUserRanks)
+        public async Task<List<string>> getByUserIdAsync(string userId)
         {
-            return _userRanks.ReplaceOneAsync(UserRanks => UserRanks.id == id, newUserRanks);
+            var projection = Builders<User>.Projection.Include("purchasedRankIds").Exclude("_id");
+            var filter = Builders<User>.Filter.Eq("_id", new ObjectId(userId));
+            var result = await _users.Find(filter).Project(projection).FirstOrDefaultAsync();
+            result.TryGetValue("purchasedRankIds", out var ranks);
+            return ranks.AsBsonArray.Select(o => o.AsObjectId.ToString()).ToList();
 
-        }
-
-        public Task deleteByUserRanksAsync(UserRanks UserRanksIn)
-        {
-            return _userRanks.DeleteOneAsync(UserRanks => UserRanks.id == UserRanksIn.id);
-        }
-
-        public Task deleteByIdAsync(string id)
-        {
-            return _userRanks.DeleteOneAsync(UserRanks => UserRanks.id == id);
-
-        }
-
-        public Task<UserRanks> getByUserIdAsync(string userId)
-        {
-            return _userRanks.Find<UserRanks>(userRanks => userRanks.userId == userId).FirstOrDefaultAsync();
         }
     }
 }

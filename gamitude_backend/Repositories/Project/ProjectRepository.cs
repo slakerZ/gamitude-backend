@@ -1,8 +1,6 @@
 using gamitude_backend.Models;
 using System.Collections.Generic;
-using System;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using gamitude_backend.Data;
 using MongoDB.Bson;
@@ -11,13 +9,13 @@ namespace gamitude_backend.Repositories
 {
     public interface IProjectRepository
     {
-        Task<Project> getByIdAsync(String id);
-        Task<List<Project>> getByUserIdAsync(String userId);
+        Task<Project> getByIdAsync(string id);
+        Task<List<Project>> getByUserIdAsync(string userId);
         Task createAsync(Project project);
-        Task updateAsync(String id, Project updateProject);
-        Task updateTotalTimeAsync(String projectId, int timeToAdd);
-        Task updateTotalTimeBreakAsync(String projectId, int timeToAdd);
-        Task deleteByIdAsync(String id);
+        Task updateAsync(string id, Project updateProject);
+        Task updateTotalTimeAsync(string projectId, int timeToAdd);
+        Task updateTotalTimeBreakAsync(string projectId, int timeToAdd);
+        Task deleteByIdAsync(string id);
     }
     public class ProjectRepository : IProjectRepository
     {
@@ -29,12 +27,12 @@ namespace gamitude_backend.Repositories
             _Projects = dbCollections.projects;
         }
 
-        public Task<Project> getByIdAsync(String id)
+        public Task<Project> getByIdAsync(string id)
         {
             return _Projects.Find<Project>(Project => Project.id == id).FirstOrDefaultAsync();
         }
 
-        public Task<List<Project>> getByUserIdAsync(String userId)
+        public Task<List<Project>> getByUserIdAsync(string userId)
         {
             return _Projects.Find<Project>(Project => Project.userId == userId).ToListAsync();
 
@@ -45,18 +43,18 @@ namespace gamitude_backend.Repositories
             return _Projects.InsertOneAsync(Project);
         }
 
-        public Task updateAsync(String id, Project newProject)
+        public Task updateAsync(string id, Project newProject)
         {
             return _Projects.ReplaceOneAsync(Project => Project.id == id, newProject);
 
         }
-        public Task updateTotalTimeAsync(String projectId, int timeToAdd)
+        public Task updateTotalTimeAsync(string projectId, int timeToAdd)
         {
             var filter = new BsonDocument("_id", new ObjectId(projectId));
             var update = new BsonDocument("$inc", new BsonDocument("totalTimeSpend", timeToAdd));
             return _Projects.UpdateOneAsync(filter,update);
         }
-        public Task updateTotalTimeBreakAsync(String projectId, int timeToAdd)
+        public Task updateTotalTimeBreakAsync(string projectId, int timeToAdd)
         {
             var filter = new BsonDocument("_id", new ObjectId(projectId));
             var update = new BsonDocument("$inc", new BsonDocument("totalTimeSpendBreak", timeToAdd));

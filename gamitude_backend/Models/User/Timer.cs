@@ -1,6 +1,7 @@
 using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+
 namespace gamitude_backend.Models
 {
     [BsonIgnoreExtraElements]
@@ -15,6 +16,12 @@ namespace gamitude_backend.Models
 
         [BsonElement("name")]
         public string name { get; set; }
+
+        [BsonElement("label")]
+        public string label { get; set; }
+
+        [BsonElement("timerType")]
+        public TIMER_TYPE? timerType { get; set; }
 
         [BsonElement("workTime")]
         public int workTime { get; set; }

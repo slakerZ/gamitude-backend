@@ -1,12 +1,5 @@
 using gamitude_backend.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System;
-using Microsoft.Extensions.Logging;
-using AutoMapper;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using gamitude_backend.Settings;
 using MongoDB.Driver;
 using gamitude_backend.Data;
 
@@ -14,11 +7,11 @@ namespace gamitude_backend.Repositories
 {
     public interface IStatsRepository
     {
-        Task<Stats> getByIdAsync(String id);
-        Task<Stats> getByUserIdAsync(String userId);
+        Task<Stats> getByIdAsync(string id);
+        Task<Stats> getByUserIdAsync(string userId);
         Task createAsync(Stats stats);
-        Task updateAsync(String id, Stats updateStats);
-        Task deleteByIdAsync(String id);
+        Task updateAsync(string id, Stats updateStats);
+        Task deleteByIdAsync(string id);
     }
     public class StatsRepository : IStatsRepository
     {
@@ -30,12 +23,12 @@ namespace gamitude_backend.Repositories
             _stats = dbCollections.stats;
         }
 
-        public Task<Stats> getByIdAsync(String id)
+        public Task<Stats> getByIdAsync(string id)
         {
             return _stats.Find<Stats>(Stats => Stats.id == id).FirstOrDefaultAsync();
         }
 
-        public Task<Stats> getByUserIdAsync(String userId)
+        public Task<Stats> getByUserIdAsync(string userId)
         {
             return _stats.Find<Stats>(Stats => Stats.userId == userId).FirstOrDefaultAsync();
 
@@ -46,7 +39,7 @@ namespace gamitude_backend.Repositories
             return _stats.InsertOneAsync(Stats);
         }
 
-        public Task updateAsync(String id, Stats newStats)
+        public Task updateAsync(string id, Stats newStats)
         {
             return _stats.ReplaceOneAsync(Stats => Stats.id == id, newStats,new ReplaceOptions{IsUpsert=true});
 

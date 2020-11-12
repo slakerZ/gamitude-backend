@@ -1,4 +1,7 @@
 # gamitude-backend
+## backend + database
+docker-compose build
+docker-compose run (-d)
 ## database   
 ```
 cd db  
