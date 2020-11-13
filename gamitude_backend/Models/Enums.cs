@@ -1,6 +1,6 @@
 namespace gamitude_backend.Models
 {
-    public enum STATS {STRENGTH,INTELLIGENCE,CREATIVITY,FLUENCY};
+    public enum STATS {STRENGTH,INTELLIGENCE,CREATIVITY,FLUENCY,BODY,EMOTIONS,MIND,SOUL};
     public enum PROJECT_TYPE {STAT,ENERGY,BREAK};
     public enum TIMER_TYPE {STOPWATCH,TIMER};
     public enum GAMITUDE_STYLE

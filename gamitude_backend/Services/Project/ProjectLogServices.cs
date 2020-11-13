@@ -48,15 +48,50 @@ namespace gamitude_backend.Services
         {
             return a - b;
         }
-
+        private STATS updateStatsTo(STATS stats)
+        {
+            switch (stats)
+            {
+                case STATS.BODY: return STATS.STRENGTH;
+                case STATS.MIND: return STATS.INTELLIGENCE;
+                case STATS.EMOTIONS: return STATS.CREATIVITY;
+                case STATS.SOUL: return STATS.FLUENCY;
+                default: return stats;
+            }
+        }
+        private STATS updateStatsFrom(STATS stats)
+        {
+            switch (stats)
+            {
+                case STATS.STRENGTH: return STATS.BODY;
+                case STATS.INTELLIGENCE: return STATS.MIND;
+                case STATS.CREATIVITY: return STATS.EMOTIONS;
+                case STATS.FLUENCY: return STATS.SOUL;
+                default: return stats;
+            }
+        }
+        public delegate STATS statsChange(STATS stats);
+        private ProjectLog updateStatsFields(statsChange update,ProjectLog projectLog)
+        {
+            projectLog.dominantStat = update(projectLog.dominantStat.Value);
+            projectLog.stats = projectLog.stats.Select(o => update(o)).ToArray();
+            return projectLog;
+        }
         public async Task<ProjectLog> processCreateProjectLog(ProjectLog projectLog)
         {
             projectLog.dateCreated = DateTime.UtcNow;
+
+            //WORKAROUND PARSE ENERGIES TO STATS
+            projectLog = updateStatsFields(updateStatsTo,projectLog);
+
             Dictionary<STATS, int> wages = projectLog.getWages();
             List<Task> processTasks = new List<Task>();
             processTasks.Add(Task.Run(() => manageEnergyAsync(add, wages, projectLog)));
             processTasks.Add(Task.Run(() => manageStatsAsync(add, wages, projectLog)));
             await Task.WhenAll(processTasks);
+
+            //WORKAROUND REVERT
+            projectLog = updateStatsFields(updateStatsFrom,projectLog);
             await createAsync(projectLog);
             if (projectLog.projectId != null)
             {
