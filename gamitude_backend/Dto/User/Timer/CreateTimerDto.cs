@@ -5,7 +5,7 @@ using gamitude_backend.Models;
 namespace gamitude_backend.Dto.Timer
 {
 
-    public class CreateTimerDto//TODO
+    public class CreateTimerDto
     {
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "At least 1")]

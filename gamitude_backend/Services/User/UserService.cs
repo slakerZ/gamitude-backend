@@ -93,9 +93,9 @@ namespace gamitude_backend.Services
         {
             List<Task> processTasks = new List<Task>
             {
-                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(), name = "Active", description = "Folder for active projects" })),
-                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(), name = "Inactive", description = "Folder for inactive projects" })),
-                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(), name = "Done", description = "Folder for finished projects" }))
+                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="active", name = "Active", description = "Folder for active projects" })),
+                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="paused", name = "Inactive", description = "Folder for inactive projects" })),
+                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="done", name = "Done", description = "Folder for finished projects" }))
             };
 
             return Task.WhenAll(processTasks);
