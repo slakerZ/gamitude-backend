@@ -30,7 +30,7 @@ spec:
                   name: token-string
                   key: token_string
           ports:
-            - name: gamitude_backend-http
+            - name: backend-http
               containerPort: 80
           livenessProbe: # Used by deployment controller
             httpGet:
