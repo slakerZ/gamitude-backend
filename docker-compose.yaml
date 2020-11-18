@@ -1,0 +1,24 @@
+version: "3"
+services:
+ mongo:
+  image: mongo
+  container_name: gamitude_mongo
+  ports:
+    - 27017:27017
+  environment:
+    MONGO_INITDB_DATABASE: gamitude
+  volumes:
+    - ./db/init:/docker-entrypoint-initdb.d:ro
+ gamitude_backend:
+  image: gamitude_backend
+  container_name: gamitude_backend
+  build:
+      context: ./gamitude_backend
+      dockerfile: DockerfileForCompose
+  ports:
+    - 5000:80
+  environment:
+    - 'DatabaseSettings__ConnectionString=mongodb://mongo:27017'
+    - 'ASPNETCORE_ENVIRONMENT=Development'
+  depends_on: 
+    - mongo

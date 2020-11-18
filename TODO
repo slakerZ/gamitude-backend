@@ -1,0 +1,4 @@
+- Unit tests for stats and energy management
+- Api unit tests
+- change energy calculation wages that always some energy goeas away from all energies 
+- new endpoint for adding stopwatch
