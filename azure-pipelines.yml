@@ -38,7 +38,7 @@ steps:
   displayName: 'print folders'
   inputs:
     filename: /bin/bash
-    arguments: '-c ls gamitude_backend'
+    arguments: '-c ls gamitude_backend/gamitude_backend'
 
 - task: CmdLine@1
   displayName: 'Lock image version in deployment.yaml'
