@@ -34,6 +34,11 @@ steps:
     arguments: '--configuration $(BuildConfiguration) --framework=$(TargetFramework)'
     zipAfterPublish: false
     modifyOutputPath: false
+- task: CmdLine@1
+  displayName: 'print folders'
+  inputs:
+    filename: /bin/bash
+    arguments: 'ls && ls gamitude_backend'
 
 - task: CmdLine@1
   displayName: 'Lock image version in deployment.yaml'
