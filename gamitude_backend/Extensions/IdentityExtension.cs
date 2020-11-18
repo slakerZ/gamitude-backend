@@ -24,7 +24,7 @@ namespace gamitude_backend.Extensions
                 identityOptions.User.RequireUniqueEmail = true;
             }, mongoIdentityOptions =>
             {
-                mongoIdentityOptions.ConnectionString = $"{connectionString}/{dbName}";
+                mongoIdentityOptions.ConnectionString = connectionString;
             }); 
 
         }
