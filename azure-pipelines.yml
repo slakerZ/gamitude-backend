@@ -22,6 +22,7 @@ steps:
     #nugetConfigPath: ./nuget/
 - task: DotNetCoreCLI@2
   displayName: Build
+  buildContext: ./gamitude_backend
   inputs:
     projects: '$(RestoreBuildProjects)'
     arguments: '--configuration $(BuildConfiguration) --framework=$(TargetFramework)'
