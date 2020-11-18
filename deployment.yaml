@@ -9,14 +9,14 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: gamitude_backend
+      app: backend
   template:
     metadata:
       labels:
-        app: gamitude_backend
+        app: backend
     spec:
       containers:
-        - name: gamitude_backend
+        - name: backend
           image: GAMITUDE_BACKEND_IMAGE
           env:
             - name: DatabaseSettings__ConnectionString
