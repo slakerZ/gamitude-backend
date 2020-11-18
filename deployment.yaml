@@ -24,7 +24,7 @@ spec:
                 secretKeyRef:
                   name: database-string
                   key: connection_string
-            - name: AppSettings__Secret
+            - name: JwtSettings__Secret
               valueFrom:
                 secretKeyRef:
                   name: token-string
