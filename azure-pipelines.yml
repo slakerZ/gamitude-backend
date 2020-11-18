@@ -23,7 +23,6 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: Build
   inputs:
-    buildContext: ./gamitude_backend
     projects: '$(RestoreBuildProjects)'
     arguments: '--configuration $(BuildConfiguration) --framework=$(TargetFramework)'
     
@@ -48,6 +47,7 @@ steps:
 - task: Docker@0
   displayName: 'Build image'
   inputs:
+    buildContext: './gamitude_backend'
     containerregistrytype: 'Container Registry'
     dockerRegistryConnection: 'gcr-gamitude-pipeline'
     imageName: '$(DockerImageName):$(Build.BuildId)'
