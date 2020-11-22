@@ -35,7 +35,7 @@ namespace gamitude_backend.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{id:length(24)}")]
+        [HttpGet("{journalId:length(24)}")]
         public async Task<ActionResult<ControllerResponse<List<GetPageDto>>>> get(string journalId)
         {
 
