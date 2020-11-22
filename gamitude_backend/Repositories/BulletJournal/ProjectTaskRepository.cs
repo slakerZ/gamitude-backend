@@ -16,44 +16,44 @@ namespace gamitude_backend.Repositories
     }
     public class ProjectTaskRepository : IProjectTaskRepository
     {
-        private readonly IMongoCollection<ProjectTask> _ProjectTasks;
+        private readonly IMongoCollection<ProjectTask> _projectTasks;
 
 
         public ProjectTaskRepository(IDatabaseCollections dbCollections)
         {
-            _ProjectTasks = dbCollections.projectTasks;
+            _projectTasks = dbCollections.projectTasks;
         }
 
         public Task<ProjectTask> getByIdAsync(string id)
         {
-            return _ProjectTasks.Find<ProjectTask>(ProjectTask => ProjectTask.id == id).FirstOrDefaultAsync();
+            return _projectTasks.Find<ProjectTask>(ProjectTask => ProjectTask.id == id).FirstOrDefaultAsync();
         }
 
         public Task<List<ProjectTask>> getByProjectIdAsync(string projectId)
         {
-            return _ProjectTasks.Find<ProjectTask>(ProjectTask => ProjectTask.projectId == projectId).ToListAsync();
+            return _projectTasks.Find<ProjectTask>(ProjectTask => ProjectTask.projectId == projectId).ToListAsync();
 
         }
 
         public Task createAsync(ProjectTask ProjectTask)
         {
-            return _ProjectTasks.InsertOneAsync(ProjectTask);
+            return _projectTasks.InsertOneAsync(ProjectTask);
         }
 
         public Task updateAsync(string id, ProjectTask newProjectTask)
         {
-            return _ProjectTasks.ReplaceOneAsync(ProjectTask => ProjectTask.id == id, newProjectTask);
+            return _projectTasks.ReplaceOneAsync(ProjectTask => ProjectTask.id == id, newProjectTask);
 
         }
 
         public Task deleteByProjectTaskAsync(ProjectTask ProjectTaskIn)
         {
-            return _ProjectTasks.DeleteOneAsync(ProjectTask => ProjectTask.id == ProjectTaskIn.id);
+            return _projectTasks.DeleteOneAsync(ProjectTask => ProjectTask.id == ProjectTaskIn.id);
         }
 
         public Task deleteByIdAsync(string id)
         {
-            return _ProjectTasks.DeleteOneAsync(ProjectTask => ProjectTask.id == id);
+            return _projectTasks.DeleteOneAsync(ProjectTask => ProjectTask.id == id);
 
         }
 

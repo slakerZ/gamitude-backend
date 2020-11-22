@@ -23,12 +23,23 @@ namespace gamitude_backend.Models
         [BsonElement("timerType")]
         public TIMER_TYPE? timerType { get; set; }
 
+        [BsonElement("timer")]
+        public CountDownInfo countDownInfo { get; set; }
+
+        [BsonElement("dateCreated")]
+        public DateTime dateCreated { get; set; }
+
+    }
+    
+    [BsonIgnoreExtraElements]
+    public class CountDownInfo
+    {
         [BsonElement("workTime")]
         public int workTime { get; set; }
 
         [BsonElement("breakTime")]
         public int breakTime { get; set; }
-        
+
         [BsonElement("overTime")]
         public int overTime { get; set; }
 
@@ -37,8 +48,7 @@ namespace gamitude_backend.Models
 
         [BsonElement("breakInterval")]
         public int? breakInterval { get; set; }
-
-        [BsonElement("dateCreated")]
-        public DateTime dateCreated { get; set; }
     }
+
+
 }

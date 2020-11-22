@@ -62,6 +62,15 @@ namespace gamitude_backend
             CreateMap<UpdateTimerDto, Timer>() // helper for update
                     .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
+            //CountDownInfo          
+            CreateMap<CreateCountDownInfoDto, CountDownInfo>();
+            CreateMap<CountDownInfo, GetCountDownInfoDto>();
+            // CreateMap<UpdateCountDownInfoDto, CountDownInfo>();
+            CreateMap<CountDownInfo, CountDownInfo>() // helper for update
+                    .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<UpdateCountDownInfoDto, CountDownInfo>() // helper for update
+                    .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
         }
     }
 }

@@ -25,9 +25,6 @@ namespace gamitude_backend.Controllers
     public class FoldersController : ControllerBase
     {
         private readonly ILogger<FoldersController> _logger;
-
-        //TODO stats verification if Dominant in stats
-
         private readonly IFolderService _folderService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;

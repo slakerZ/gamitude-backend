@@ -8,6 +8,8 @@ namespace gamitude_backend.Settings
         public string projectsCollectionName { get; set; }
         public string projectLogsCollectionName { get; set; }
         public string projectTasksCollectionName { get; set; }
+        public string journalsCollectionName { get; set; }
+        public string pagesCollectionName { get; set; }
         public string ranksCollectionName { get; set; }
         public string themesCollectionName { get; set; }
         public string dailyEnergiesCollectionName { get; set; }
@@ -29,6 +31,8 @@ namespace gamitude_backend.Settings
         string projectsCollectionName { get; set; }
         string projectLogsCollectionName { get; set; }
         string projectTasksCollectionName { get; set; }
+        string journalsCollectionName { get; set; }
+        string pagesCollectionName { get; set; }
         string ranksCollectionName { get; set; }
         string themesCollectionName { get; set; }
         string dailyEnergiesCollectionName { get; set; }
