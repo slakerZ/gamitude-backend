@@ -36,7 +36,7 @@ namespace gamitude_backend.Models
         public List<string> tags { get; set; }
 
         [BsonElement("deadLine")]
-        public DateTime deadLine { get; set; }
+        public DateTime? deadLine { get; set; }
 
         [BsonElement("dateCreated")]
         public DateTime dateCreated { get; set; }

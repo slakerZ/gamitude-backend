@@ -1,5 +1,6 @@
 using AutoMapper;
 using gamitude_backend.Dto.Authorization;
+using gamitude_backend.Dto.BulletJournal;
 using gamitude_backend.Dto.Folder;
 using gamitude_backend.Dto.Project;
 using gamitude_backend.Dto.Rank;
@@ -65,12 +66,39 @@ namespace gamitude_backend
             //CountDownInfo          
             CreateMap<CreateCountDownInfoDto, CountDownInfo>();
             CreateMap<CountDownInfo, GetCountDownInfoDto>();
+
             // CreateMap<UpdateCountDownInfoDto, CountDownInfo>();
             CreateMap<CountDownInfo, CountDownInfo>() // helper for update
                     .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<UpdateCountDownInfoDto, CountDownInfo>() // helper for update
                     .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
+            //Journal          
+            CreateMap<CreateJournalDto, Journal>();
+            CreateMap<Journal, GetJournalDto>();
+            // CreateMap<UpdateJournalDto, Journal>();
+            CreateMap<Journal, Journal>() // helper for update
+                    .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<UpdateJournalDto, Journal>() // helper for update
+                    .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            //Page          
+            CreateMap<CreatePageDto, Page>();
+            CreateMap<Page, GetPageDto>();
+            // CreateMap<UpdatePageDto, Page>();
+            CreateMap<Page, Page>() // helper for update
+                    .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<UpdatePageDto, Page>() // helper for update
+                    .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            //ProjectTask          
+            CreateMap<CreateProjectTaskDto, ProjectTask>();
+            CreateMap<ProjectTask, GetProjectTaskDto>();
+            // CreateMap<UpdateProjectTaskDto, ProjectTask>();
+            CreateMap<ProjectTask, ProjectTask>() // helper for update
+                    .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<UpdateProjectTaskDto, ProjectTask>() // helper for update
+                    .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

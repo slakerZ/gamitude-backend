@@ -11,6 +11,8 @@ namespace gamitude_backend.Extensions
             services.AddScoped<IProjectService,ProjectService>();
             services.AddScoped<IProjectLogService,ProjectLogService>();
             services.AddScoped<IProjectTaskService,ProjectTaskService>();
+            services.AddScoped<IJournalService,JournalService>();
+            services.AddScoped<IPageService,PageService>();
             services.AddScoped<IRankService,RankService>();
             services.AddScoped<IDailyEnergyService,DailyEnergyService>();
             services.AddScoped<IStatsService,StatsService>();
