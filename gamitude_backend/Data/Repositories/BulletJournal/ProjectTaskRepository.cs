@@ -15,6 +15,7 @@ namespace gamitude_backend.Repositories
         Task<List<ProjectTask>> getByUserIdAsync(string userId);
         Task<List<ProjectTask>> getActiveByDayOffsetAsync(string userId, string journalId, int fromDays, int toDays);
         Task<List<ProjectTask>> getOverdueAsync(string userId);
+        Task<List<ProjectTask>> getUnScheduledAsync(string userId);
         Task createAsync(ProjectTask projectTask);
         Task updateAsync(string id, ProjectTask updateProjectTask);
         Task deleteByIdAsync(string id);
@@ -42,13 +43,17 @@ namespace gamitude_backend.Repositories
         //TODO unit test
         public Task<List<ProjectTask>> getActiveByDayOffsetAsync(string userId, string journalId, int fromDays, int toDays)
         {
-            var projectTasks = _projectTasks.AsQueryable()
+            var query = _projectTasks.AsQueryable()
                 .Where(o => o.journalId == journalId)
                 .Where(o => o.dateFinished == null)
                 .Where(o => o.userId == userId)
-                .Where(o => o.deadLine > DateTime.UtcNow.Date.AddDays(fromDays))
-                .Where(o => o.deadLine < DateTime.UtcNow.Date.AddDays(toDays))
-                .ToListAsync();
+                .Where(o => o.deadLine > DateTime.UtcNow.Date.AddDays(fromDays));
+            if(toDays != 0)
+            {
+                query = query.Where(o => o.deadLine < DateTime.UtcNow.Date.AddDays(toDays));
+            }
+
+            var projectTasks = query.ToListAsync();
             return projectTasks;
         }
 
@@ -58,6 +63,16 @@ namespace gamitude_backend.Repositories
                 .Where(o => o.dateFinished != null)
                 .Where(o => o.userId == userId)
                 .Where(o => o.deadLine < DateTime.UtcNow.Date)
+                .ToListAsync();
+            return projectTasks;
+        }
+
+        public Task<List<ProjectTask>> getUnScheduledAsync(string userId)
+        {
+            var projectTasks = _projectTasks.AsQueryable()
+                .Where(o => o.userId == userId)
+                .Where(o => o.dateFinished == null)
+                .Where(o => o.deadLine == null )
                 .ToListAsync();
             return projectTasks;
         }

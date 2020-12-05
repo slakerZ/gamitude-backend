@@ -22,11 +22,8 @@ namespace gamitude_backend.Models
         [BsonElement("name")]
         public string name { get; set; }
 
-        [BsonElement("fromDay")]
-        public int fromDay { get; set; }
-
-        [BsonElement("toDay")]
-        public int toDay { get; set; }
+        [BsonElement("beetwenDays")]
+        public BeetwenDays beetwenDays { get; set; }
 
         [BsonElement("icon")]
         public string icon { get; set; } = "";
@@ -36,5 +33,19 @@ namespace gamitude_backend.Models
 
         [BsonElement("description")]
         public string description { get; set; }
+
+        [BsonElement("pageType")]
+        public PAGE_TYPE pageType { get; set; }
     }
+
+    [BsonIgnoreExtraElements]
+    public class BeetwenDays
+    {
+        [BsonElement("fromDay")]
+        public int fromDay { get; set; }
+
+        [BsonElement("toDay")]
+        public int toDay { get; set; }
+    }
+
 }

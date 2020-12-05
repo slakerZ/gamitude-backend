@@ -22,6 +22,7 @@ namespace gamitude_backend.Extensions
             services.AddScoped<IUserThemeRepository,UserThemeRepository>();
             services.AddScoped<IUserThemesRepository,UserThemesRepository>();
             services.AddScoped<ITimerRepository,TimerRepository>();
+            services.AddScoped<IMoneyRepository,MoneyRepository>();
         }
     }
 }

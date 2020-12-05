@@ -10,6 +10,9 @@ namespace gamitude_backend.Models
     public class User : MongoUser
     {
 
+        [BsonElement("money")]
+        public long money { get; set; }
+
         [BsonElement("dateCreated")]
         public DateTime dateCreated { get; set; }
         

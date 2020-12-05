@@ -23,7 +23,7 @@ namespace gamitude_backend.Models
         [BsonElement("timerType")]
         public TIMER_TYPE? timerType { get; set; }
 
-        [BsonElement("timer")]
+        [BsonElement("countDownInfo")]
         public CountDownInfo countDownInfo { get; set; }
 
         [BsonElement("dateCreated")]
@@ -48,6 +48,14 @@ namespace gamitude_backend.Models
 
         [BsonElement("breakInterval")]
         public int? breakInterval { get; set; }
+
+        public CountDownInfo initStopWatch()
+        {
+            workTime = 0;
+            breakTime = 0;
+            overTime = 0;
+            return this;
+        }
     }
 
 

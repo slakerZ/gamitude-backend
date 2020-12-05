@@ -25,7 +25,15 @@ namespace gamitude_backend.Services
         public async Task<List<ProjectTask>> getByJournalIdAndPageIdAsync(string userId, string journalId, string pageId)
         {
             var page = await _pageRepository.getByIdAsync(pageId);
-            return await getActiveByDayOffsetAsync(userId,journalId, page.fromDay, page.toDay);
+            List<ProjectTask> projectTasks = null;
+            switch (page.pageType)
+            {
+                case PAGE_TYPE.NORMAL: projectTasks = await getActiveByDayOffsetAsync(userId, journalId, page.beetwenDays.fromDay, page.beetwenDays.toDay); break;
+                case PAGE_TYPE.OVERDUE: projectTasks = await getOverdueAsync(userId); break;
+                case PAGE_TYPE.UNSCHEDULED: projectTasks = await getUnScheduledAsync(userId); break;
+            }
+            return projectTasks;
         }
+
     }
 }

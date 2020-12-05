@@ -36,6 +36,8 @@ namespace gamitude_backend.Services
         private readonly IStatsRepository _statsRepository;
         private readonly IFolderRepository _folderRepository;
         private readonly ITimerRepository _timerRepository;
+        private readonly IJournalRepository _journalRepository;
+        private readonly IPageRepository _pageRepository;
 
         public UserService(ILogger<UserService> logger,
         IDatabaseSettings databaseSettings,
@@ -44,7 +46,9 @@ namespace gamitude_backend.Services
           IRankRepository rankRepository,
           IStatsRepository statsRepository,
           IFolderRepository folderRepository,
-          ITimerRepository timerRepository)
+          ITimerRepository timerRepository,
+          IJournalRepository journalRepository,
+          IPageRepository pageRepository)
         {
             _logger = logger;
             _databaseSettings = databaseSettings;
@@ -54,6 +58,8 @@ namespace gamitude_backend.Services
             _statsRepository = statsRepository;
             _folderRepository = folderRepository;
             _timerRepository = timerRepository;
+            _journalRepository = journalRepository;
+            _pageRepository = pageRepository;
         }
 
         private Task initializeUser(User user)
@@ -62,7 +68,9 @@ namespace gamitude_backend.Services
             {
                 Task.Run(() => initializeUserStats(user)),
                 Task.Run(() => initializeUserFolder(user)),
-                Task.Run(() => initializeUserTimer(user))
+                Task.Run(() => initializeUserTimer(user)),
+                Task.Run(() => initializeUserJournals(user))
+
             };
             //TODO add initializeUserTheme
             return Task.WhenAll(processTasks);
@@ -100,6 +108,21 @@ namespace gamitude_backend.Services
 
             return Task.WhenAll(processTasks);
 
+        }
+
+        private async Task initializeUserJournals(User user)
+        {
+            var journal = new Journal { userId = user.Id.ToString(), dateCreated = DateTime.UtcNow, description = "Your first journal", icon = "active", name = "Life" };
+            await _journalRepository.createAsync(journal);
+            List<Task> processTasks = new List<Task>
+            {
+                Task.Run(() => _pageRepository.createAsync(new Page {dateCreated = DateTime.UtcNow,journalId=journal.id,pageType=PAGE_TYPE.NORMAL,beetwenDays= new BeetwenDays{ fromDay=0, toDay=1},userId = user.Id.ToString(),icon="active", name = "Today", description = "Folder for tasks for today" })),
+                Task.Run(() => _pageRepository.createAsync(new Page {dateCreated = DateTime.UtcNow,journalId=journal.id,pageType=PAGE_TYPE.NORMAL,beetwenDays= new BeetwenDays{ fromDay=1, toDay=8}, userId = user.Id.ToString(),icon="active", name = "Week", description = "Folder for tasks for this week" })),
+                Task.Run(() => _pageRepository.createAsync(new Page {dateCreated = DateTime.UtcNow,journalId=journal.id,pageType=PAGE_TYPE.NORMAL,beetwenDays= new BeetwenDays{ fromDay=8, toDay=0} ,userId = user.Id.ToString(),icon="active", name = "Scheduled Future", description = "Page with all scheduled task that are further than week from now" })),
+                Task.Run(() => _pageRepository.createAsync(new Page {dateCreated = DateTime.UtcNow,journalId=journal.id,pageType=PAGE_TYPE.OVERDUE, userId = user.Id.ToString(),icon="done", name = "Overdue", description = "Folder for tasks after deadline" })),
+                Task.Run(() => _pageRepository.createAsync(new Page {dateCreated = DateTime.UtcNow,journalId=journal.id,pageType=PAGE_TYPE.UNSCHEDULED, userId = user.Id.ToString(),icon="paused", name = "Unscheduled", description = "Page with all unscheduled tasks that are not finished" }))
+            };
+            await Task.WhenAll(processTasks);
         }
 
         private async Task<User> initializeUserRank(User user)

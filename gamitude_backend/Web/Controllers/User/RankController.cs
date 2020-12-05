@@ -27,28 +27,30 @@ namespace gamitude_backend.Controllers
         private readonly ILogger<RankController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IRankService _rankService;
+        private readonly IUserRankService _userRankService;
 
         public RankController(IMapper mapper, ILogger<RankController> logger
-        , IHttpContextAccessor httpContextAccessor, IRankService rankService)
+        , IHttpContextAccessor httpContextAccessor, IRankService rankService, IUserRankService userRankService)
         {
             _mapper = mapper;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _rankService = rankService;
+            _userRankService = userRankService;
         }
 
 
         [HttpGet]
-        public async Task<ActionResult<ControllerResponse<List<GetRank>>>> get(int page = 1,int limit = 20,string sortBy="name")
+        public async Task<ActionResult<ControllerResponse<List<GetRank>>>> get(int page = 1, int limit = 20, string sortBy = "name")
         {
             _logger.LogInformation("In GET rank");
             var ranks = await _rankService.getAsync();
             // var ranks = await _rankService.getAllAsync(page,limit,sortBy);
-            return new ControllerResponse<List<GetRank>>
+            return Ok(new ControllerResponse<List<GetRank>>
             {
                 data = ranks.Select(o => _mapper.Map<GetRank>(o)).ToList()
-                
-            };
+
+            });
         }
         [HttpGet("user")]
         public async Task<ActionResult<ControllerResponse<List<GetRank>>>> getUser()
@@ -56,10 +58,10 @@ namespace gamitude_backend.Controllers
             _logger.LogInformation("In GET user rank");
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
             var ranks = await _rankService.getAllByUserIdAsync(userId);
-            return new ControllerResponse<List<GetRank>>
+            return Ok(new ControllerResponse<List<GetRank>>
             {
                 data = ranks.Select(o => _mapper.Map<GetRank>(o)).ToList()
-            };
+            });
         }
         [HttpGet("current")]
         public async Task<ActionResult<ControllerResponse<GetRank>>> getUserCurrent()
@@ -67,10 +69,32 @@ namespace gamitude_backend.Controllers
             _logger.LogInformation("In GET user rank");
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
             var rank = await _rankService.getCurrentByUserIdAsync(userId);
-            return new ControllerResponse<GetRank>
+            return Ok(new ControllerResponse<GetRank>
             {
                 data = _mapper.Map<GetRank>(rank)
-            };
+            });
+        }
+        [HttpPost("purchase")]
+        public async Task<ActionResult<ControllerResponse<GetRank>>> purchase(PostPurchaseRankDto purchaseRank)
+        {
+            _logger.LogInformation("In POST user rank purchase");
+            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+            var rank = await _rankService.purchaseRankIdAsync(userId, purchaseRank.id, purchaseRank.currency);
+            return Ok(new ControllerResponse<GetRank>
+            {
+                data = _mapper.Map<GetRank>(rank)
+            });
+        }
+        [HttpPost("select/{rankId}")]
+        public async Task<ActionResult<ControllerResponse<GetRank>>> select(string rankId)
+        {
+            _logger.LogInformation("In POST user rank purchase");
+            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+            var rank = await _rankService.selectRankIdAsync(userId, rankId);
+            return Ok(new ControllerResponse<GetRank>
+            {
+                data = _mapper.Map<GetRank>(rank)
+            });
         }
     }
 }

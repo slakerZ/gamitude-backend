@@ -4,3 +4,7 @@ services:
   image: mongo
   ports:
     - 27017:27017
+  volumes:
+    - ./init:/docker-entrypoint-initdb.d:ro
+  environment:
+    MONGO_INITDB_DATABASE: gamitude

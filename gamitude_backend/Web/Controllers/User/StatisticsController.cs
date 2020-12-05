@@ -55,16 +55,16 @@ namespace gamitude_backend.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ControllerResponse<GetLastWeekAvgEnergyDto>>> energy()
+        public async Task<ActionResult<ControllerResponse<GetDailyEnergyDto>>> energy()
         {
 
             _logger.LogInformation("In GET GetEnergy");
 
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
-
-            return Ok(new ControllerResponse<GetLastWeekAvgEnergyDto>
+            var energy = await _dailyEnergyService.GetDailyEnergyByUserIdAsync(userId);
+            return Ok(new ControllerResponse<GetDailyEnergyDto>
             {
-                data = await _dailyEnergyService.GetLastWeekAvgEnergyByUserIdAsync(userId)
+                data = _mapper.Map<GetDailyEnergyDto>(energy).scaleToPercent()
             });
 
         }

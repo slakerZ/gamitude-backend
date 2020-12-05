@@ -1,6 +1,7 @@
 using AutoMapper;
 using gamitude_backend.Dto.Authorization;
 using gamitude_backend.Dto.BulletJournal;
+using gamitude_backend.Dto.Energy;
 using gamitude_backend.Dto.Folder;
 using gamitude_backend.Dto.Project;
 using gamitude_backend.Dto.Rank;
@@ -54,6 +55,9 @@ namespace gamitude_backend
             //Stats
             CreateMap<Stats, GetStatsDto>();
 
+            //DailyEnergy
+            CreateMap<DailyEnergy, GetDailyEnergyDto>();
+
             //Timer          
             CreateMap<CreateTimerDto, Timer>();
             CreateMap<Timer, GetTimerDto>();
@@ -66,8 +70,6 @@ namespace gamitude_backend
             //CountDownInfo          
             CreateMap<CreateCountDownInfoDto, CountDownInfo>();
             CreateMap<CountDownInfo, GetCountDownInfoDto>();
-
-            // CreateMap<UpdateCountDownInfoDto, CountDownInfo>();
             CreateMap<CountDownInfo, CountDownInfo>() // helper for update
                     .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<UpdateCountDownInfoDto, CountDownInfo>() // helper for update
@@ -98,6 +100,14 @@ namespace gamitude_backend
             CreateMap<ProjectTask, ProjectTask>() // helper for update
                     .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<UpdateProjectTaskDto, ProjectTask>() // helper for update
+                    .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            //BeetwenDays          
+            CreateMap<CreateBeetwenDaysDto, BeetwenDays>();
+            CreateMap<BeetwenDays, GetBeetwenDaysDto>();
+            CreateMap<BeetwenDays, BeetwenDays>() // helper for update
+                    .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<UpdateBeetwenDaysDto, BeetwenDays>() // helper for update
                     .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }

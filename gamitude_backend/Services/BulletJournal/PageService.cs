@@ -2,6 +2,7 @@ using gamitude_backend.Models;
 using MongoDB.Driver;
 using gamitude_backend.Data;
 using gamitude_backend.Repositories;
+using System.Threading.Tasks;
 
 namespace gamitude_backend.Services
 {
@@ -18,7 +19,6 @@ namespace gamitude_backend.Services
         {
             _pages = dbCollections.pages;
         }
-
      
     }
 }

@@ -13,13 +13,16 @@ namespace gamitude_backend.Dto.BulletJournal
         public string name { get; set; }
 
         [Required]
+        public string icon { get; set;}
+
+        public CreateBeetwenDaysDto beetwenDays { get; set; }
+    }
+    public class CreateBeetwenDaysDto
+    {
+        [Required]
         public int fromDay { get; set; }
 
         [Required]
         public int toDay { get; set; }
-
-        [Required]
-        public string icon { get; set;}
-
     }
 }
