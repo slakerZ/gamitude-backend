@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using gamitude_backend.Models;
+
 namespace gamitude_backend.Dto.BulletJournal
 {
     public class GetPageDto

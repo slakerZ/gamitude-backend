@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using gamitude_backend.Models;
 
 namespace gamitude_backend.Dto.BulletJournal
 {
@@ -16,6 +17,9 @@ namespace gamitude_backend.Dto.BulletJournal
         public string icon { get; set;}
 
         public CreateBeetwenDaysDto beetwenDays { get; set; }
+
+        [Required]
+        public PAGE_TYPE pageType { get; set; }
     }
     public class CreateBeetwenDaysDto
     {
