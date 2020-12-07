@@ -1,7 +1,8 @@
 # gamitude-backend
 ## backend + database
-docker-compose build
-docker-compose run (-d)
+docker-compose build  
+after repository update run docker-compose build --no-cache  
+docker-compose run (-d)  
 ## database   
 ```
 cd db  

@@ -40,6 +40,7 @@ namespace gamitude_backend.Services
         private readonly IJournalRepository _journalRepository;
         private readonly IPageRepository _pageRepository;
         private readonly IMoneyRepository _moneyRepository;
+        private readonly IProjectRepository _projectRepository;
 
         public UserService(ILogger<UserService> logger,
         IDatabaseSettings databaseSettings,
@@ -51,7 +52,8 @@ namespace gamitude_backend.Services
           ITimerRepository timerRepository,
           IJournalRepository journalRepository,
           IPageRepository pageRepository,
-          IMoneyRepository moneyRepository)
+          IMoneyRepository moneyRepository,
+          IProjectRepository projectRepository)
         {
             _logger = logger;
             _databaseSettings = databaseSettings;
@@ -64,6 +66,7 @@ namespace gamitude_backend.Services
             _journalRepository = journalRepository;
             _pageRepository = pageRepository;
             _moneyRepository = moneyRepository;
+            _projectRepository = projectRepository;
         }
 
         private Task initializeUser(User user)
@@ -94,23 +97,30 @@ namespace gamitude_backend.Services
             {
                 Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="90" , timerType=TIMER_TYPE.TIMER, name = "90/30", countDownInfo = new CountDownInfo{  breakTime = 30, overTime = 5, workTime = 90} })),
                 Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="25" , timerType=TIMER_TYPE.TIMER, name = "Pomodoro",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 25} })),
-                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="5" , timerType=TIMER_TYPE.TIMER, name = "Just Five",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 5} }))
+                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="5" , timerType=TIMER_TYPE.TIMER, name = "Just Five",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 5} })),
+                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="SW" , timerType=TIMER_TYPE.STOPWATCH, name = "Stopwatch",countDownInfo = null }))
             };
 
             return Task.WhenAll(processTasks);
 
         }
 
-        private Task initializeUserFolder(User user)
+        private async Task initializeUserFolder(User user)
         {
+            var demoFolder = new Folder { userId = user.Id.ToString(),icon="active", name = "Active", description = "Folder for active projects" };
             List<Task> processTasks = new List<Task>
             {
-                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="active", name = "Active", description = "Folder for active projects" })),
+                Task.Run(() => _folderRepository.createAsync(demoFolder)),
                 Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="paused", name = "Inactive", description = "Folder for inactive projects" })),
                 Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="done", name = "Done", description = "Folder for finished projects" }))
             };
-
-            return Task.WhenAll(processTasks);
+            await Task.WhenAll(processTasks);
+            processTasks = new List<Task>
+            {
+                Task.Run(() =>  _projectRepository.createAsync(new Project{dateCreated = DateTime.UtcNow,name="Your first stats project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.INTELLIGENCE,stats = new STATS[] {STATS.INTELLIGENCE},projectType=PROJECT_TYPE.STAT,userId=user.Id.ToString(),timeSpendBreak=0 })),
+                Task.Run(() =>  _projectRepository.createAsync(new Project{dateCreated = DateTime.UtcNow,name="Your first energy project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.INTELLIGENCE,stats = new STATS[] {STATS.INTELLIGENCE},projectType=PROJECT_TYPE.ENERGY,userId=user.Id.ToString(),timeSpendBreak=0 })),
+            };
+            await Task.WhenAll(processTasks);
 
         }
 
