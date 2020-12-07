@@ -34,9 +34,10 @@ namespace gamitude_backend.Services
             _logger = logger;
         }
 
-        public Task<DailyEnergy> GetDailyEnergyByUserIdAsync(string userId)
+        public async Task<DailyEnergy> GetDailyEnergyByUserIdAsync(string userId)
         {
-            return _DailyEnergy.Find(o => o.userId == userId && o.dateCreated == DateTime.UtcNow.Date).FirstOrDefaultAsync();
+            var energy = await _DailyEnergy.Find(o => o.userId == userId && o.dateCreated == DateTime.UtcNow.Date).FirstOrDefaultAsync() ?? new DailyEnergy();
+            return energy;
         }
 
         /// <summary>
