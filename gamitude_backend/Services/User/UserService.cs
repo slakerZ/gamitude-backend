@@ -74,8 +74,7 @@ namespace gamitude_backend.Services
             List<Task> processTasks = new List<Task>
             {
                 Task.Run(() => initializeUserStats(user)),
-                Task.Run(() => initializeUserFolder(user)),
-                Task.Run(() => initializeUserTimer(user)),
+                Task.Run(() => initializeUserTimersFoldersAndProjects(user)),
                 Task.Run(() => initializeUserJournals(user))
 
             };
@@ -91,37 +90,27 @@ namespace gamitude_backend.Services
             });
         }
 
-        private Task initializeUserTimer(User user)
+        private async Task initializeUserTimersFoldersAndProjects(User user)
         {
+            var demoTimer = new Timer { userId = user.Id.ToString(), label = "90", timerType = TIMER_TYPE.TIMER, name = "90/30", countDownInfo = new CountDownInfo { breakTime = 30, overTime = 5, workTime = 90 } };
+            var demoFolder = new Folder { userId = user.Id.ToString(), icon = "active", name = "Active", description = "Folder for active projects" };
+
+            await _folderRepository.createAsync(demoFolder);
+            await _timerRepository.createAsync(demoTimer);
+
             List<Task> processTasks = new List<Task>
             {
-                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="90" , timerType=TIMER_TYPE.TIMER, name = "90/30", countDownInfo = new CountDownInfo{  breakTime = 30, overTime = 5, workTime = 90} })),
                 Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="25" , timerType=TIMER_TYPE.TIMER, name = "Pomodoro",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 25, breakInterval=5, longerBreakTime=15} })),
                 Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="5" , timerType=TIMER_TYPE.TIMER, name = "Just Five",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 5} })),
-                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="SW" , timerType=TIMER_TYPE.STOPWATCH, name = "Stopwatch",countDownInfo = null }))
-            };
+                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="SW" , timerType=TIMER_TYPE.STOPWATCH, name = "Stopwatch",countDownInfo = null })),
 
-            return Task.WhenAll(processTasks);
-
-        }
-
-        private async Task initializeUserFolder(User user)
-        {
-            var demoFolder = new Folder { userId = user.Id.ToString(), icon = "active", name = "Active", description = "Folder for active projects" };
-            List<Task> processTasks = new List<Task>
-            {
-                Task.Run(() => _folderRepository.createAsync(demoFolder)),
                 Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="paused", name = "Inactive", description = "Folder for inactive projects" })),
-                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="done", name = "Done", description = "Folder for finished projects" }))
-            };
-            await Task.WhenAll(processTasks);
-            processTasks = new List<Task>
-            {
-                Task.Run(() =>  _projectRepository.createAsync(new Project{dateCreated = DateTime.UtcNow,name="Your first stats project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.INTELLIGENCE,stats = new STATS[] {STATS.INTELLIGENCE},projectType=PROJECT_TYPE.STAT,userId=user.Id.ToString(),timeSpendBreak=0 })),
-                Task.Run(() =>  _projectRepository.createAsync(new Project{dateCreated = DateTime.UtcNow,name="Your first energy project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.INTELLIGENCE,stats = new STATS[] {STATS.INTELLIGENCE},projectType=PROJECT_TYPE.ENERGY,userId=user.Id.ToString(),timeSpendBreak=0 })),
-            };
-            await Task.WhenAll(processTasks);
+                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="done", name = "Done", description = "Folder for finished projects" })),
 
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = demoTimer.id, dateCreated = DateTime.UtcNow,name="Your first stats project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.INTELLIGENCE,stats = new STATS[] {STATS.INTELLIGENCE},projectType=PROJECT_TYPE.STAT,userId=user.Id.ToString(),timeSpendBreak=0 })),
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = demoTimer.id, dateCreated = DateTime.UtcNow,name="Your first energy project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.INTELLIGENCE,stats = new STATS[] {STATS.INTELLIGENCE},projectType=PROJECT_TYPE.ENERGY,userId=user.Id.ToString(),timeSpendBreak=0 })),
+            };
+            await Task.WhenAll(processTasks);
         }
 
         private async Task initializeUserJournals(User user)
