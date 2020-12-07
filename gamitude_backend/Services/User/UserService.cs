@@ -96,7 +96,7 @@ namespace gamitude_backend.Services
             List<Task> processTasks = new List<Task>
             {
                 Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="90" , timerType=TIMER_TYPE.TIMER, name = "90/30", countDownInfo = new CountDownInfo{  breakTime = 30, overTime = 5, workTime = 90} })),
-                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="25" , timerType=TIMER_TYPE.TIMER, name = "Pomodoro",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 25} })),
+                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="25" , timerType=TIMER_TYPE.TIMER, name = "Pomodoro",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 25, breakInterval=5, longerBreakTime=15} })),
                 Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="5" , timerType=TIMER_TYPE.TIMER, name = "Just Five",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 5} })),
                 Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="SW" , timerType=TIMER_TYPE.STOPWATCH, name = "Stopwatch",countDownInfo = null }))
             };
@@ -107,7 +107,7 @@ namespace gamitude_backend.Services
 
         private async Task initializeUserFolder(User user)
         {
-            var demoFolder = new Folder { userId = user.Id.ToString(),icon="active", name = "Active", description = "Folder for active projects" };
+            var demoFolder = new Folder { userId = user.Id.ToString(), icon = "active", name = "Active", description = "Folder for active projects" };
             List<Task> processTasks = new List<Task>
             {
                 Task.Run(() => _folderRepository.createAsync(demoFolder)),
