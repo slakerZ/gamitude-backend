@@ -17,6 +17,8 @@ namespace gamitude_backend.Dto.BulletJournal
         public string icon { get; set; } = "";
 
         public DateTime dateCreated { get; set; }
+
+        public PAGE_TYPE pageType { get; set; }
     }
     public class GetBeetwenDaysDto
     {
