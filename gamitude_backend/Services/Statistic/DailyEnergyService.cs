@@ -36,7 +36,7 @@ namespace gamitude_backend.Services
 
         public async Task<DailyEnergy> GetDailyEnergyByUserIdAsync(string userId)
         {
-            var energy = await _DailyEnergy.Find(o => o.userId == userId && o.dateCreated == DateTime.UtcNow.Date).FirstOrDefaultAsync() ?? new DailyEnergy();
+            var energy = await _DailyEnergy.Find(o => o.userId == userId && o.dateCreated == DateTime.UtcNow.Date).FirstOrDefaultAsync() ?? new DailyEnergy().init();
             return energy;
         }
 
