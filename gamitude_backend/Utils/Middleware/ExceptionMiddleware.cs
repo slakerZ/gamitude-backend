@@ -43,6 +43,12 @@ namespace gamitude_backend.Middleware
                 _logger.LogWarning($"IdentityException: {ex}");
                 message = handleIdentityExceptionAsync(httpContext, ex);
             }
+            catch (ShopException ex)
+            {
+                _logger.LogWarning($"IdentityException: {ex}");
+                message = handleShopExceptionAsync(httpContext, ex);
+            }
+            
             catch (MongoException ex)
             {
                 _logger.LogError($"MongoException: {ex}");
@@ -87,6 +93,16 @@ namespace gamitude_backend.Middleware
             return message;
 
         }
+        public string handleShopExceptionAsync(HttpContext context, ShopException ex)
+        {
+            var message = "Huston we got a database problem";
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)HttpStatusCode.NotAcceptable;
+            message = ex.Message;
+            return message;
+
+        }
+        
 
         // Used for handling login exceptions maybe create LoginException?? 
         public string handleArgumentExceptionAsync(HttpContext context, ArgumentException ex)

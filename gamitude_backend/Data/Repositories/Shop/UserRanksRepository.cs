@@ -26,8 +26,8 @@ namespace gamitude_backend.Repositories
 
         public Task addAsync(string userId, string rankId)
         {
-            var filter = Builders<User>.Filter.Eq("_id", userId);
-            var update = Builders<User>.Update.AddToSet("purchasedRankIds", new ObjectId(rankId));
+            var filter = Builders<User>.Filter.Eq("_id", new ObjectId(userId));
+            var update = Builders<User>.Update.AddToSet("purchasedRankIds", rankId);
             return _users.UpdateOneAsync(filter, update);
         }
 

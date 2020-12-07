@@ -18,6 +18,7 @@ namespace gamitude_backend.Services
     public interface IUserService
     {
         Task<User> getByIdAsync(string id);
+        Task<long> getMoneyAsync(string userId);
         Task<User> createAsync(User newUser, string password);
         Task<User> getByUserNameAsync(string userName);
         Task changePasswordAsync(string id, string oldPassword, string newPassword);
@@ -38,6 +39,7 @@ namespace gamitude_backend.Services
         private readonly ITimerRepository _timerRepository;
         private readonly IJournalRepository _journalRepository;
         private readonly IPageRepository _pageRepository;
+        private readonly IMoneyRepository _moneyRepository;
 
         public UserService(ILogger<UserService> logger,
         IDatabaseSettings databaseSettings,
@@ -48,7 +50,8 @@ namespace gamitude_backend.Services
           IFolderRepository folderRepository,
           ITimerRepository timerRepository,
           IJournalRepository journalRepository,
-          IPageRepository pageRepository)
+          IPageRepository pageRepository,
+          IMoneyRepository moneyRepository)
         {
             _logger = logger;
             _databaseSettings = databaseSettings;
@@ -60,6 +63,7 @@ namespace gamitude_backend.Services
             _timerRepository = timerRepository;
             _journalRepository = journalRepository;
             _pageRepository = pageRepository;
+            _moneyRepository = moneyRepository;
         }
 
         private Task initializeUser(User user)
@@ -195,6 +199,11 @@ namespace gamitude_backend.Services
                 var s = result.Errors.AsEnumerable();
                 throw new IdentityException(s);
             }
+        }
+
+        public Task<long> getMoneyAsync(string userId)
+        {
+            return _moneyRepository.getMoneyByUserIdAsync(userId);
         }
     }
 

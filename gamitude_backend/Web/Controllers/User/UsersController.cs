@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using gamitude_backend.Dto;
 using AutoMapper;
 using gamitude_backend.Models;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace gamitude_backend.Controllers
 {
@@ -20,12 +22,14 @@ namespace gamitude_backend.Controllers
     {
         private readonly ILogger<UsersController> _logger;
         private readonly IUserService _userService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
-        public UsersController(ILogger<UsersController> logger, IUserService userService, IMapper mapper)
+        public UsersController(ILogger<UsersController> logger, IUserService userService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _logger = logger;
             _userService = userService;
+            _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
         }
 
@@ -37,6 +41,17 @@ namespace gamitude_backend.Controllers
             return Ok(new ControllerResponse<GetUserDto>
             {
                 data = _mapper.Map<GetUserDto>(user)
+            });
+        }
+        [HttpGet("money")]
+        public async Task<ActionResult<ControllerResponse<long>>> money()
+        {
+            _logger.LogInformation("In GET money");
+            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+            var money = await _userService.getMoneyAsync(userId);
+            return Ok(new ControllerResponse<long>
+            {
+                data = money
             });
         }
 

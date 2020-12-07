@@ -56,13 +56,18 @@ namespace gamitude_backend.Services
         public async Task<Rank> purchaseRankIdAsync(string userId, string rankId, CURRENCY currency)
         {
             var rank = await getByIdAsync(rankId);
+            var userRanks = await _userRanksRepository.getByUserIdAsync(userId);
+            if(userRanks.Contains(rank.id))
+            {
+                throw new ShopException("This rank is already owned");
+            }
             if (currency == CURRENCY.REAL)
             {
                 var money = await _moneyRepository.getMoneyByUserIdAsync(userId);
                 var afterPurchaseMoney = money - rank.priceEuro;
                 if (afterPurchaseMoney >= 0)
                 {
-                    await _userRanksRepository.addAsync(userId, rank.id);
+                    await _userRanksRepository.addAsync(userId, rankId);
                     await _moneyRepository.createOrUpdateMoneyAsync(userId, afterPurchaseMoney);
                     return rank;
                 }
@@ -80,7 +85,7 @@ namespace gamitude_backend.Services
                     && stats.strength >= 0)
                 {
                     await _userRanksRepository.addAsync(userId,rankId);
-                    await _statsRepository.updateAsync(stats.id,stats);
+                    await _statsRepository.updateAsync(stats.id.ToString(),stats);
                 }
             }
 
