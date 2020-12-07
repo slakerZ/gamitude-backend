@@ -18,6 +18,7 @@ namespace gamitude_backend.Services
     public interface IUserService
     {
         Task<User> getByIdAsync(string id);
+        Task<long> getMoneyAsync(string userId);
         Task<User> createAsync(User newUser, string password);
         Task<User> getByUserNameAsync(string userName);
         Task changePasswordAsync(string id, string oldPassword, string newPassword);
@@ -36,6 +37,9 @@ namespace gamitude_backend.Services
         private readonly IStatsRepository _statsRepository;
         private readonly IFolderRepository _folderRepository;
         private readonly ITimerRepository _timerRepository;
+        private readonly IJournalRepository _journalRepository;
+        private readonly IPageRepository _pageRepository;
+        private readonly IMoneyRepository _moneyRepository;
 
         public UserService(ILogger<UserService> logger,
         IDatabaseSettings databaseSettings,
@@ -44,7 +48,10 @@ namespace gamitude_backend.Services
           IRankRepository rankRepository,
           IStatsRepository statsRepository,
           IFolderRepository folderRepository,
-          ITimerRepository timerRepository)
+          ITimerRepository timerRepository,
+          IJournalRepository journalRepository,
+          IPageRepository pageRepository,
+          IMoneyRepository moneyRepository)
         {
             _logger = logger;
             _databaseSettings = databaseSettings;
@@ -54,6 +61,9 @@ namespace gamitude_backend.Services
             _statsRepository = statsRepository;
             _folderRepository = folderRepository;
             _timerRepository = timerRepository;
+            _journalRepository = journalRepository;
+            _pageRepository = pageRepository;
+            _moneyRepository = moneyRepository;
         }
 
         private Task initializeUser(User user)
@@ -62,7 +72,9 @@ namespace gamitude_backend.Services
             {
                 Task.Run(() => initializeUserStats(user)),
                 Task.Run(() => initializeUserFolder(user)),
-                Task.Run(() => initializeUserTimer(user))
+                Task.Run(() => initializeUserTimer(user)),
+                Task.Run(() => initializeUserJournals(user))
+
             };
             //TODO add initializeUserTheme
             return Task.WhenAll(processTasks);
@@ -80,9 +92,9 @@ namespace gamitude_backend.Services
         {
             List<Task> processTasks = new List<Task>
             {
-                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="90" , timerType=TIMER_TYPE.TIMER, name = "90/30", breakTime = 30, overTime = 5, workTime = 90 })),
-                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="25" , timerType=TIMER_TYPE.TIMER, name = "Pomodoro", breakTime = 5, overTime = 5, workTime = 25 })),
-                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="5" , timerType=TIMER_TYPE.TIMER, name = "Just Five", breakTime = 5, overTime = 5, workTime = 5 }))
+                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="90" , timerType=TIMER_TYPE.TIMER, name = "90/30", countDownInfo = new CountDownInfo{  breakTime = 30, overTime = 5, workTime = 90} })),
+                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="25" , timerType=TIMER_TYPE.TIMER, name = "Pomodoro",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 25} })),
+                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="5" , timerType=TIMER_TYPE.TIMER, name = "Just Five",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 5} }))
             };
 
             return Task.WhenAll(processTasks);
@@ -100,6 +112,21 @@ namespace gamitude_backend.Services
 
             return Task.WhenAll(processTasks);
 
+        }
+
+        private async Task initializeUserJournals(User user)
+        {
+            var journal = new Journal { userId = user.Id.ToString(), dateCreated = DateTime.UtcNow, description = "Your first journal", icon = "active", name = "Life" };
+            await _journalRepository.createAsync(journal);
+            List<Task> processTasks = new List<Task>
+            {
+                Task.Run(() => _pageRepository.createAsync(new Page {dateCreated = DateTime.UtcNow,journalId=journal.id,pageType=PAGE_TYPE.NORMAL,beetwenDays= new BeetwenDays{ fromDay=0, toDay=1},userId = user.Id.ToString(),icon="active", name = "Today", description = "Folder for tasks for today" })),
+                Task.Run(() => _pageRepository.createAsync(new Page {dateCreated = DateTime.UtcNow,journalId=journal.id,pageType=PAGE_TYPE.NORMAL,beetwenDays= new BeetwenDays{ fromDay=1, toDay=8}, userId = user.Id.ToString(),icon="active", name = "Week", description = "Folder for tasks for this week" })),
+                Task.Run(() => _pageRepository.createAsync(new Page {dateCreated = DateTime.UtcNow,journalId=journal.id,pageType=PAGE_TYPE.NORMAL,beetwenDays= new BeetwenDays{ fromDay=8, toDay=0} ,userId = user.Id.ToString(),icon="active", name = "Scheduled Future", description = "Page with all scheduled task that are further than week from now" })),
+                Task.Run(() => _pageRepository.createAsync(new Page {dateCreated = DateTime.UtcNow,journalId=journal.id,pageType=PAGE_TYPE.OVERDUE, userId = user.Id.ToString(),icon="done", name = "Overdue", description = "Folder for tasks after deadline" })),
+                Task.Run(() => _pageRepository.createAsync(new Page {dateCreated = DateTime.UtcNow,journalId=journal.id,pageType=PAGE_TYPE.UNSCHEDULED, userId = user.Id.ToString(),icon="paused", name = "Unscheduled", description = "Page with all unscheduled tasks that are not finished" }))
+            };
+            await Task.WhenAll(processTasks);
         }
 
         private async Task<User> initializeUserRank(User user)
@@ -172,6 +199,11 @@ namespace gamitude_backend.Services
                 var s = result.Errors.AsEnumerable();
                 throw new IdentityException(s);
             }
+        }
+
+        public Task<long> getMoneyAsync(string userId)
+        {
+            return _moneyRepository.getMoneyByUserIdAsync(userId);
         }
     }
 

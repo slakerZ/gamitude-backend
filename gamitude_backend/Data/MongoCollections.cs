@@ -14,6 +14,8 @@ namespace gamitude_backend.Data
         IMongoCollection<Project> projects { get; set; }
         IMongoCollection<ProjectLog> projectLogs { get; set; }
         IMongoCollection<ProjectTask> projectTasks { get; set; }
+        IMongoCollection<Journal> journals { get; set; }
+        IMongoCollection<Page> pages { get; set; }
         IMongoCollection<Rank> ranks { get; set; }
         IMongoCollection<Theme> themes { get; set; }
         IMongoCollection<DailyEnergy> dailyEnergies { get; set; }
@@ -38,6 +40,8 @@ namespace gamitude_backend.Data
         public IMongoCollection<Timer> timers { get; set; }
         public IMongoCollection<UserToken> userTokens { get; set; }
         public IMongoCollection<User> users { get; set; }
+        public IMongoCollection<Journal> journals { get ; set ; }
+        public IMongoCollection<Page> pages { get ; set ; }
 
         public MongoCollections(IDatabaseSettings settings)
         {
@@ -58,6 +62,8 @@ namespace gamitude_backend.Data
             projects = database.GetCollection<Project>(settings.projectsCollectionName);
             projectLogs = database.GetCollection<ProjectLog>(settings.projectLogsCollectionName);
             projectTasks = database.GetCollection<ProjectTask>(settings.projectTasksCollectionName);
+            journals = database.GetCollection<Journal>(settings.journalsCollectionName);
+            pages = database.GetCollection<Page>(settings.pagesCollectionName);
             ranks = database.GetCollection<Rank>(settings.ranksCollectionName);
             themes = database.GetCollection<Theme>(settings.themesCollectionName);
             dailyEnergies = database.GetCollection<DailyEnergy>(settings.dailyEnergiesCollectionName);
