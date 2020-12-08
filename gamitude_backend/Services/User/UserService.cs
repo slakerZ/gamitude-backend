@@ -108,7 +108,7 @@ namespace gamitude_backend.Services
                 Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="done", name = "Done", description = "Folder for finished projects" })),
 
                 Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = demoTimer.id, dateCreated = DateTime.UtcNow,name="Your first stats project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.INTELLIGENCE,stats = new STATS[] {STATS.INTELLIGENCE},projectType=PROJECT_TYPE.STAT,userId=user.Id.ToString(),timeSpendBreak=0 })),
-                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = demoTimer.id, dateCreated = DateTime.UtcNow,name="Your first energy project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.INTELLIGENCE,stats = new STATS[] {STATS.INTELLIGENCE},projectType=PROJECT_TYPE.ENERGY,userId=user.Id.ToString(),timeSpendBreak=0 })),
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = demoTimer.id, dateCreated = DateTime.UtcNow,name="Your first energy project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.MIND,stats = new STATS[] {STATS.MIND},projectType=PROJECT_TYPE.ENERGY,userId=user.Id.ToString(),timeSpendBreak=0 })),
             };
             await Task.WhenAll(processTasks);
         }
