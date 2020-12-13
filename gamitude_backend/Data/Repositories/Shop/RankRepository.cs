@@ -11,7 +11,7 @@ namespace gamitude_backend.Repositories
     {
         Task<Rank> getByIdAsync(string id);
         Task<List<Rank>> getByIdAsync(List<string> ids);
-        Task<IReadOnlyList<Rank>> getAllAsync(int page = 1, int limit = 20, string sortBy = "name");
+        Task<List<Rank>> getAllAsync(int page = 1, int limit = 20, string sortByField = "name",SORT_TYPE sortByType = SORT_TYPE.DESC);
         Task<Rank> getRookieAsync();
         Task<List<Rank>> getAsync();
         Task createAsync(Rank rank);
@@ -68,12 +68,28 @@ namespace gamitude_backend.Repositories
             return _ranks.Find<Rank>(o => o.rookie == true).FirstOrDefaultAsync();
         }
 
-        public Task<IReadOnlyList<Rank>> getAllAsync(int page = 1, int limit = 20, string sortBy = "name")
+        public Task<List<Rank>> getAllAsync(int page = 1, int limit = 20, string sortByName = "name",SORT_TYPE sortByType = SORT_TYPE.DESC)
         {
-            return _ranks.AggregateByPage<Rank>(Builders<Rank>.Filter.Empty,
-                                            Builders<Rank>.Sort.Ascending(x => x.GetType()
-                                                                                .GetProperty(sortBy)
-                                                                                .GetValue(x, null)), page, limit);
+            // var filter = Builders<Rank>.Filter.Empty;
+            
+            //  .Eq("_id", new ObjectId(userId));
+
+            SortDefinition<Rank> sort;
+            if(sortByType == SORT_TYPE.DESC)
+            {
+                sort = new SortDefinitionBuilder<Rank>().Descending(sortByName);
+            }
+            else
+            {
+                sort = new SortDefinitionBuilder<Rank>().Ascending(sortByName);
+            }
+
+            return _ranks.Find(FilterDefinition<Rank>.Empty)
+                        .Sort(sort)
+                        .Skip((page-1) * limit)
+                        .Limit(limit)
+                        .ToListAsync();
+
         }
 
     }

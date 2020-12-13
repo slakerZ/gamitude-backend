@@ -41,15 +41,14 @@ namespace gamitude_backend.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<ControllerResponse<List<GetRank>>>> get(int page = 1, int limit = 20, string sortBy = "name")
+        public async Task<ActionResult<ControllerResponse<List<GetRank>>>> get(int page = 1, int limit = 20, string sortByField = "name", SORT_TYPE sortByType = SORT_TYPE.DESC)
         {
             _logger.LogInformation("In GET rank");
-            var ranks = await _rankService.getAsync();
+            var ranks = await _rankService.getAllAsync(page, limit, sortByField, sortByType);
             // var ranks = await _rankService.getAllAsync(page,limit,sortBy);
             return Ok(new ControllerResponse<List<GetRank>>
             {
                 data = ranks.Select(o => _mapper.Map<GetRank>(o)).ToList()
-
             });
         }
         [HttpGet("user")]
