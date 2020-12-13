@@ -151,6 +151,12 @@ namespace gamitude_backend.Services
                 throw new IdentityException(s);
             }
         }
+        public async Task sendVerifiactionEmail(string userEmail)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+        }
 
         public Task<User> getByIdAsync(string id)
         {

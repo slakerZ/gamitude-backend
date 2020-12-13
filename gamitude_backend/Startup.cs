@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using gamitude_backend.Extensions;
+using gamitude_backend.Services;
 using gamitude_backend.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -41,6 +42,9 @@ namespace gamitude_backend
 
             var key = Encoding.ASCII.GetBytes(configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>().secret);
             services.AddCustomAuthenticationConfiguration(key);
+
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(configuration);
 
             services.AddRepositories();
             services.AddServices();

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace gamitude_backend.Controllers
@@ -16,8 +17,9 @@ namespace gamitude_backend.Controllers
         }
 
         [HttpGet]
-        public ActionResult<string> Version()
+        public async Task<ActionResult<string>> Version()
         {
+            await new Example().Execute();
 
             return Created("Version", version);
         }
