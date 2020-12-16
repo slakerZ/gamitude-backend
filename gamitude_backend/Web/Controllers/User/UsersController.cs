@@ -69,40 +69,46 @@ namespace gamitude_backend.Controllers
             });
         }
 
-        [HttpPut("{id:length(24)}")]
+        [AllowAnonymous]
+        [HttpPost("verifyEmail/{login}/{token}")]
+        public async Task<ActionResult<ControllerResponse<string>>> verifyEmail(string login, string token)
+        {
+            _logger.LogInformation("In POST verifyEmail");
+            await _userService.verifyEmail(login, token);
+            _logger.LogInformation("after create");
+
+            return Ok(new ControllerResponse<string> { data = "Email verified" });
+        }
+
+        [HttpPut]
         public async Task<ActionResult<ControllerResponse<GetUserDto>>> update(string id, UpdateUserDto updateUser)
         {
             _logger.LogInformation("In PUT update");
             string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
-            if (tokenUserId != id)
-            {
-                throw new UnauthorizedAccessException("YOU SHALL NOT PASS");
-            }
-            var user = await _userService.updateAsync(id, _mapper.Map<User>(updateUser));
+
+            var user = await _userService.updateAsync(tokenUserId, _mapper.Map<User>(updateUser));
             return Ok(new ControllerResponse<GetUserDto>
             {
                 data = _mapper.Map<GetUserDto>(user)
             });
         }
 
-        [HttpPut("{id:length(24)}/password")]
+        [HttpPut("password")]
         public async Task<ActionResult<ControllerResponse<GetUserDto>>> updatePassword(string id, ChangePasswordUserDto passwordUserDto)
         {
             _logger.LogInformation("In PUT changePassword");
             string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
-            if (tokenUserId != id)
-            {
-                throw new UnauthorizedAccessException("YOU SHALL NOT PASS");
-            }
-            await _userService.changePasswordAsync(id, passwordUserDto.oldPassword, passwordUserDto.newPassword);
-            return Ok(new ControllerResponse<GetUserDto>());
 
+            await _userService.changePasswordAsync(tokenUserId, passwordUserDto.oldPassword, passwordUserDto.newPassword);
+            return Ok(new ControllerResponse<GetUserDto>());
         }
-        [HttpDelete("{id}")]
+
+        [HttpDelete]
         public async Task<ActionResult> delete(string id)
         {
             _logger.LogInformation("In DELETE delete");
-            await _userService.deleteByIdAsync(id);
+            string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+            await _userService.deleteByIdAsync(tokenUserId);
             return NoContent();
         }
     }

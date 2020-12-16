@@ -1,6 +1,6 @@
-namespace gamitude_backend.Services
+namespace gamitude_backend.Configuration
 {
-    public class AuthMessageSenderOptions
+    public class EmailSenderSettings
     {
         public string SendGridUser { get; set; }
         public string SendGridKey { get; set; }

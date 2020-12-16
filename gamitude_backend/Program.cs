@@ -29,6 +29,7 @@ namespace gamitude_backend
 
             try
             {
+                Log.Information($"isDevelopment: {isDevelopment}");
                 Log.Information("Starting up");
                 CreateHostBuilder(args).Build().Run();
             }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using gamitude_backend.Configuration;
 using gamitude_backend.Extensions;
 using gamitude_backend.Services;
 using gamitude_backend.Settings;
@@ -44,7 +45,7 @@ namespace gamitude_backend
             services.AddCustomAuthenticationConfiguration(key);
 
             services.AddTransient<IEmailSender, EmailSender>();
-            services.Configure<AuthMessageSenderOptions>(configuration);
+            services.Configure<EmailSenderSettings>(configuration);
 
             services.AddRepositories();
             services.AddServices();
@@ -69,7 +70,11 @@ namespace gamitude_backend
             }
             else
             {
-                app.UseSecurityHeaders();
+                // app.UseSecurityHeaders();
+                app.UseCors(x => x
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
             }
             // app.UseCustomLocalization();
 

@@ -1,4 +1,6 @@
+using gamitude_backend.Configuration;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Threading.Tasks;
@@ -7,46 +9,50 @@ namespace gamitude_backend.Services
 {
     public interface IEmailSender
     {
-        Task SendEmailAsync(string email, string subject, string message);
-        Task SendVerificationEmailAsync(string email,string userName,string token);
-        Task Execute(string apiKey, string subject, string messageHtml,string messagePlain, string email, string userName);
+        // Task SendEmailAsync(string email, string subject, string message);
+        Task<Response> SendVerificationEmailAsync(string email, string userName, string token);
+        Task<Response> Execute(string apiKey, SendGridMessage msg);
+
 
     }
     public class EmailSender : IEmailSender
     {
-        public EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor)
+        public EmailSender(IOptions<EmailSenderSettings> optionsAccessor)
         {
             Options = optionsAccessor.Value;
         }
 
-        public AuthMessageSenderOptions Options { get; } //set only via Secret Manager
+        public EmailSenderSettings Options { get; } //set only via Secret Manager
 
-        public Task SendEmailAsync(string email, string subject, string message)
+        // public Task SendEmailAsync(string email, string subject, string message)
+        // {
+        //     return Execute(Options.SendGridKey, subject, message, message, email, email);
+        // }
+        public Task<Response> SendVerificationEmailAsync(string email, string userName, string token)
         {
-            return Execute(Options.SendGridKey, subject, message,message, email,email);
+            var link = $"https://gamitude.rocks/verifyEmail/{userName}/{token}";
+            var templateId= "d-ec00d4674dab420caa9b98276dec734a";
+            var dynamicTemplateData = new templateData
+            {
+                name = userName,
+                button_url = link
+            };
+            var to = new EmailAddress(email, userName);
+            var from = new EmailAddress("noreply@gamitude.rocks", "Gamitude");
+            var msg = MailHelper.CreateSingleTemplateEmail(from,to,templateId,dynamicTemplateData);
+            return Execute(Options.SendGridKey, msg);
         }
-        public Task SendVerificationEmailAsync(string email,string userName,string token)
+        private class templateData
         {
-            var subject = "Welcome to Gamitude! Confirm Your Email";
-            
-            var plainTextContent = "and easy to do anywhere, even with C#";
-            var htmlContent = "<strong>and easy to do anywhere, even with C#</strong>";
-            return Execute(Options.SendGridKey, subject,htmlContent, plainTextContent, email,userName);
-        }
+            [JsonProperty("name")]
+            public string name { get; set; }
 
-        public Task Execute(string apiKey, string subject, string messageHtml,string messagePlain, string email, string userName)
+            [JsonProperty("button_url")]
+            public string button_url { get; set; }
+        }
+        public Task<Response> Execute(string apiKey, SendGridMessage msg)
         {
             var client = new SendGridClient(apiKey);
-            var msg = new SendGridMessage()
-            {
-                From = new EmailAddress("gamitude@gamitude.rocks", "Gamitude"),
-                Subject = subject,
-                PlainTextContent = messagePlain,
-                HtmlContent = messageHtml,
-
-            };
-            msg.AddTo(new EmailAddress(email,userName));
-
             // Disable click tracking.
             // See https://sendgrid.com/docs/User_Guide/Settings/tracking.html
             msg.SetClickTracking(false, false);
