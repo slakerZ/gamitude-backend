@@ -8,7 +8,7 @@ namespace gamitude_backend.Services
     public interface IEmailSender
     {
         Task SendEmailAsync(string email, string subject, string message);
-        Task SendVerificationEmailAsync(string email,string userName);
+        Task SendVerificationEmailAsync(string email,string userName,string token);
         Task Execute(string apiKey, string subject, string messageHtml,string messagePlain, string email, string userName);
 
     }
@@ -25,7 +25,7 @@ namespace gamitude_backend.Services
         {
             return Execute(Options.SendGridKey, subject, message,message, email,email);
         }
-        public Task SendVerificationEmailAsync(string email,string userName)
+        public Task SendVerificationEmailAsync(string email,string userName,string token)
         {
             var subject = "Welcome to Gamitude! Confirm Your Email";
             

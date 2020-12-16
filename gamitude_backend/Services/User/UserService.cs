@@ -22,7 +22,7 @@ namespace gamitude_backend.Services
         Task<User> createAsync(User newUser, string password);
         Task<User> getByUserNameAsync(string userName);
         Task changePasswordAsync(string id, string oldPassword, string newPassword);
-        Task<User> updateAsync(User updateUser);
+        Task<User> updateAsync(string userId, User updateUser);
         Task deleteByIdAsync(string id);
     }
     public class UserService : IUserService
@@ -41,6 +41,7 @@ namespace gamitude_backend.Services
         private readonly IPageRepository _pageRepository;
         private readonly IMoneyRepository _moneyRepository;
         private readonly IProjectRepository _projectRepository;
+        private readonly IEmailSender _emailSender;
 
         public UserService(ILogger<UserService> logger,
         IDatabaseSettings databaseSettings,
@@ -53,7 +54,8 @@ namespace gamitude_backend.Services
           IJournalRepository journalRepository,
           IPageRepository pageRepository,
           IMoneyRepository moneyRepository,
-          IProjectRepository projectRepository)
+          IProjectRepository projectRepository,
+          IEmailSender emailSender)
         {
             _logger = logger;
             _databaseSettings = databaseSettings;
@@ -67,6 +69,7 @@ namespace gamitude_backend.Services
             _pageRepository = pageRepository;
             _moneyRepository = moneyRepository;
             _projectRepository = projectRepository;
+            _emailSender = emailSender;
         }
 
         private Task initializeUser(User user)
@@ -107,8 +110,8 @@ namespace gamitude_backend.Services
                 Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="paused", name = "Inactive", description = "Folder for inactive projects" })),
                 Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="done", name = "Done", description = "Folder for finished projects" })),
 
-                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = demoTimer.id, dateCreated = DateTime.UtcNow,name="Your first stats project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.INTELLIGENCE,stats = new STATS[] {STATS.INTELLIGENCE},projectType=PROJECT_TYPE.STAT,userId=user.Id.ToString(),timeSpendBreak=0 })),
-                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = demoTimer.id, dateCreated = DateTime.UtcNow,name="Your first energy project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.MIND,stats = new STATS[] {STATS.MIND},projectType=PROJECT_TYPE.ENERGY,userId=user.Id.ToString(),timeSpendBreak=0 })),
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = demoTimer.id, dateCreated = DateTime.UtcNow,name="Engineering thesis",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.INTELLIGENCE,stats = new STATS[] {STATS.INTELLIGENCE},projectType=PROJECT_TYPE.STAT,userId=user.Id.ToString(),timeSpendBreak=0 })),
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = demoTimer.id, dateCreated = DateTime.UtcNow,name="Recreational book reading",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.MIND,stats = new STATS[] {STATS.MIND},projectType=PROJECT_TYPE.ENERGY,userId=user.Id.ToString(),timeSpendBreak=0 })),
             };
             await Task.WhenAll(processTasks);
         }
@@ -143,6 +146,7 @@ namespace gamitude_backend.Services
             if (result.Succeeded)
             {
                 await initializeUser(newUser);
+                await sendVerificationEmail(newUser.Email);
                 return newUser;
             }
             else
@@ -151,11 +155,23 @@ namespace gamitude_backend.Services
                 throw new IdentityException(s);
             }
         }
-        public async Task sendVerifiactionEmail(string userEmail)
+
+        private async Task sendVerificationEmail(string userEmail)
         {
             var user = await _userManager.FindByEmailAsync(userEmail);
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            await _emailSender.SendVerificationEmailAsync(user.Email, user.UserName, token);
+        }
 
+        public async Task verifyEmail(string userEmail, string token)
+        {
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+                var s = result.Errors.AsEnumerable();
+                throw new IdentityException(s);
+            }
         }
 
         public Task<User> getByIdAsync(string id)
@@ -168,10 +184,13 @@ namespace gamitude_backend.Services
             return _userManager.FindByNameAsync(userName);
         }
 
-        public async Task<User> updateAsync(User updateUser)
+        public async Task<User> updateAsync(string userId, User updateUser)
         {
-            var user = await _userManager.FindByIdAsync(updateUser.Id.ToString());
+            var user = await _userManager.FindByIdAsync(userId);
             user = _mapper.Map<User, User>(updateUser, user);
+            _logger.LogInformation(user.UserName);
+            _logger.LogInformation(user.Email);
+            _logger.LogInformation(user.Id.ToString());
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {

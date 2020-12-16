@@ -63,28 +63,38 @@ namespace gamitude_backend.Controllers
             var user = await _userService.createAsync(_mapper.Map<User>(newUser), newUser.password);
             _logger.LogInformation("after create");
 
-            return Created(new Uri($"{Request.Path}/{user.Id}", UriKind.Relative),new ControllerResponse<GetUserDto>
+            return Created(new Uri($"{Request.Path}/{user.Id}", UriKind.Relative), new ControllerResponse<GetUserDto>
             {
                 data = _mapper.Map<GetUserDto>(user)
             });
         }
 
-        [HttpPut]
-        public async Task<ActionResult<ControllerResponse<GetUserDto>>> update(UpdateUserDto updateUser)
+        [HttpPut("{id:length(24)}")]
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> update(string id, UpdateUserDto updateUser)
         {
             _logger.LogInformation("In PUT update");
-            var user = await _userService.updateAsync(_mapper.Map<User>(updateUser));
-            return Ok( new ControllerResponse<GetUserDto>
+            string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+            if (tokenUserId != id)
+            {
+                throw new UnauthorizedAccessException("YOU SHALL NOT PASS");
+            }
+            var user = await _userService.updateAsync(id, _mapper.Map<User>(updateUser));
+            return Ok(new ControllerResponse<GetUserDto>
             {
                 data = _mapper.Map<GetUserDto>(user)
             });
         }
 
-        [HttpPut("password")]
-        public async Task<ActionResult<ControllerResponse<GetUserDto>>> updatePassword(ChangePasswordUserDto passwordUserDto)
+        [HttpPut("{id:length(24)}/password")]
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> updatePassword(string id, ChangePasswordUserDto passwordUserDto)
         {
             _logger.LogInformation("In PUT changePassword");
-            await _userService.changePasswordAsync(passwordUserDto.id, passwordUserDto.oldPassword,passwordUserDto.newPassword);
+            string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+            if (tokenUserId != id)
+            {
+                throw new UnauthorizedAccessException("YOU SHALL NOT PASS");
+            }
+            await _userService.changePasswordAsync(id, passwordUserDto.oldPassword, passwordUserDto.newPassword);
             return Ok(new ControllerResponse<GetUserDto>());
 
         }
