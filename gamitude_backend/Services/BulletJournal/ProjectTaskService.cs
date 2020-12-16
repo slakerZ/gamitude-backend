@@ -28,7 +28,7 @@ namespace gamitude_backend.Services
         public async Task<List<ProjectTask>> getByJournalIdAndPageIdAsync(string userId, string journalId, string pageId)
         {
             var page = await _pageRepository.getByIdAsync(pageId);
-            _logger.LogInformation(page.pageType.ToString());
+            _logger.LogDebug(page.pageType.ToString());
             List<ProjectTask> projectTasks = null;
             switch (page.pageType)
             {

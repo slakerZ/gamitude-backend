@@ -47,8 +47,8 @@ namespace gamitude_backend.Repositories
                 .Where(o => o.journalId == journalId)
                 .Where(o => o.dateFinished == null)
                 .Where(o => o.userId == userId)
-                .Where(o => o.deadLine > DateTime.UtcNow.Date.AddDays(fromDays));
-            if(toDays != 0)
+                .Where(o => o.deadLine >= DateTime.UtcNow.Date.AddDays(fromDays));
+            if(toDays != 0) // if 0 means forever
             {
                 query = query.Where(o => o.deadLine < DateTime.UtcNow.Date.AddDays(toDays));
             }
