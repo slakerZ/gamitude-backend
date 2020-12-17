@@ -81,7 +81,7 @@ namespace gamitude_backend.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<ControllerResponse<GetUserDto>>> update(string id, UpdateUserDto updateUser)
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> update(UpdateUserDto updateUser)
         {
             _logger.LogInformation("In PUT update");
             string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
@@ -94,7 +94,7 @@ namespace gamitude_backend.Controllers
         }
 
         [HttpPut("password")]
-        public async Task<ActionResult<ControllerResponse<GetUserDto>>> updatePassword(string id, ChangePasswordUserDto passwordUserDto)
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> updatePassword(ChangePasswordUserDto passwordUserDto)
         {
             _logger.LogInformation("In PUT changePassword");
             string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
@@ -104,7 +104,7 @@ namespace gamitude_backend.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult> delete(string id)
+        public async Task<ActionResult> delete()
         {
             _logger.LogInformation("In DELETE delete");
             string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
