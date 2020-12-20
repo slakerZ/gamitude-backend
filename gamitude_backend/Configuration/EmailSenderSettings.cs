@@ -4,5 +4,6 @@ namespace gamitude_backend.Configuration
     {
         public string SendGridUser { get; set; }
         public string SendGridKey { get; set; }
+        public string BaseUrl { get; set; }
     }
 }

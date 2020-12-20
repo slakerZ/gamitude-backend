@@ -72,14 +72,36 @@ namespace gamitude_backend.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("verifyEmail/{login}/{token}")]
-        public async Task<ActionResult<ControllerResponse<string>>> verifyEmail(string login, string token)
+        [HttpPost("verifyEmail")]
+        public async Task<ActionResult<ControllerResponse<string>>> verifyEmail(VerifyEmailDto verify)
         {
             _logger.LogInformation("In POST verifyEmail");
-            await _userService.verifyEmail(login, token);
-            _logger.LogInformation("after create");
+            await _userService.verifyEmail(verify.login, verify.token);
+            _logger.LogInformation("after verifyEmail");
 
             return Ok(new ControllerResponse<string> { data = "Email verified" });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("verifyEmailNew")]
+        public async Task<ActionResult<ControllerResponse<string>>> verifyNewEmail(VerifyEmailNewDto  verify)
+        {
+            _logger.LogInformation("In POST verifyNewEmail");
+            await _userService.verifyNewEmail(verify.login, verify.email, verify.token);
+            _logger.LogInformation("after verifyNewEmail");
+
+            return Ok(new ControllerResponse<string> { data = "New Email verified and updated" });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("verifyEmail/resend/{login}")]
+        public async Task<ActionResult<ControllerResponse<string>>> resendVerifyEmail(string login)
+        {
+            _logger.LogInformation("In POST resendVerifyEmail");
+            await _userService.resendVerifyEmail(login);
+            _logger.LogInformation("after resendVerifyEmail");
+
+            return Ok(new ControllerResponse<string> { data = "Email send" });
         }
 
         [HttpPut]
@@ -104,13 +126,14 @@ namespace gamitude_backend.Controllers
             await _userService.changePasswordAsync(tokenUserId, passwordUserDto.oldPassword, passwordUserDto.newPassword);
             return Ok(new ControllerResponse<GetUserDto>());
         }
+
         [HttpPut("email")]
         public async Task<ActionResult<ControllerResponse<GetUserDto>>> updateEmail(ChangeEmailUserDto emailUserDto)
         {
             _logger.LogInformation("In PUT changePassword");
             string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
-            // await _userService.changePasswordAsync(tokenUserId, passwordUserDto.oldPassword, passwordUserDto.newPassword);
+            await _userService.changeEmailAsync(tokenUserId, emailUserDto.newEmail);
             return Ok(new ControllerResponse<GetUserDto>());
         }
 
@@ -119,6 +142,7 @@ namespace gamitude_backend.Controllers
         {
             _logger.LogInformation("In DELETE delete");
             string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+
             await _userService.deleteByIdAsync(tokenUserId);
             return NoContent();
         }

@@ -28,6 +28,8 @@ namespace gamitude_backend.Services
         Task changePasswordAsync(string id, string oldPassword, string newPassword);
         Task changeEmailAsync(string id, string newEmail);
         Task verifyEmail(string login, string token);
+        Task verifyNewEmail(string login, string newEmail, string token);
+        Task resendVerifyEmail(string login);
         Task<User> updateAsync(string userId, User updateUser);
         Task deleteByIdAsync(string id);
     }
@@ -180,8 +182,8 @@ namespace gamitude_backend.Services
 
                 if (!StaticValues.IsDevelopment())
                 {
-                    var response = await sendVerificationEmail(newUser.Email);
-                    _logger.LogInformation(response.Headers.ToString() + response.StatusCode.ToString());
+                    var response = await sendVerificationEmail(newUser.UserName);
+                    _logger.LogDebug(response.Headers.ToString() + response.StatusCode.ToString());
                 }
                 return newUser;
             }
@@ -192,19 +194,27 @@ namespace gamitude_backend.Services
             }
         }
 
-        private async Task<Response> sendVerificationEmail(string userEmail)
+        private async Task<Response> sendVerificationEmail(string userName)
         {
-            var user = await _userManager.FindByEmailAsync(userEmail);
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user.EmailConfirmed)
+            {
+                throw new LoginException("Email already verified");
+            }
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+             _logger.LogDebug(token);
             token = HttpUtility.UrlEncode(token);
-            var link = $"https://gamitude.rocks/verifyEmail/{user.UserName}/{token}";
+             _logger.LogDebug(token);
+            var link = $"/verifyEmail/{user.UserName}/{token}";
             return await _emailSender.SendVerificationEmailAsync(user.Email, user.UserName, link);
         }
 
         public async Task verifyEmail(string login, string token)
         {
             var user = await _userManager.FindByNameAsync(login);
+             _logger.LogDebug(token);
             token = HttpUtility.UrlDecode(token);
+             _logger.LogDebug(token);
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (!result.Succeeded)
             {
@@ -215,7 +225,9 @@ namespace gamitude_backend.Services
         public async Task verifyNewEmail(string login, string newEmail, string token)
         {
             var user = await _userManager.FindByNameAsync(login);
+             _logger.LogDebug(token);
             token = HttpUtility.UrlDecode(token);
+             _logger.LogDebug(token);
             var result = await _userManager.ChangeEmailAsync(user, newEmail, token);
             if (!result.Succeeded)
             {
@@ -238,9 +250,7 @@ namespace gamitude_backend.Services
         {
             var user = await _userManager.FindByIdAsync(userId);
             user = _mapper.Map<User, User>(updateUser, user);
-            _logger.LogInformation(user.UserName);
-            _logger.LogInformation(user.Email);
-            _logger.LogInformation(user.Id.ToString());
+
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
@@ -286,9 +296,15 @@ namespace gamitude_backend.Services
             var user = await _userManager.FindByIdAsync(id);
             var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
             token = HttpUtility.UrlEncode(token);
-            var link = $"https://gamitude.rocks/verifyEmail/{user.UserName}/newEmail/{newEmail}/{token}";
+            var link = $"/verifyEmail/{user.UserName}/newEmail/{newEmail}/{token}";
             await _emailSender.SendVerificationEmailAsync(newEmail, user.UserName, link);
         }
+
+        public Task resendVerifyEmail(string login)
+        {
+            return sendVerificationEmail(login);
+        }
+
     }
 
 }

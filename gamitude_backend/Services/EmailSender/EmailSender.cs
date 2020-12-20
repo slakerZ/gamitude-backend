@@ -30,6 +30,7 @@ namespace gamitude_backend.Services
         // }
         public Task<Response> SendVerificationEmailAsync(string email, string userName, string link,string templateId)
         {
+            link = Options.BaseUrl+link;
             var dynamicTemplateData = new templateData
             {
                 name = userName,
