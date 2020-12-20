@@ -17,10 +17,8 @@ namespace gamitude_backend.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<string>> Version()
+        public ActionResult<string> Version()
         {
-            await new Example().Execute();
-
             return Created("Version", version);
         }
 
