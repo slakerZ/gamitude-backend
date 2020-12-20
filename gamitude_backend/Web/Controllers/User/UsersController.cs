@@ -33,16 +33,18 @@ namespace gamitude_backend.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ControllerResponse<GetUserDto>>> id(string id)
+        [HttpGet]
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> id()
         {
             _logger.LogInformation("In GET id");
-            var user = await _userService.getByIdAsync(id);
+            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+            var user = await _userService.getByIdAsync(userId);
             return Ok(new ControllerResponse<GetUserDto>
             {
                 data = _mapper.Map<GetUserDto>(user)
             });
         }
+        
         [HttpGet("money")]
         public async Task<ActionResult<ControllerResponse<long>>> money()
         {
