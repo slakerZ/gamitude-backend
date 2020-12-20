@@ -15,6 +15,7 @@ using MongoDB.Driver;
 using Microsoft.Extensions.Hosting;
 using gamitude_backend.Configuration;
 using SendGrid;
+using System.Web;
 
 namespace gamitude_backend.Services
 {
@@ -25,6 +26,7 @@ namespace gamitude_backend.Services
         Task<User> createAsync(User newUser, string password);
         Task<User> getByUserNameAsync(string userName);
         Task changePasswordAsync(string id, string oldPassword, string newPassword);
+        Task changeEmailAsync(string id, string newEmail);
         Task verifyEmail(string login, string token);
         Task<User> updateAsync(string userId, User updateUser);
         Task deleteByIdAsync(string id);
@@ -33,8 +35,6 @@ namespace gamitude_backend.Services
     {
         private readonly ILogger<UserService> _logger;
         private readonly IDatabaseSettings _databaseSettings;
-
-        //TODO make async
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
         private readonly IRankRepository _rankRepository;
@@ -85,7 +85,7 @@ namespace gamitude_backend.Services
                 Task.Run(() => initializeUserJournals(user))
 
             };
-            //TODO add initializeUserTheme
+            // TODO add initializeUserTheme
             return Task.WhenAll(processTasks);
         }
 
@@ -109,10 +109,10 @@ namespace gamitude_backend.Services
             var fluencyFolder = new Folder { userId = user.Id.ToString(), icon = "fluency", name = "Learn Languages", description = "Folder for projects that boosts fluency stats" };
 
             var ultTimer = new Timer { userId = user.Id.ToString(), label = "90", timerType = TIMER_TYPE.TIMER, name = "90/30", countDownInfo = new CountDownInfo { breakTime = 30, overTime = 5, workTime = 90 } };
-            var pomodoroTimer = new Timer { userId = user.Id.ToString(),label="25" , timerType=TIMER_TYPE.TIMER, name = "Pomodoro",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 25, breakInterval=5, longerBreakTime=15} };
-            var justFiveTimer = new Timer { userId = user.Id.ToString(),label="5" , timerType=TIMER_TYPE.TIMER, name = "Just Five",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 5} };
-            var stopwatchTimer = new Timer { userId = user.Id.ToString(),label="SW" , timerType=TIMER_TYPE.STOPWATCH, name = "Stopwatch",countDownInfo = null };
-            
+            var pomodoroTimer = new Timer { userId = user.Id.ToString(), label = "25", timerType = TIMER_TYPE.TIMER, name = "Pomodoro", countDownInfo = new CountDownInfo { breakTime = 5, overTime = 5, workTime = 25, breakInterval = 5, longerBreakTime = 15 } };
+            var justFiveTimer = new Timer { userId = user.Id.ToString(), label = "5", timerType = TIMER_TYPE.TIMER, name = "Just Five", countDownInfo = new CountDownInfo { breakTime = 5, overTime = 5, workTime = 5 } };
+            var stopwatchTimer = new Timer { userId = user.Id.ToString(), label = "SW", timerType = TIMER_TYPE.STOPWATCH, name = "Stopwatch", countDownInfo = null };
+
             List<Task> processTasks = new List<Task>
             {
                 Task.Run(() =>  _folderRepository.createAsync(emotionFolder)),
@@ -181,7 +181,7 @@ namespace gamitude_backend.Services
                 if (!StaticValues.IsDevelopment())
                 {
                     var response = await sendVerificationEmail(newUser.Email);
-                    _logger.LogInformation(response.Headers.ToString()+response.StatusCode.ToString());
+                    _logger.LogInformation(response.Headers.ToString() + response.StatusCode.ToString());
                 }
                 return newUser;
             }
@@ -196,13 +196,27 @@ namespace gamitude_backend.Services
         {
             var user = await _userManager.FindByEmailAsync(userEmail);
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            return await _emailSender.SendVerificationEmailAsync(user.Email, user.UserName, token);
+            token = HttpUtility.UrlEncode(token);
+            var link = $"https://gamitude.rocks/verifyEmail/{user.UserName}/{token}";
+            return await _emailSender.SendVerificationEmailAsync(user.Email, user.UserName, link);
         }
 
         public async Task verifyEmail(string login, string token)
         {
             var user = await _userManager.FindByNameAsync(login);
+            token = HttpUtility.UrlDecode(token);
             var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+                var s = result.Errors.AsEnumerable();
+                throw new IdentityException(s);
+            }
+        }
+        public async Task verifyNewEmail(string login, string newEmail, string token)
+        {
+            var user = await _userManager.FindByNameAsync(login);
+            token = HttpUtility.UrlDecode(token);
+            var result = await _userManager.ChangeEmailAsync(user, newEmail, token);
             if (!result.Succeeded)
             {
                 var s = result.Errors.AsEnumerable();
@@ -264,6 +278,16 @@ namespace gamitude_backend.Services
         public Task<long> getMoneyAsync(string userId)
         {
             return _moneyRepository.getMoneyByUserIdAsync(userId);
+        }
+
+        public async Task changeEmailAsync(string id, string newEmail)
+        {
+            // ! TODO CREATE NEW TEMPLATE EMAIL FOR CHANGE EMAIL
+            var user = await _userManager.FindByIdAsync(id);
+            var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
+            token = HttpUtility.UrlEncode(token);
+            var link = $"https://gamitude.rocks/verifyEmail/{user.UserName}/newEmail/{newEmail}/{token}";
+            await _emailSender.SendVerificationEmailAsync(newEmail, user.UserName, link);
         }
     }
 

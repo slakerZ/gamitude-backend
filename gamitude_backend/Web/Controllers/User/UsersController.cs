@@ -44,7 +44,7 @@ namespace gamitude_backend.Controllers
                 data = _mapper.Map<GetUserDto>(user)
             });
         }
-        
+
         [HttpGet("money")]
         public async Task<ActionResult<ControllerResponse<long>>> money()
         {
@@ -102,6 +102,15 @@ namespace gamitude_backend.Controllers
             string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
             await _userService.changePasswordAsync(tokenUserId, passwordUserDto.oldPassword, passwordUserDto.newPassword);
+            return Ok(new ControllerResponse<GetUserDto>());
+        }
+        [HttpPut("email")]
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> updateEmail(ChangeEmailUserDto emailUserDto)
+        {
+            _logger.LogInformation("In PUT changePassword");
+            string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+
+            // await _userService.changePasswordAsync(tokenUserId, passwordUserDto.oldPassword, passwordUserDto.newPassword);
             return Ok(new ControllerResponse<GetUserDto>());
         }
 

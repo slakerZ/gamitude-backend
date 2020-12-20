@@ -45,7 +45,6 @@ namespace gamitude_backend
             services.AddCustomAuthenticationConfiguration(key);
 
             services.AddTransient<IEmailSender, EmailSender>();
-            services.Configure<EmailSenderSettings>(configuration);
 
             services.AddRepositories();
             services.AddServices();

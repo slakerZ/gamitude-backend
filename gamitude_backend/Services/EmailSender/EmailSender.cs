@@ -10,7 +10,7 @@ namespace gamitude_backend.Services
     public interface IEmailSender
     {
         // Task SendEmailAsync(string email, string subject, string message);
-        Task<Response> SendVerificationEmailAsync(string email, string userName, string token);
+        Task<Response> SendVerificationEmailAsync(string email, string userName, string token,string templateId="d-ec00d4674dab420caa9b98276dec734a");
         Task<Response> Execute(string apiKey, SendGridMessage msg);
 
 
@@ -28,10 +28,8 @@ namespace gamitude_backend.Services
         // {
         //     return Execute(Options.SendGridKey, subject, message, message, email, email);
         // }
-        public Task<Response> SendVerificationEmailAsync(string email, string userName, string token)
+        public Task<Response> SendVerificationEmailAsync(string email, string userName, string link,string templateId)
         {
-            var link = $"https://gamitude.rocks/verifyEmail/{userName}/{token}";
-            var templateId= "d-ec00d4674dab420caa9b98276dec734a";
             var dynamicTemplateData = new templateData
             {
                 name = userName,
