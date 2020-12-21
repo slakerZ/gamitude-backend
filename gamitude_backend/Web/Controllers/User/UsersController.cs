@@ -104,18 +104,18 @@ namespace gamitude_backend.Controllers
             return Ok(new ControllerResponse<string> { data = "Email send" });
         }
 
-        [HttpPut]
-        public async Task<ActionResult<ControllerResponse<GetUserDto>>> update(UpdateUserDto updateUser)
-        {
-            _logger.LogInformation("In PUT update");
-            string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+        // [HttpPut]
+        // public async Task<ActionResult<ControllerResponse<GetUserDto>>> update(UpdateUserDto updateUser)
+        // {
+        //     _logger.LogInformation("In PUT update");
+        //     string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
-            var user = await _userService.updateAsync(tokenUserId, _mapper.Map<User>(updateUser));
-            return Ok(new ControllerResponse<GetUserDto>
-            {
-                data = _mapper.Map<GetUserDto>(user)
-            });
-        }
+        //     var user = await _userService.updateAsync(tokenUserId, _mapper.Map<User>(updateUser));
+        //     return Ok(new ControllerResponse<GetUserDto>
+        //     {
+        //         data = _mapper.Map<GetUserDto>(user)
+        //     });
+        // }
 
         [HttpPut("password")]
         public async Task<ActionResult<ControllerResponse<GetUserDto>>> updatePassword(ChangePasswordUserDto passwordUserDto)

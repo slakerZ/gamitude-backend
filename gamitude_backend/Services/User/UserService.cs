@@ -197,6 +197,10 @@ namespace gamitude_backend.Services
         private async Task<Response> sendVerificationEmail(string userName)
         {
             var user = await _userManager.FindByNameAsync(userName);
+            if(user == null)
+            {
+                throw new LoginException("There is no user with that login");
+            }
             if (user.EmailConfirmed)
             {
                 throw new LoginException("Email already verified");
