@@ -104,6 +104,28 @@ namespace gamitude_backend.Controllers
             return Ok(new ControllerResponse<string> { data = "Email send" });
         }
 
+        [AllowAnonymous]
+        [HttpGet("ifExists/email/{email}")]
+        public async Task<ActionResult<ControllerResponse<Boolean>>> checkByEmail(string email)
+        {
+            _logger.LogInformation("In POST checkByEmail");
+            var ifExists = await _userService.ifUserExistByEmailAsync(email);
+            _logger.LogInformation("after checkByEmail");
+
+            return Ok(new ControllerResponse<Boolean> { data = ifExists });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("ifExists/login/{login}")]
+        public async Task<ActionResult<ControllerResponse<Boolean>>> checkByLogin(string login)
+        {
+            _logger.LogInformation("In POST checkByLogin");
+            var ifExists = await _userService.ifUserExistByNameAsync(login);
+            _logger.LogInformation("after checkByLogin");
+
+            return Ok(new ControllerResponse<Boolean> { data = ifExists });
+        }
+
         // [HttpPut]
         // public async Task<ActionResult<ControllerResponse<GetUserDto>>> update(UpdateUserDto updateUser)
         // {

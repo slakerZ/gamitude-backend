@@ -22,6 +22,8 @@ namespace gamitude_backend.Services
     public interface IUserService
     {
         Task<User> getByIdAsync(string id);
+        Task<Boolean> ifUserExistByNameAsync(string login);
+        Task<Boolean> ifUserExistByEmailAsync(string email);
         Task<long> getMoneyAsync(string userId);
         Task<User> createAsync(User newUser, string password);
         Task<User> getByUserNameAsync(string userName);
@@ -309,6 +311,14 @@ namespace gamitude_backend.Services
             return sendVerificationEmail(login);
         }
 
+        public async Task<Boolean> ifUserExistByNameAsync(string login)
+        {
+            return (await _userManager.FindByNameAsync(login)) != null ;
+        }
+        public async Task<Boolean> ifUserExistByEmailAsync(string email)
+        {
+            return (await _userManager.FindByEmailAsync(email)) != null ;
+        }
     }
 
 }
