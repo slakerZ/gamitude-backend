@@ -11,6 +11,7 @@ using gamitude_backend.Dto.Project;
 using gamitude_backend.Services;
 using System;
 using System.Collections.Generic;
+using gamitude_backend.Exceptions;
 
 namespace gamitude_backend.Controllers
 {
@@ -24,16 +25,22 @@ namespace gamitude_backend.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
         private readonly IProjectLogService _projectLogService;
+        private readonly IProjectService _projectService;
+        private readonly IProjectTaskService _projectTaskService;
 
         public ProjectLogsController(ILogger<ProjectLogsController> logger,
                                 IHttpContextAccessor httpContextAccessor,
                                 IMapper mapper,
-                                IProjectLogService projectLogService)
+                                IProjectLogService projectLogService,
+                                IProjectService projectService,
+                                IProjectTaskService projectTaskService)
         {
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
             _projectLogService = projectLogService;
+            _projectService = projectService;
+            _projectTaskService = projectTaskService;
         }
 
         [HttpGet]
@@ -54,7 +61,7 @@ namespace gamitude_backend.Controllers
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
             var projectLog = await _projectLogService.getByIdAsync(id);
-            if(projectLog == null)
+            if (projectLog == null)
             {
                 return NotFound();
             }
@@ -62,7 +69,7 @@ namespace gamitude_backend.Controllers
             {
                 throw new UnauthorizedAccessException("ProjectLog don't belong to you");
             }
-            return Ok( new ControllerResponse<ProjectLog>
+            return Ok(new ControllerResponse<ProjectLog>
             {
                 data = projectLog
             });
@@ -76,7 +83,28 @@ namespace gamitude_backend.Controllers
 
             ProjectLog projectLog = _mapper.Map<ProjectLog>(createProjectLog);
             projectLog.userId = userId;
-            projectLog  =  await _projectLogService.processCreateProjectLog(projectLog);
+            projectLog.project = await _projectService.getByIdAsync(createProjectLog.projectId);
+            if (projectLog.project == null)
+            {
+                throw new ArgumentException("There is no project with corresponding id");
+            }
+            if (projectLog.project.userId != userId)
+            {
+                throw new UnauthorizedAccessException("Project don't belong to you");
+            }
+            if (createProjectLog.projectTaskId != null)
+            {
+                projectLog.projectTask = await _projectTaskService.getByIdAsync(createProjectLog.projectTaskId);
+                if (projectLog.projectTask.userId != userId)
+                {
+                    throw new UnauthorizedAccessException("ProjectTask don't belong to you");
+                }
+            }
+            if(createProjectLog.type != PROJECT_TYPE.BREAK)
+            {
+                createProjectLog.type = projectLog.project.projectType;
+            }
+            projectLog = await _projectLogService.processCreateProjectLog(projectLog);
             return Created(new Uri($"{Request.Path}/{projectLog.id}", UriKind.Relative), new ControllerResponse<ProjectLog>
             {
                 data = projectLog
@@ -108,7 +136,7 @@ namespace gamitude_backend.Controllers
         public async Task<ActionResult> Delete(string id)
         {
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
-            await _projectLogService.processDeleteProjectLog(id,userId);
+            await _projectLogService.processDeleteProjectLog(id, userId);
 
             return NoContent();
         }

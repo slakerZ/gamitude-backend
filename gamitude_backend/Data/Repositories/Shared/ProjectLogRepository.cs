@@ -36,7 +36,7 @@ namespace gamitude_backend.Repositories
 
         public Task<List<ProjectLog>> getByProjectIdAsync(string projectId)
         {
-            return _ProjectLogs.Find<ProjectLog>(ProjectLog => ProjectLog.projectId == projectId).ToListAsync();
+            return _ProjectLogs.Find<ProjectLog>(ProjectLog => ProjectLog.project.id == projectId).ToListAsync();
         }
 
         public System.Threading.Tasks.Task createAsync(ProjectLog ProjectLog)

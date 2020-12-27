@@ -11,20 +11,15 @@ namespace gamitude_backend.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
 
-        [BsonElement("projectId")]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string projectId { get; set; }
+        [BsonElement("project")]
+        public Project project { get; set; }
 
-        [BsonElement("projectTaskId")]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string projectTaskId { get; set; }
+        [BsonElement("projectTask")]
+        public ProjectTask projectTask { get; set; }
 
         [BsonElement("userId")]
         [BsonRepresentation(BsonType.ObjectId)]
         public string userId { get; set; }
-
-        [BsonElement("projectType")]
-        public PROJECT_TYPE? projectType { get; set; }
 
         [BsonElement("log")]
         public string log { get; set; }
@@ -32,14 +27,12 @@ namespace gamitude_backend.Models
         [BsonElement("timeSpend")]
         public int timeSpend { get; set; }
 
-        [BsonElement("dominantStat")]
-        public STATS? dominantStat { get; set; }
-
-        [BsonElement("stats")]
-        public STATS[] stats { get; set; }
-
         [BsonElement("dateCreated")]
         public DateTime dateCreated { get; set; }
+
+        [BsonElement("type")]
+        public PROJECT_TYPE? type { get; set; }
+        
 
         /// <summary>
         /// Calculates the wages. Values depends on how many stats u wanna boost.
@@ -49,7 +42,7 @@ namespace gamitude_backend.Models
             Dictionary<STATS, int> wageMap = new Dictionary<STATS, int>();
             int dominantStat = 0;
             int stat = 0;
-            switch (stats.GetLength(0))
+            switch (project.stats.GetLength(0))
             {
                 case 1:
                     stat = 0;
@@ -69,9 +62,9 @@ namespace gamitude_backend.Models
                     break;
 
             }
-            foreach (var s in stats)
+            foreach (var s in project.stats)
             {
-                if (s == this.dominantStat)
+                if (s == this.project.dominantStat)
                 {
                     wageMap.Add(s, dominantStat);
                 }

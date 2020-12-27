@@ -211,7 +211,7 @@ namespace gamitude_backend.Services
              _logger.LogDebug(token);
             token = HttpUtility.UrlEncode(token);
              _logger.LogDebug(token);
-            var link = $"/verifyEmail/{user.UserName}/{token}";
+            var link = $"/verifyEmail/{user.UserName}/{token}/newEmail/none";
             return await _emailSender.SendVerificationEmailAsync(user.Email, user.UserName, link);
         }
 
@@ -302,8 +302,8 @@ namespace gamitude_backend.Services
             var user = await _userManager.FindByIdAsync(id);
             var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
             token = HttpUtility.UrlEncode(token);
-            var link = $"/verifyEmail/{user.UserName}/newEmail/{newEmail}/{token}";
-            await _emailSender.SendVerificationEmailAsync(newEmail, user.UserName, link);
+            var link = $"/verifyEmail/{user.UserName}/{token}/newEmail/{newEmail}";
+            await _emailSender.SendVerificationEmailAsync(newEmail, user.UserName, link,"d-ffc8f066fa554d3380bda1291a9a4968");
         }
 
         public Task resendVerifyEmail(string login)
