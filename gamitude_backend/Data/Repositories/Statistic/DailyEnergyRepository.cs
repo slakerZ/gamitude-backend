@@ -70,7 +70,7 @@ namespace gamitude_backend.Repositories
             {
                 return updateAsync(dailyEnergy.id, dailyEnergy.validate());
             }
-            return createAsync(dailyEnergy);
+            return createAsync(dailyEnergy.validate());
 
         }
 
