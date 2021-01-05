@@ -71,10 +71,13 @@ namespace gamitude_backend.Services
             }
         }
         public delegate STATS statsChange(STATS stats);
-        private ProjectLog updateStatsFields(statsChange update,ProjectLog projectLog)
+        private ProjectLog updateStatsFields(statsChange update, ProjectLog projectLog)
         {
-            projectLog.project.dominantStat = update(projectLog.project.dominantStat.Value);
-            projectLog.project.stats = projectLog.project.stats.Select(o => update(o)).ToArray();
+            if (projectLog.project.projectType != PROJECT_TYPE.STAT)
+            {
+                projectLog.project.dominantStat = update(projectLog.project.dominantStat.Value);
+                projectLog.project.stats = projectLog.project.stats.Select(o => update(o)).ToArray();
+            }
             return projectLog;
         }
         public async Task<ProjectLog> processCreateProjectLog(ProjectLog projectLog)
@@ -82,7 +85,7 @@ namespace gamitude_backend.Services
             projectLog.dateCreated = DateTime.UtcNow;
 
             //WORKAROUND PARSE ENERGIES TO STATS
-            projectLog = updateStatsFields(updateStatsTo,projectLog);
+            projectLog = updateStatsFields(updateStatsTo, projectLog);
 
             Dictionary<STATS, int> wages = projectLog.getWages();
             List<Task> processTasks = new List<Task>();
@@ -91,7 +94,7 @@ namespace gamitude_backend.Services
             await Task.WhenAll(processTasks);
 
             //WORKAROUND REVERT
-            projectLog = updateStatsFields(updateStatsFrom,projectLog);
+            projectLog = updateStatsFields(updateStatsFrom, projectLog);
             await createAsync(projectLog);
             if (projectLog.project != null)
             {
@@ -167,8 +170,8 @@ namespace gamitude_backend.Services
             int sum = wages.Sum(x => x.Value);
             dailyEnergy.body = (int)op(dailyEnergy.body, duration * wages.GetValueOrDefault(STATS.STRENGTH) / sum);
             dailyEnergy.soul = (int)op(dailyEnergy.soul, duration * wages.GetValueOrDefault(STATS.FLUENCY) / sum);
-            dailyEnergy.emotions = (int)op(dailyEnergy.soul, duration * wages.GetValueOrDefault(STATS.CREATIVITY) / sum);
-            dailyEnergy.mind = (int)op(dailyEnergy.soul, duration * wages.GetValueOrDefault(STATS.INTELLIGENCE) / sum);
+            dailyEnergy.emotions = (int)op(dailyEnergy.emotions, duration * wages.GetValueOrDefault(STATS.CREATIVITY) / sum);
+            dailyEnergy.mind = (int)op(dailyEnergy.mind, duration * wages.GetValueOrDefault(STATS.INTELLIGENCE) / sum);
             return dailyEnergy;
 
         }

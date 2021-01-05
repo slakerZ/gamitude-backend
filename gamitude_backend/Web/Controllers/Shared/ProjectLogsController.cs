@@ -81,7 +81,7 @@ namespace gamitude_backend.Controllers
         {
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
-            ProjectLog projectLog = _mapper.Map<ProjectLog>(createProjectLog);
+            ProjectLog projectLog = _mapper.Map<ProjectLog>(createProjectLog); 
             projectLog.userId = userId;
             projectLog.project = await _projectService.getByIdAsync(createProjectLog.projectId);
             if (projectLog.project == null)

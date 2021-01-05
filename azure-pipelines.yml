@@ -6,7 +6,7 @@ queue:
 trigger:
 - master
 variables:
-  TargetFramework: 'netcoreapp3.1'
+  TargetFramework: 'netcoreapp5.0'
   RestoreBuildProjects: 'gamitude_backend/*.csproj'
   BuildConfiguration: 'Release'
   DockerImageName: 'gentle-ally-270120/gamitude_backend'

@@ -86,6 +86,7 @@ namespace gamitude_backend.Services
                 {
                     await _userRanksRepository.addAsync(userId,rankId);
                     await _statsRepository.updateAsync(stats.id.ToString(),stats);
+                    return rank;
                 }
             }
 
@@ -99,7 +100,7 @@ namespace gamitude_backend.Services
             if (userRanks.Contains(rankId))
             {
                 await _userRankRepository.createOrUpdateAsync(userId, rankId);
-                return await getByIdAsync(userId);
+                return await getByIdAsync(rankId);
             }
             throw new ShopException("There is no purchased rank with coresponding id");
         }

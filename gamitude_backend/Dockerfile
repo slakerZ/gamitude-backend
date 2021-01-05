@@ -1,5 +1,5 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS runtime
 WORKDIR /app
-COPY bin/Release/netcoreapp3.1/publish/ .
+COPY bin/Release/netcoreapp5.0/publish/ .
 RUN ls 
 ENTRYPOINT ["dotnet", "gamitude_backend.dll"]
