@@ -15,7 +15,7 @@ namespace gamitude_backend.Dto.Timer
 
         public TIMER_TYPE? timerType { get; set; }
         
-        public GetCountDownInfoDto countDownInfo { get; set; }
+        public UpdateCountDownInfoDto countDownInfo { get; set; }
     }
 
     public class UpdateCountDownInfoDto
