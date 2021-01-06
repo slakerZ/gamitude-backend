@@ -29,6 +29,13 @@ spec:
                 secretKeyRef:
                   name: token-string
                   key: token_string
+            - name: EmailSenderSettings__SendGridKey
+              valueFrom:
+                secretKeyRef:
+                  name: sendgrid-key
+                  key: sendgrid_key
+            - name: EmailSenderSettings__BaseUrl
+              value: "https://gamitude.rocks"
           ports:
             - name: backend-http
               containerPort: 80
