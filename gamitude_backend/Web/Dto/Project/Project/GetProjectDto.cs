@@ -22,7 +22,7 @@ namespace gamitude_backend.Dto.Project
 
         public int totalTimeSpend { get; set; }
 
-        public int totalTimeSpendBreak { get; set; }
+        public int timeSpendBreak { get; set; }
 
         public int? daysPerWeek { get; set; }
 
