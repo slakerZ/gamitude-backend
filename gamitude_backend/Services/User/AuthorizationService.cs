@@ -16,12 +16,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
+using gamitude_backend.Configuration;
 
 namespace gamitude_backend.Services
 {
     public interface IAuthorizationService
     {
-        Task<UserToken> authorizeUserAsync(string login,string password);
+        Task<UserToken> authorizeUserAsync(string login, string password);
     }
     public class AuthorizationService : IAuthorizationService
     {
@@ -51,20 +52,33 @@ namespace gamitude_backend.Services
         }
 
 
-        public async Task<UserToken> authorizeUserAsync(string login,string password)
+        public async Task<UserToken> authorizeUserAsync(string login, string password)
         {
-            _logger.LogInformation("In authorizeUserAsync");
+            _logger.LogInformation($"In authorizeUserAsync user: {login}");
+            var user = await _signInManager.UserManager.FindByNameAsync(login);
+            if (user == null)
+            {
+                throw new LoginException("noUserWithThatLogin");
+            }
+
+            if (!StaticValues.IsDevelopment())
+            {
+                if (!(await _signInManager.UserManager.IsEmailConfirmedAsync(user)))
+                {
+                    throw new LoginException("emailNotVerified");
+                }
+            }
 
             var result = await _signInManager.PasswordSignInAsync(login,
-                               password,isPersistent: false, lockoutOnFailure: false);
+                               password, isPersistent: false, lockoutOnFailure: false);
             if (!result.Succeeded)
             {
                 throw new LoginException("passwordWrongErrorMessage");
             }
+
+
             _logger.LogInformation("authentication successful");
-            
-            var user  = await _signInManager.UserManager.FindByNameAsync(login);
-            _logger.LogInformation("User:"+ user.UserName);
+
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.secret);
@@ -97,13 +111,13 @@ namespace gamitude_backend.Services
             }
             else
             {
-                userToken.id=user.id;
+                userToken.id = user.id;
                 await _UsersToken.ReplaceOneAsync(UserToken => UserToken.userId == userToken.userId, userToken);
             }
             return userToken;
         }
 
-        public Task RemoveAsync(UserToken userToken) 
+        public Task RemoveAsync(UserToken userToken)
         {
             _logger.LogInformation("In RemoveAsync userToken");
             return _UsersToken.DeleteOneAsync(UserToken => UserToken.id == userToken.id);

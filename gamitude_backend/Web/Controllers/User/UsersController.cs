@@ -33,16 +33,18 @@ namespace gamitude_backend.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<ControllerResponse<GetUserDto>>> id(string id)
+        [HttpGet]
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> id()
         {
             _logger.LogInformation("In GET id");
-            var user = await _userService.getByIdAsync(id);
+            string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+            var user = await _userService.getByIdAsync(userId);
             return Ok(new ControllerResponse<GetUserDto>
             {
                 data = _mapper.Map<GetUserDto>(user)
             });
         }
+
         [HttpGet("money")]
         public async Task<ActionResult<ControllerResponse<long>>> money()
         {
@@ -63,36 +65,107 @@ namespace gamitude_backend.Controllers
             var user = await _userService.createAsync(_mapper.Map<User>(newUser), newUser.password);
             _logger.LogInformation("after create");
 
-            return Created(new Uri($"{Request.Path}/{user.Id}", UriKind.Relative),new ControllerResponse<GetUserDto>
+            return Created(new Uri($"{Request.Path}/{user.Id}", UriKind.Relative), new ControllerResponse<GetUserDto>
             {
                 data = _mapper.Map<GetUserDto>(user)
             });
         }
 
-        [HttpPut]
-        public async Task<ActionResult<ControllerResponse<GetUserDto>>> update(UpdateUserDto updateUser)
+        [AllowAnonymous]
+        [HttpPost("verifyEmail")]
+        public async Task<ActionResult<ControllerResponse<string>>> verifyEmail(VerifyEmailDto verify)
         {
-            _logger.LogInformation("In PUT update");
-            var user = await _userService.updateAsync(_mapper.Map<User>(updateUser));
-            return Ok( new ControllerResponse<GetUserDto>
-            {
-                data = _mapper.Map<GetUserDto>(user)
-            });
+            _logger.LogInformation("In POST verifyEmail");
+            await _userService.verifyEmail(verify.login, verify.token);
+            _logger.LogInformation("after verifyEmail");
+
+            return Ok(new ControllerResponse<string> { data = "Email verified" });
         }
+
+        [AllowAnonymous]
+        [HttpPost("verifyEmailNew")]
+        public async Task<ActionResult<ControllerResponse<string>>> verifyNewEmail(VerifyEmailNewDto  verify)
+        {
+            _logger.LogInformation("In POST verifyNewEmail");
+            await _userService.verifyNewEmail(verify.login, verify.email, verify.token);
+            _logger.LogInformation("after verifyNewEmail");
+
+            return Ok(new ControllerResponse<string> { data = "New Email verified and updated" });
+        }
+
+        [AllowAnonymous]
+        [HttpPost("verifyEmail/resend/{login}")]
+        public async Task<ActionResult<ControllerResponse<string>>> resendVerifyEmail(string login)
+        {
+            _logger.LogInformation("In POST resendVerifyEmail");
+            await _userService.resendVerifyEmail(login);
+            _logger.LogInformation("after resendVerifyEmail");
+
+            return Ok(new ControllerResponse<string> { data = "Email send" });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("ifExists/email/{email}")]
+        public async Task<ActionResult<ControllerResponse<Boolean>>> checkByEmail(string email)
+        {
+            _logger.LogInformation("In POST checkByEmail");
+            var ifExists = await _userService.ifUserExistByEmailAsync(email);
+            _logger.LogInformation("after checkByEmail");
+
+            return Ok(new ControllerResponse<Boolean> { data = ifExists });
+        }
+
+        [AllowAnonymous]
+        [HttpGet("ifExists/login/{login}")]
+        public async Task<ActionResult<ControllerResponse<Boolean>>> checkByLogin(string login)
+        {
+            _logger.LogInformation("In POST checkByLogin");
+            var ifExists = await _userService.ifUserExistByNameAsync(login);
+            _logger.LogInformation("after checkByLogin");
+
+            return Ok(new ControllerResponse<Boolean> { data = ifExists });
+        }
+
+        // [HttpPut]
+        // public async Task<ActionResult<ControllerResponse<GetUserDto>>> update(UpdateUserDto updateUser)
+        // {
+        //     _logger.LogInformation("In PUT update");
+        //     string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+
+        //     var user = await _userService.updateAsync(tokenUserId, _mapper.Map<User>(updateUser));
+        //     return Ok(new ControllerResponse<GetUserDto>
+        //     {
+        //         data = _mapper.Map<GetUserDto>(user)
+        //     });
+        // }
 
         [HttpPut("password")]
         public async Task<ActionResult<ControllerResponse<GetUserDto>>> updatePassword(ChangePasswordUserDto passwordUserDto)
         {
             _logger.LogInformation("In PUT changePassword");
-            await _userService.changePasswordAsync(passwordUserDto.id, passwordUserDto.oldPassword,passwordUserDto.newPassword);
-            return Ok(new ControllerResponse<GetUserDto>());
+            string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
+            await _userService.changePasswordAsync(tokenUserId, passwordUserDto.oldPassword, passwordUserDto.newPassword);
+            return Ok(new ControllerResponse<GetUserDto>());
         }
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> delete(string id)
+
+        [HttpPut("email")]
+        public async Task<ActionResult<ControllerResponse<GetUserDto>>> updateEmail(ChangeEmailUserDto emailUserDto)
+        {
+            _logger.LogInformation("In PUT changePassword");
+            string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+
+            await _userService.changeEmailAsync(tokenUserId, emailUserDto.newEmail);
+            return Ok(new ControllerResponse<GetUserDto>());
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> delete()
         {
             _logger.LogInformation("In DELETE delete");
-            await _userService.deleteByIdAsync(id);
+            string tokenUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
+
+            await _userService.deleteByIdAsync(tokenUserId);
             return NoContent();
         }
     }

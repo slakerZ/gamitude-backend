@@ -1,4 +1,5 @@
 using System;
+using gamitude_backend.Dto.BulletJournal;
 using gamitude_backend.Models;
 namespace gamitude_backend.Dto.Project
 {
@@ -10,11 +11,9 @@ namespace gamitude_backend.Dto.Project
 
         public int timeSpend { get; set; }
 
-        public STATS? dominantStat { get; set; }
+        public GetProjectDto project { get; set; }
+        public GetProjectTaskDto projectTask { get; set; }
 
-        public STATS[] stats { get; set; }
-
-        public DateTime dateCreated { get; set; }
 
     }
 }

@@ -41,15 +41,14 @@ namespace gamitude_backend.Controllers
 
 
         [HttpGet]
-        public async Task<ActionResult<ControllerResponse<List<GetRank>>>> get(int page = 1, int limit = 20, string sortBy = "name")
+        public async Task<ActionResult<ControllerResponse<List<GetRank>>>> get(int page = 1, int limit = 20, string sortByField = "name", SORT_TYPE sortByType = SORT_TYPE.DESC)
         {
             _logger.LogInformation("In GET rank");
-            var ranks = await _rankService.getAsync();
+            var ranks = await _rankService.getAllAsync(page, limit, sortByField, sortByType);
             // var ranks = await _rankService.getAllAsync(page,limit,sortBy);
             return Ok(new ControllerResponse<List<GetRank>>
             {
                 data = ranks.Select(o => _mapper.Map<GetRank>(o)).ToList()
-
             });
         }
         [HttpGet("user")]
@@ -85,12 +84,12 @@ namespace gamitude_backend.Controllers
                 data = _mapper.Map<GetRank>(rank)
             });
         }
-        [HttpPost("select/{rankId}")]
-        public async Task<ActionResult<ControllerResponse<GetRank>>> select(string rankId)
+        [HttpPost("select")]
+        public async Task<ActionResult<ControllerResponse<GetRank>>> select(PostSetRankDto setRank)
         {
             _logger.LogInformation("In POST user rank purchase");
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
-            var rank = await _rankService.selectRankIdAsync(userId, rankId);
+            var rank = await _rankService.selectRankIdAsync(userId, setRank.id);
             return Ok(new ControllerResponse<GetRank>
             {
                 data = _mapper.Map<GetRank>(rank)

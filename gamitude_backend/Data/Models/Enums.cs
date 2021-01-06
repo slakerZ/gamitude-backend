@@ -5,6 +5,7 @@ namespace gamitude_backend.Models
     public enum TIMER_TYPE { STOPWATCH, TIMER };
     public enum PAGE_TYPE { NORMAL, OVERDUE, UNSCHEDULED }
     public enum CURRENCY { REAL, STATS };
+    public enum SORT_TYPE { ASC, DESC };
     public enum GAMITUDE_STYLE
     {
         DEFAULT, WINTER, BUSINESS, LOL

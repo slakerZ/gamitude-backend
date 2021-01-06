@@ -71,10 +71,13 @@ namespace gamitude_backend.Services
             }
         }
         public delegate STATS statsChange(STATS stats);
-        private ProjectLog updateStatsFields(statsChange update,ProjectLog projectLog)
+        private ProjectLog updateStatsFields(statsChange update, ProjectLog projectLog)
         {
-            projectLog.dominantStat = update(projectLog.dominantStat.Value);
-            projectLog.stats = projectLog.stats.Select(o => update(o)).ToArray();
+            if (projectLog.project.projectType != PROJECT_TYPE.STAT)
+            {
+                projectLog.project.dominantStat = update(projectLog.project.dominantStat.Value);
+                projectLog.project.stats = projectLog.project.stats.Select(o => update(o)).ToArray();
+            }
             return projectLog;
         }
         public async Task<ProjectLog> processCreateProjectLog(ProjectLog projectLog)
@@ -82,7 +85,7 @@ namespace gamitude_backend.Services
             projectLog.dateCreated = DateTime.UtcNow;
 
             //WORKAROUND PARSE ENERGIES TO STATS
-            projectLog = updateStatsFields(updateStatsTo,projectLog);
+            projectLog = updateStatsFields(updateStatsTo, projectLog);
 
             Dictionary<STATS, int> wages = projectLog.getWages();
             List<Task> processTasks = new List<Task>();
@@ -91,11 +94,11 @@ namespace gamitude_backend.Services
             await Task.WhenAll(processTasks);
 
             //WORKAROUND REVERT
-            projectLog = updateStatsFields(updateStatsFrom,projectLog);
+            projectLog = updateStatsFields(updateStatsFrom, projectLog);
             await createAsync(projectLog);
-            if (projectLog.projectId != null)
+            if (projectLog.project != null)
             {
-                await _projectRepository.updateTotalTimeAsync(projectLog.projectId, projectLog.timeSpend);
+                await _projectRepository.updateTotalTimeAsync(projectLog.project.id, projectLog.timeSpend);
             }
             return projectLog;
         }
@@ -113,9 +116,9 @@ namespace gamitude_backend.Services
             processTasks.Add(Task.Run(() => manageStatsAsync(substract, wages, projectLog)));
             await Task.WhenAll(processTasks);
             await deleteByIdAsync(projectLogId);
-            if (projectLog.projectId != null)
+            if (projectLog.project != null)
             {
-                await _projectRepository.updateTotalTimeAsync(projectLog.projectId, projectLog.timeSpend * -1);
+                await _projectRepository.updateTotalTimeAsync(projectLog.project.id, projectLog.timeSpend * -1);
             }
         }
 
@@ -148,7 +151,7 @@ namespace gamitude_backend.Services
 
         private DailyEnergy calculateAndUpdateEnergy(Del op, DailyEnergy dailyEnergy, Dictionary<STATS, int> wages, ProjectLog projectLog)
         {
-            switch (projectLog.projectType)
+            switch (projectLog.type)
             {
                 case (PROJECT_TYPE.ENERGY):
                     return updateEnergiesWithWages(op, dailyEnergy, wages, projectLog.timeSpend >> 1);
@@ -167,15 +170,15 @@ namespace gamitude_backend.Services
             int sum = wages.Sum(x => x.Value);
             dailyEnergy.body = (int)op(dailyEnergy.body, duration * wages.GetValueOrDefault(STATS.STRENGTH) / sum);
             dailyEnergy.soul = (int)op(dailyEnergy.soul, duration * wages.GetValueOrDefault(STATS.FLUENCY) / sum);
-            dailyEnergy.emotions = (int)op(dailyEnergy.soul, duration * wages.GetValueOrDefault(STATS.CREATIVITY) / sum);
-            dailyEnergy.mind = (int)op(dailyEnergy.soul, duration * wages.GetValueOrDefault(STATS.INTELLIGENCE) / sum);
+            dailyEnergy.emotions = (int)op(dailyEnergy.emotions, duration * wages.GetValueOrDefault(STATS.CREATIVITY) / sum);
+            dailyEnergy.mind = (int)op(dailyEnergy.mind, duration * wages.GetValueOrDefault(STATS.INTELLIGENCE) / sum);
             return dailyEnergy;
 
         }
 
         private Stats calculateAndUpdateStats(Del op, Stats stats, Dictionary<STATS, int> wages, ProjectLog projectLog)
         {
-            switch (projectLog.projectType)
+            switch (projectLog.type)
             {
                 case (PROJECT_TYPE.ENERGY):
                     return updateStatsWithWages(op, stats, wages, projectLog.timeSpend >> 2);

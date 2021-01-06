@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using gamitude_backend.Configuration;
 using gamitude_backend.Extensions;
+using gamitude_backend.Services;
 using gamitude_backend.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -42,6 +44,8 @@ namespace gamitude_backend
             var key = Encoding.ASCII.GetBytes(configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>().secret);
             services.AddCustomAuthenticationConfiguration(key);
 
+            services.AddTransient<IEmailSender, EmailSender>();
+
             services.AddRepositories();
             services.AddServices();
             services.AddCustomControllersConfiguration();
@@ -65,7 +69,11 @@ namespace gamitude_backend
             }
             else
             {
-                app.UseSecurityHeaders();
+                // app.UseSecurityHeaders();
+                app.UseCors(x => x
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
             }
             // app.UseCustomLocalization();
 

@@ -14,8 +14,8 @@ namespace gamitude_backend.Repositories
         Task<List<ProjectTask>> getByProjectIdAsync(string projectId);
         Task<List<ProjectTask>> getByUserIdAsync(string userId);
         Task<List<ProjectTask>> getActiveByDayOffsetAsync(string userId, string journalId, int fromDays, int toDays);
-        Task<List<ProjectTask>> getOverdueAsync(string userId);
-        Task<List<ProjectTask>> getUnScheduledAsync(string userId);
+        Task<List<ProjectTask>> getOverdueAsync(string userId,string journalId);
+        Task<List<ProjectTask>> getUnScheduledAsync(string userId,string journalId);
         Task createAsync(ProjectTask projectTask);
         Task updateAsync(string id, ProjectTask updateProjectTask);
         Task deleteByIdAsync(string id);
@@ -47,8 +47,8 @@ namespace gamitude_backend.Repositories
                 .Where(o => o.journalId == journalId)
                 .Where(o => o.dateFinished == null)
                 .Where(o => o.userId == userId)
-                .Where(o => o.deadLine > DateTime.UtcNow.Date.AddDays(fromDays));
-            if(toDays != 0)
+                .Where(o => o.deadLine >= DateTime.UtcNow.Date.AddDays(fromDays));
+            if(toDays != 0) // if 0 means forever
             {
                 query = query.Where(o => o.deadLine < DateTime.UtcNow.Date.AddDays(toDays));
             }
@@ -57,19 +57,21 @@ namespace gamitude_backend.Repositories
             return projectTasks;
         }
 
-        public Task<List<ProjectTask>> getOverdueAsync(string userId)
+        public Task<List<ProjectTask>> getOverdueAsync(string userId,string journalId)
         {
             var projectTasks = _projectTasks.AsQueryable()
-                .Where(o => o.dateFinished != null)
+                .Where(o => o.journalId == journalId)
+                .Where(o => o.dateFinished == null)
                 .Where(o => o.userId == userId)
                 .Where(o => o.deadLine < DateTime.UtcNow.Date)
                 .ToListAsync();
             return projectTasks;
         }
 
-        public Task<List<ProjectTask>> getUnScheduledAsync(string userId)
+        public Task<List<ProjectTask>> getUnScheduledAsync(string userId,string journalId)
         {
             var projectTasks = _projectTasks.AsQueryable()
+                .Where(o => o.journalId == journalId)
                 .Where(o => o.userId == userId)
                 .Where(o => o.dateFinished == null)
                 .Where(o => o.deadLine == null )

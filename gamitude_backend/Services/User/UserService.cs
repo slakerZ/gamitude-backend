@@ -12,25 +12,33 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using gamitude_backend.Repositories;
 using MongoDB.Driver;
+using Microsoft.Extensions.Hosting;
+using gamitude_backend.Configuration;
+using SendGrid;
+using System.Web;
 
 namespace gamitude_backend.Services
 {
     public interface IUserService
     {
         Task<User> getByIdAsync(string id);
+        Task<Boolean> ifUserExistByNameAsync(string login);
+        Task<Boolean> ifUserExistByEmailAsync(string email);
         Task<long> getMoneyAsync(string userId);
         Task<User> createAsync(User newUser, string password);
         Task<User> getByUserNameAsync(string userName);
         Task changePasswordAsync(string id, string oldPassword, string newPassword);
-        Task<User> updateAsync(User updateUser);
+        Task changeEmailAsync(string id, string newEmail);
+        Task verifyEmail(string login, string token);
+        Task verifyNewEmail(string login, string newEmail, string token);
+        Task resendVerifyEmail(string login);
+        Task<User> updateAsync(string userId, User updateUser);
         Task deleteByIdAsync(string id);
     }
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
         private readonly IDatabaseSettings _databaseSettings;
-
-        //TODO make async
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
         private readonly IRankRepository _rankRepository;
@@ -41,6 +49,7 @@ namespace gamitude_backend.Services
         private readonly IPageRepository _pageRepository;
         private readonly IMoneyRepository _moneyRepository;
         private readonly IProjectRepository _projectRepository;
+        private readonly IEmailSender _emailSender;
 
         public UserService(ILogger<UserService> logger,
         IDatabaseSettings databaseSettings,
@@ -53,7 +62,8 @@ namespace gamitude_backend.Services
           IJournalRepository journalRepository,
           IPageRepository pageRepository,
           IMoneyRepository moneyRepository,
-          IProjectRepository projectRepository)
+          IProjectRepository projectRepository,
+          IEmailSender emailSender)
         {
             _logger = logger;
             _databaseSettings = databaseSettings;
@@ -67,6 +77,7 @@ namespace gamitude_backend.Services
             _pageRepository = pageRepository;
             _moneyRepository = moneyRepository;
             _projectRepository = projectRepository;
+            _emailSender = emailSender;
         }
 
         private Task initializeUser(User user)
@@ -78,7 +89,7 @@ namespace gamitude_backend.Services
                 Task.Run(() => initializeUserJournals(user))
 
             };
-            //TODO add initializeUserTheme
+            // TODO add initializeUserTheme
             return Task.WhenAll(processTasks);
         }
 
@@ -92,23 +103,50 @@ namespace gamitude_backend.Services
 
         private async Task initializeUserTimersFoldersAndProjects(User user)
         {
-            var demoTimer = new Timer { userId = user.Id.ToString(), label = "90", timerType = TIMER_TYPE.TIMER, name = "90/30", countDownInfo = new CountDownInfo { breakTime = 30, overTime = 5, workTime = 90 } };
-            var demoFolder = new Folder { userId = user.Id.ToString(), icon = "active", name = "Active", description = "Folder for active projects" };
+            var emotionFolder = new Folder { userId = user.Id.ToString(), icon = "emotions", name = "Emotional Care", description = "Folder for projects that restores emotional energy" };
+            var mindFolder = new Folder { userId = user.Id.ToString(), icon = "mind", name = "Nourish Mind ", description = "Folder for projects that restores mind energy" };
+            var bodyFolder = new Folder { userId = user.Id.ToString(), icon = "body", name = "Relax Body", description = "Folder for projects that restores body energy" };
+            var soulFolder = new Folder { userId = user.Id.ToString(), icon = "soul", name = "Feed Soul ", description = "Folder for projects that restores soul energy" };
+            var creativityFolder = new Folder { userId = user.Id.ToString(), icon = "creativity", name = "Release Creativity", description = "Folder for projects that boosts creativity stats" };
+            var intelligenceFolder = new Folder { userId = user.Id.ToString(), icon = "intelligence", name = "Develop Intelligence", description = "Folder for projects that boosts intelligence stats" };
+            var strengthFolder = new Folder { userId = user.Id.ToString(), icon = "strength", name = "Strengthen Physique", description = "Folder for projects that boosts strength stats" };
+            var fluencyFolder = new Folder { userId = user.Id.ToString(), icon = "fluency", name = "Learn Languages", description = "Folder for projects that boosts fluency stats" };
 
-            await _folderRepository.createAsync(demoFolder);
-            await _timerRepository.createAsync(demoTimer);
+            var ultTimer = new Timer { userId = user.Id.ToString(), label = "90", timerType = TIMER_TYPE.TIMER, name = "90/30", countDownInfo = new CountDownInfo { breakTime = 30, overTime = 5, workTime = 90 } };
+            var pomodoroTimer = new Timer { userId = user.Id.ToString(), label = "25", timerType = TIMER_TYPE.TIMER, name = "Pomodoro", countDownInfo = new CountDownInfo { breakTime = 5, overTime = 5, workTime = 25, breakInterval = 5, longerBreakTime = 15 } };
+            var justFiveTimer = new Timer { userId = user.Id.ToString(), label = "5", timerType = TIMER_TYPE.TIMER, name = "Just Five", countDownInfo = new CountDownInfo { breakTime = 5, overTime = 5, workTime = 5 } };
+            var stopwatchTimer = new Timer { userId = user.Id.ToString(), label = "SW", timerType = TIMER_TYPE.STOPWATCH, name = "Stopwatch", countDownInfo = null };
 
             List<Task> processTasks = new List<Task>
             {
-                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="25" , timerType=TIMER_TYPE.TIMER, name = "Pomodoro",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 25, breakInterval=5, longerBreakTime=15} })),
-                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="5" , timerType=TIMER_TYPE.TIMER, name = "Just Five",countDownInfo = new CountDownInfo{ breakTime = 5, overTime = 5, workTime = 5} })),
-                Task.Run(() => _timerRepository.createAsync(new Timer { userId = user.Id.ToString(),label="SW" , timerType=TIMER_TYPE.STOPWATCH, name = "Stopwatch",countDownInfo = null })),
+                Task.Run(() =>  _folderRepository.createAsync(emotionFolder)),
+                Task.Run(() =>  _folderRepository.createAsync(mindFolder)),
+                Task.Run(() =>  _folderRepository.createAsync(bodyFolder)),
+                Task.Run(() =>  _folderRepository.createAsync(soulFolder)),
+                Task.Run(() =>  _folderRepository.createAsync(creativityFolder)),
+                Task.Run(() =>  _folderRepository.createAsync(intelligenceFolder)),
+                Task.Run(() =>  _folderRepository.createAsync(strengthFolder)),
+                Task.Run(() =>  _folderRepository.createAsync(fluencyFolder)),
+                Task.Run(() =>   _timerRepository.createAsync(ultTimer)),
+                Task.Run(() => _timerRepository.createAsync(pomodoroTimer)),
+                Task.Run(() => _timerRepository.createAsync(justFiveTimer)),
+                Task.Run(() => _timerRepository.createAsync(stopwatchTimer))
+            };
+            await Task.WhenAll(processTasks);
 
-                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="paused", name = "Inactive", description = "Folder for inactive projects" })),
-                Task.Run(() => _folderRepository.createAsync(new Folder { userId = user.Id.ToString(),icon="done", name = "Done", description = "Folder for finished projects" })),
 
-                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = demoTimer.id, dateCreated = DateTime.UtcNow,name="Your first stats project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.INTELLIGENCE,stats = new STATS[] {STATS.INTELLIGENCE},projectType=PROJECT_TYPE.STAT,userId=user.Id.ToString(),timeSpendBreak=0 })),
-                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = demoTimer.id, dateCreated = DateTime.UtcNow,name="Your first energy project",folderId=demoFolder.id,totalTimeSpend=0,dominantStat=STATS.MIND,stats = new STATS[] {STATS.MIND},projectType=PROJECT_TYPE.ENERGY,userId=user.Id.ToString(),timeSpendBreak=0 })),
+            processTasks = new List<Task>
+            {
+                //ENERGY
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = justFiveTimer.id, dateCreated = DateTime.UtcNow,name="Pranayama", folderId=emotionFolder.id,totalTimeSpend=0,dominantStat=STATS.EMOTIONS,stats = new STATS[] {STATS.EMOTIONS},projectType=PROJECT_TYPE.ENERGY,userId=user.Id.ToString(),timeSpendBreak=0 })),
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = justFiveTimer.id, dateCreated = DateTime.UtcNow,name="Meditation", folderId=mindFolder.id,totalTimeSpend=0,dominantStat=STATS.MIND,stats = new STATS[] {STATS.MIND},projectType=PROJECT_TYPE.ENERGY,userId=user.Id.ToString(),timeSpendBreak=0 })),
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = justFiveTimer.id, dateCreated = DateTime.UtcNow,name="Stretching", folderId=bodyFolder.id,totalTimeSpend=0,dominantStat=STATS.BODY,stats = new STATS[] {STATS.BODY},projectType=PROJECT_TYPE.ENERGY,userId=user.Id.ToString(),timeSpendBreak=0 })),
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = stopwatchTimer.id, dateCreated = DateTime.UtcNow,name="Family Time", folderId=soulFolder.id,totalTimeSpend=0,dominantStat=STATS.SOUL,stats = new STATS[] {STATS.SOUL},projectType=PROJECT_TYPE.ENERGY,userId=user.Id.ToString(),timeSpendBreak=0 })),
+                //STATS
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = stopwatchTimer.id, dateCreated = DateTime.UtcNow,name="Painting", folderId=creativityFolder.id,totalTimeSpend=0,dominantStat=STATS.CREATIVITY ,stats = new STATS[] {STATS.CREATIVITY},projectType=PROJECT_TYPE.STAT,userId=user.Id.ToString(),timeSpendBreak=0 })),
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = ultTimer.id, dateCreated = DateTime.UtcNow,name="Programming", folderId=intelligenceFolder.id,totalTimeSpend=0,dominantStat=STATS.INTELLIGENCE ,stats = new STATS[] {STATS.INTELLIGENCE},projectType=PROJECT_TYPE.STAT,userId=user.Id.ToString(),timeSpendBreak=0 })),
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = justFiveTimer.id, dateCreated = DateTime.UtcNow,name="Push Ups", folderId=strengthFolder.id,totalTimeSpend=0,dominantStat=STATS.STRENGTH ,stats = new STATS[] {STATS.STRENGTH},projectType=PROJECT_TYPE.STAT,userId=user.Id.ToString(),timeSpendBreak=0 })),
+                Task.Run(() =>  _projectRepository.createAsync(new Project{defaultTimerId = pomodoroTimer.id, dateCreated = DateTime.UtcNow,name="Learn Polish", folderId=fluencyFolder.id,totalTimeSpend=0,dominantStat=STATS.FLUENCY,stats = new STATS[] {STATS.FLUENCY},projectType=PROJECT_TYPE.STAT,userId=user.Id.ToString(),timeSpendBreak=0 }))
             };
             await Task.WhenAll(processTasks);
         }
@@ -143,9 +181,61 @@ namespace gamitude_backend.Services
             if (result.Succeeded)
             {
                 await initializeUser(newUser);
+
+                if (!StaticValues.IsDevelopment())
+                {
+                    var response = await sendVerificationEmail(newUser.UserName);
+                    _logger.LogDebug(response.Headers.ToString() + response.StatusCode.ToString());
+                }
                 return newUser;
             }
             else
+            {
+                var s = result.Errors.AsEnumerable();
+                throw new IdentityException(s);
+            }
+        }
+
+        private async Task<Response> sendVerificationEmail(string userName)
+        {
+            var user = await _userManager.FindByNameAsync(userName);
+            if(user == null)
+            {
+                throw new LoginException("There is no user with that login");
+            }
+            if (user.EmailConfirmed)
+            {
+                throw new LoginException("Email already verified");
+            }
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+             _logger.LogDebug(token);
+            token = HttpUtility.UrlEncode(token);
+             _logger.LogDebug(token);
+            var link = $"/verifyEmail/{user.UserName}/{token}/newEmail/none";
+            return await _emailSender.SendVerificationEmailAsync(user.Email, user.UserName, link);
+        }
+
+        public async Task verifyEmail(string login, string token)
+        {
+            var user = await _userManager.FindByNameAsync(login);
+             _logger.LogDebug(token);
+            token = HttpUtility.UrlDecode(token);
+             _logger.LogDebug(token);
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+                var s = result.Errors.AsEnumerable();
+                throw new IdentityException(s);
+            }
+        }
+        public async Task verifyNewEmail(string login, string newEmail, string token)
+        {
+            var user = await _userManager.FindByNameAsync(login);
+             _logger.LogDebug(token);
+            token = HttpUtility.UrlDecode(token);
+             _logger.LogDebug(token);
+            var result = await _userManager.ChangeEmailAsync(user, newEmail, token);
+            if (!result.Succeeded)
             {
                 var s = result.Errors.AsEnumerable();
                 throw new IdentityException(s);
@@ -162,10 +252,11 @@ namespace gamitude_backend.Services
             return _userManager.FindByNameAsync(userName);
         }
 
-        public async Task<User> updateAsync(User updateUser)
+        public async Task<User> updateAsync(string userId, User updateUser)
         {
-            var user = await _userManager.FindByIdAsync(updateUser.Id.ToString());
+            var user = await _userManager.FindByIdAsync(userId);
             user = _mapper.Map<User, User>(updateUser, user);
+
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
@@ -203,6 +294,30 @@ namespace gamitude_backend.Services
         public Task<long> getMoneyAsync(string userId)
         {
             return _moneyRepository.getMoneyByUserIdAsync(userId);
+        }
+
+        public async Task changeEmailAsync(string id, string newEmail)
+        {
+            // ! TODO CREATE NEW TEMPLATE EMAIL FOR CHANGE EMAIL
+            var user = await _userManager.FindByIdAsync(id);
+            var token = await _userManager.GenerateChangeEmailTokenAsync(user, newEmail);
+            token = HttpUtility.UrlEncode(token);
+            var link = $"/verifyEmail/{user.UserName}/{token}/newEmail/{newEmail}";
+            await _emailSender.SendVerificationEmailAsync(newEmail, user.UserName, link,"d-ffc8f066fa554d3380bda1291a9a4968");
+        }
+
+        public Task resendVerifyEmail(string login)
+        {
+            return sendVerificationEmail(login);
+        }
+
+        public async Task<Boolean> ifUserExistByNameAsync(string login)
+        {
+            return (await _userManager.FindByNameAsync(login)) != null ;
+        }
+        public async Task<Boolean> ifUserExistByEmailAsync(string email)
+        {
+            return (await _userManager.FindByEmailAsync(email)) != null ;
         }
     }
 

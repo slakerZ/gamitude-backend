@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace gamitude_backend.Controllers
@@ -18,7 +19,6 @@ namespace gamitude_backend.Controllers
         [HttpGet]
         public ActionResult<string> Version()
         {
-
             return Created("Version", version);
         }
 

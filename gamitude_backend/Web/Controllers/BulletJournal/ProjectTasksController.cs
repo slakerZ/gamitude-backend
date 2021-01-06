@@ -53,7 +53,7 @@ namespace gamitude_backend.Controllers
 
         }
 
-        [HttpGet("/journal/{journalId:length(24)}/page/{pageId:length(24)}")]
+        [HttpGet("journal/{journalId:length(24)}/page/{pageId:length(24)}")]
         public async Task<ActionResult<ControllerResponse<List<GetProjectTaskDto>>>> get(string journalId, string pageId)
         {
 
