@@ -6,31 +6,24 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using gamitude_backend.Settings;
+using Microsoft.AspNetCore.TestHost;
+using gamitude_backend.Extensions;
+using System.Text.Json;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace gamitude_backend.IntegrationTests
 {
     public class MongoIntegrationTest
     {
-        internal static MongoDbRunner _runner;
+        public MongoDbRunner _runner;
 
-        internal static void CreateDatabase()
+        public void CreateDatabase()
         {
             _runner = MongoDbRunner.Start();
-            _runner.Import("gamitude", "ranks", @"../db/rankCollection.json", true);
-        }
-    }
-
-    public class CustomWebApplicationFactory<TStartup>
-        : WebApplicationFactory<TStartup> where TStartup : class
-    {
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
-        {
-            Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT","Development");
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.Development.json")
-                .Build();
-            builder.UseConfiguration(configuration);
+            _runner.Import("gamitude", "ranks", "rankCollection.json", true);
         }
     }
 }

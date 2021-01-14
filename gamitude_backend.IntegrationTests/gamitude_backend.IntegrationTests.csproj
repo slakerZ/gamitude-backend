@@ -23,6 +23,16 @@
     <ProjectReference Include="..\gamitude_backend\gamitude_backend.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.2" />
     <PackageReference Include="Mongo2Go" Version="2.2.16" />
+    <PackageReference Include="ExpectedObjects" Version="3.4.1" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="./rankCollection.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="./appsettings.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </Content>
+</ItemGroup>
 
 </Project>
