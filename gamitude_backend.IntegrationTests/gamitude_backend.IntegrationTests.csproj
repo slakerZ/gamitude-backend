@@ -23,7 +23,8 @@
     <ProjectReference Include="..\gamitude_backend\gamitude_backend.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.2" />
     <PackageReference Include="Mongo2Go" Version="2.2.16" />
-    <PackageReference Include="ExpectedObjects" Version="3.4.1" />
+    <PackageReference Include="DeepEqual" Version="2.0.0" />
+    <PackageReference Include="Xunit.Extensions.Ordering" Version="1.4.5" />
   </ItemGroup>
 
   <ItemGroup>
