@@ -20,6 +20,7 @@ using System.Linq;
 using System.Security.Claims;
 using DeepEqual.Syntax;
 using gamitude_backend.Models;
+using gamitude_backend.IntegrationTests.Extensions;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 [assembly: TestCaseOrderer("Xunit.Extensions.Ordering.TestCaseOrderer", "Xunit.Extensions.Ordering")]
@@ -97,16 +98,13 @@ namespace gamitude_backend.IntegrationTests
             };
 
             // Act
-            var response = await client.PostAsJsonAsync("/api/users", user);
-            var contentString = await response.Content.ReadAsStringAsync();
-            var actualResponse = System.Text.Json.JsonSerializer.Deserialize<ControllerResponse<GetUserDto>>(contentString);
+            var actualResponse = await client.testSuccessPostAsync<GetUserDto, CreateUserDto>("/api/users", user);
             // Assert
-            response.EnsureSuccessStatusCode(); // Status Code 200-299
             expectedResponse.ShouldDeepEqual(actualResponse);
 
         }
 
-        [Fact, Order(10)]
+        [Fact, Order(1)]
         public async void testLogin()
         {
             var client = _factory.CreateClient();
@@ -118,50 +116,39 @@ namespace gamitude_backend.IntegrationTests
             };
 
             // Act
-            var response = await client.PostAsJsonAsync("/api/authorization/login", login);
-            var contentString = await response.Content.ReadAsStringAsync();
-            var actualResponse = System.Text.Json.JsonSerializer.Deserialize<ControllerResponse<GetUserTokenDto>>(contentString);
+            var actualResponse = await client.testSuccessPostAsync<GetUserTokenDto, LoginUserDto>("/api/authorization/login", login);
             // Assert
-            response.EnsureSuccessStatusCode(); // Status Code 200-299
-            Assert.True(actualResponse.success);
             Assert.NotNull(actualResponse.data.token);
             Assert.NotNull(actualResponse.data.date_expires);
             _mongo.setToken(actualResponse.data.token);
+            //TODO check username from token
             // Assert.Equal(_email, actualResponse.data.user.email); // user not populated to token response can be checked in token
             // Assert.Equal(_userName, actualResponse.data.user.userName);
         }
 
-        [Fact, Order(20)]
+        [Fact, Order(2)]
         public async void testGetAllFolders()
         {
             var client = _factory.CreateClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _mongo._token);
             // Act
-            var response = await client.GetAsync("/api/folders");
-            var contentString = await response.Content.ReadAsStringAsync();
-            // Assert
-            response.EnsureSuccessStatusCode(); // Status Code 200-299
-            var actualResponse = System.Text.Json.JsonSerializer.Deserialize<ControllerResponse<List<GetFolderDto>>>(contentString);
-            Assert.True(actualResponse.success);
+            var actualResponse = await client.testSuccessGetAsync<List<GetFolderDto>>("/api/folders");
+            //Asert
             Assert.Equal(8, actualResponse.data.Count);
         }
 
-        [Fact, Order(30)]
+        [Fact, Order(3)]
         public async void testGetAllProjects()
         {
             var client = _factory.CreateClient();
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _mongo._token);
             // Act
-            var response = await client.GetAsync("/api/projects");
-            var contentString = await response.Content.ReadAsStringAsync();
+            var actualResponse = await client.testSuccessGetAsync<List<GetProjectDto>>("/api/projects");
             // Assert
-            response.EnsureSuccessStatusCode(); // Status Code 200-299
-            var actualResponse = JsonConvert.DeserializeObject<ControllerResponse<List<GetProjectDto>>>(contentString);
-            Assert.True(actualResponse.success);
             Assert.Equal(8, actualResponse.data.Count);
         }
 
-        [Fact, Order(30)]
+        [Fact, Order(4)]
         public async void testAddFolderAndProject()
         {
             var client = _factory.CreateClient();
@@ -179,29 +166,23 @@ namespace gamitude_backend.IntegrationTests
                 name = folder.name,
                 userId = _mongo._parsedToken.Claims.FirstOrDefault(claim => claim.Type == "nameid").Value
             };
-            var expectedResponse = new ControllerResponse<GetFolderDto>
-            {
-                data = expectedFolder,
-                success = true
-            };
 
             // Act
-            var response = await client.PostAsJsonAsync("/api/folders", folder);
-            var contentString = await response.Content.ReadAsStringAsync();
+            var actualResponseFolder = await client.testSuccessPostAsync<GetFolderDto, CreateFolderDto>("/api/folders", folder);
             // Assert
-            response.EnsureSuccessStatusCode(); // Status Code 200-299
-            var actualResponse = JsonConvert.DeserializeObject<ControllerResponse<GetFolderDto>>(contentString);
-            Assert.True(actualResponse.success);
-
-            // Act
-            var responseGet = await client.GetAsync("/api/folders/" + actualResponse.data.id);
-            var contentStringGet = await responseGet.Content.ReadAsStringAsync();
-            var actualResponseGet = JsonConvert.DeserializeObject<ControllerResponse<GetFolderDto>>(contentStringGet);
-            // Assert
-            Assert.True(actualResponse.success);
-            actualResponse.WithDeepEqual(actualResponseGet)
+            expectedFolder.WithDeepEqual(actualResponseFolder.data)
                     .SkipDefault<DateTime>()
-                    .IgnoreDestinationProperty(x => x.data.dateCreated)
+                    .IgnoreSourceProperty(x => x.id)
+                    .IgnoreDestinationProperty(x => x.dateCreated)
+                    .Assert();
+
+            // Act
+            var actualResponseFolderGet = await client.testSuccessGetAsync<GetFolderDto>("/api/folders/" + actualResponseFolder.data.id);
+            expectedFolder.id = actualResponseFolder.data.id;
+            // Assert
+            expectedFolder.WithDeepEqual(actualResponseFolderGet.data)
+                    .SkipDefault<DateTime>()
+                    .IgnoreDestinationProperty(x => x.dateCreated)
                     .Assert();
 
             var project = new CreateProjectDto
@@ -210,7 +191,7 @@ namespace gamitude_backend.IntegrationTests
                 name = "test1",
                 stats = new STATS[] { STATS.BODY },
                 dominantStat = STATS.BODY,
-                folderId = actualResponseGet.data.id
+                folderId = actualResponseFolderGet.data.id
             };
             var expectedProject = new GetProjectDto
             {
@@ -220,30 +201,58 @@ namespace gamitude_backend.IntegrationTests
                 projectType = project.projectType,
                 folderId = project.folderId
             };
-            var expectedResponseProject = new ControllerResponse<GetProjectDto>
-            {
-                data = expectedProject,
-                success = true
-            };
 
             // Act
-            var responseProject = await client.PostAsJsonAsync("/api/projects", project);
-            var contentStringProject = await responseProject.Content.ReadAsStringAsync();
+            var actualResponseProject = await client.testSuccessPostAsync<GetProjectDto, CreateProjectDto>("/api/projects", project);
             // Assert
-            response.EnsureSuccessStatusCode(); // Status Code 200-299
-            var actualResponseProject = JsonConvert.DeserializeObject<ControllerResponse<GetProjectDto>>(contentStringProject);
-            Assert.True(actualResponseProject.success);
+            expectedProject.WithDeepEqual(actualResponseProject.data)
+                   .SkipDefault<DateTime>()
+                   .IgnoreSourceProperty(x => x.id)
+                   .IgnoreDestinationProperty(x => x.dateCreated)
+                   .Assert();
 
             // Act
-            var responseProjectGet = await client.GetAsync("/api/projects/" + actualResponseProject.data.id);
-            var contentStringProjectGet = await responseProjectGet.Content.ReadAsStringAsync();
-            var actualResponseProjectGet = JsonConvert.DeserializeObject<ControllerResponse<GetProjectDto>>(contentStringProjectGet);
+            var actualResponseProjectGet = await client.testSuccessGetAsync<GetProjectDto>("/api/projects/" + actualResponseProject.data.id);
+            expectedProject.id = actualResponseProject.data.id;
             // Assert
-            Assert.True(actualResponseProjectGet.success);
-            actualResponseProject.WithDeepEqual(actualResponseProjectGet)
+            expectedProject.WithDeepEqual(actualResponseProjectGet.data)
                     .SkipDefault<DateTime>()
-                    .IgnoreDestinationProperty(x => x.data.dateCreated)
+                    .IgnoreDestinationProperty(x => x.dateCreated)
                     .Assert();
+
+        }
+
+        [Fact, Order(5)]
+        public async void testAddProjectLog()
+        {
+            var client = _factory.CreateClient();
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _mongo._token);
+            var actualResponseProjects = await client.testSuccessGetAsync<List<GetProjectDto>>("/api/projects");
+
+            var project = actualResponseProjects.data.FirstOrDefault(o => o.projectType == PROJECT_TYPE.STAT);
+            var projectLog = new CreateProjectLogDto
+            {
+                log = "test",
+                projectId = project.id,
+                timeSpend = 90,
+                type = PROJECT_TYPE.STAT
+            };
+            var expectedProjectLog = new GetProjectLogDto
+            {
+                log = projectLog.log,
+                project = project,
+                timeSpend = projectLog.timeSpend,
+                //TODO add projectType
+            };
+            // Check Stats and Energy
+            // Act
+            var actualResponseProjectLog = await client.testSuccessPostAsync<GetProjectLogDto, CreateProjectLogDto>("api/projectlogs", projectLog);
+            // Assert
+            actualResponseProjectLog.data.WithDeepEqual(expectedProjectLog).IgnoreSourceProperty(x => x.id);
+
+            var projectLogGet = await client.testSuccessGetAsync<GetProjectLogDto>($"api/projectlogs/{actualResponseProjectLog.data.id}");
+            expectedProjectLog.id = actualResponseProjectLog.data.id;
+            actualResponseProjectLog.data.ShouldDeepEqual(expectedProjectLog);
 
         }
     }
