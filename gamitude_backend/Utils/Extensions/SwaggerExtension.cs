@@ -22,7 +22,7 @@ namespace gamitude_backend.Extensions
             app.UseSwaggerUI(c =>
             {
                 c.DefaultModelsExpandDepth(0);
-                c.SwaggerEndpoint("/swagger/v2/swagger.json", "Gamitude V2");
+                c.SwaggerEndpoint("api/swagger/v2/swagger.json", "Gamitude V2");
                 c.RoutePrefix = "api/swagger";
             });
         }
