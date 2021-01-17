@@ -18,11 +18,11 @@ namespace gamitude_backend.Extensions
     {
         public static void UseCustomSwagger(this IApplicationBuilder app)
         {
-            app.UseSwagger();
+            app.UseSwagger(c => c.RouteTemplate = "api/swagger/{documentName}/swagger.json");
             app.UseSwaggerUI(c =>
             {
                 c.DefaultModelsExpandDepth(0);
-                c.SwaggerEndpoint("api/swagger/v2/swagger.json", "Gamitude V2");
+                c.SwaggerEndpoint("v2/swagger.json", "Gamitude V2");
                 c.RoutePrefix = "api/swagger";
             });
         }
