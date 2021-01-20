@@ -37,14 +37,14 @@ namespace gamitude_backend.Services
             _dailyEnergyRepository = dailyEnergyRepository;
         }
 
-        private delegate long Del(long a, long b);
+        public delegate long Del(long a, long b);
 
-        private long add(long a, long b)
+        public long add(long a, long b)
         {
             return a + b;
         }
 
-        private long substract(long a, long b)
+        public long substract(long a, long b)
         {
             return a - b;
         }
