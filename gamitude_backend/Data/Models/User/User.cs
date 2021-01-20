@@ -34,6 +34,6 @@ namespace gamitude_backend.Models
 
         [BsonElement("timers")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public List<string> timers { get; set; } = new List<string>();
+        public List<string> timers { get; set; } = new List<string>();//todo changes to timersIds
     }
 }

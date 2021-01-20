@@ -17,10 +17,10 @@ using System.IdentityModel.Tokens.Jwt;
 
 namespace gamitude_backend.IntegrationTests
 {
-    public class MongoIntegrationTest : IDisposable
+    public class ProjectsIntegrationTestEnv : IDisposable
     {
         public MongoDbRunner _runner;
-        public String _token;
+        public Dictionary<string, string> _stringDict;
         public JwtSecurityToken _parsedToken;
 
         public void Dispose()
@@ -34,15 +34,15 @@ namespace gamitude_backend.IntegrationTests
         }
         public void setToken(string token)
         {
-            _token = token;
+            _stringDict.Add("token", token);
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(token);
             _parsedToken = handler.ReadToken(token) as JwtSecurityToken;
         }
-        public MongoIntegrationTest()
+        public ProjectsIntegrationTestEnv()
         {
             CreateDatabase();
-            _token = null;
+            _stringDict = new Dictionary<string, string>();
         }
     }
 }

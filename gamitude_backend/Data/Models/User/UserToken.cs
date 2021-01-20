@@ -6,7 +6,7 @@ namespace gamitude_backend.Models
 {
     [BsonIgnoreExtraElements]
     public class UserToken 
-    {
+    {// todo change to is4
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string id { get; set; }
