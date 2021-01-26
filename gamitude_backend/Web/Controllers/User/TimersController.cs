@@ -40,6 +40,9 @@ namespace gamitude_backend.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get all timers of logged in user.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<ControllerResponse<List<GetTimerDto>>>> get()
         {
@@ -53,6 +56,9 @@ namespace gamitude_backend.Controllers
 
         }
 
+        /// <summary>
+        /// Get timer by id.
+        /// </summary>
         [HttpGet("{id:length(24)}", Name = "GetTimer")]
         public async Task<ActionResult<ControllerResponse<GetTimerDto>>> get(string id)
         {
@@ -74,6 +80,10 @@ namespace gamitude_backend.Controllers
             });
 
         }
+
+        /// <summary>
+        /// Create timer.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ControllerResponse<GetTimerDto>>> create(CreateTimerDto newTimer)
         {
@@ -89,7 +99,9 @@ namespace gamitude_backend.Controllers
 
         }
 
-
+        /// <summary>
+        /// Update timer.
+        /// </summary>
         [HttpPut("{id:length(24)}")]
         public async Task<ActionResult<ControllerResponse<GetTimerDto>>> update(string id, UpdateTimerDto timerIn)
         {
@@ -110,7 +122,9 @@ namespace gamitude_backend.Controllers
 
         }
 
-
+        /// <summary>
+        /// Delete timer.
+        /// </summary>
         [HttpDelete("{id:length(24)}")]
         public async Task<ActionResult> Delete(string id)
         {

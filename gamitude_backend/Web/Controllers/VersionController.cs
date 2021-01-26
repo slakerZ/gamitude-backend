@@ -16,6 +16,9 @@ namespace gamitude_backend.Controllers
 
         }
 
+        /// <summary>
+        /// Health check endpoint with application version.
+        /// </summary>
         [HttpGet]
         public ActionResult<string> Version()
         {

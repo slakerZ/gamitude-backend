@@ -37,6 +37,9 @@ namespace gamitude_backend.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get all folders of logged in user.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<ControllerResponse<List<GetFolderDto>>>> get()
         {
@@ -50,6 +53,9 @@ namespace gamitude_backend.Controllers
 
         }
 
+        /// <summary>
+        /// Get folder by id.
+        /// </summary>
         [HttpGet("{id:length(24)}", Name = "GetFolder")]
         public async Task<ActionResult<ControllerResponse<GetFolderDto>>> get(string id)
         {
@@ -72,6 +78,9 @@ namespace gamitude_backend.Controllers
 
         }
 
+        /// <summary>
+        /// Create folder.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ControllerResponse<GetFolderDto>>> create(CreateFolderDto createFolder)
         {
@@ -87,7 +96,9 @@ namespace gamitude_backend.Controllers
 
         }
 
-
+        /// <summary>
+        /// Update folder by id.
+        /// </summary>
         [HttpPut("{id:length(24)}")]
         public async Task<ActionResult<ControllerResponse<GetFolderDto>>> update(string id, UpdateFolderDto folderIn)
         {
@@ -108,7 +119,9 @@ namespace gamitude_backend.Controllers
 
         }
 
-
+        /// <summary>
+        /// Delete folder by id.
+        /// </summary>
         [HttpDelete("{id:length(24)}")]
         public async Task<ActionResult> Delete(string id)
         {

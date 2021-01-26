@@ -27,7 +27,7 @@ namespace gamitude_backend.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMapper _mapper;
 
-        public JournalsController(ILogger<JournalsController> logger,IJournalService journalService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
+        public JournalsController(ILogger<JournalsController> logger, IJournalService journalService, IHttpContextAccessor httpContextAccessor, IMapper mapper)
         {
             _logger = logger;
             _journalService = journalService;
@@ -35,6 +35,9 @@ namespace gamitude_backend.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Gets all journals of logged in user.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<ControllerResponse<List<GetJournalDto>>>> get()
         {
@@ -47,7 +50,9 @@ namespace gamitude_backend.Controllers
             });
 
         }
-
+        /// <summary>
+        /// Gets journal by id.
+        /// </summary>
         [HttpGet("{id:length(24)}", Name = "GetJournal")]
         public async Task<ActionResult<ControllerResponse<GetJournalDto>>> get(string id)
         {
@@ -55,7 +60,7 @@ namespace gamitude_backend.Controllers
             string userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier).ToString();
 
             var bullet = await _journalService.getByIdAsync(id);
-            if(bullet == null)
+            if (bullet == null)
             {
                 return NotFound();
             }
@@ -63,13 +68,16 @@ namespace gamitude_backend.Controllers
             {
                 throw new UnauthorizedAccessException("Journal don't belong to you");
             }
-            return Ok( new ControllerResponse<GetJournalDto>
+            return Ok(new ControllerResponse<GetJournalDto>
             {
                 data = _mapper.Map<GetJournalDto>(bullet)
             });
 
         }
 
+        /// <summary>
+        /// Create journal.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ControllerResponse<GetJournalDto>>> create(CreateJournalDto createJournal)
         {
@@ -85,7 +93,9 @@ namespace gamitude_backend.Controllers
 
         }
 
-
+        /// <summary>
+        /// Update journal by id.
+        /// </summary>
         [HttpPut("{id:length(24)}")]
         public async Task<ActionResult<ControllerResponse<GetJournalDto>>> update(string id, UpdateJournalDto bulletIn)
         {
@@ -107,6 +117,9 @@ namespace gamitude_backend.Controllers
         }
 
 
+        /// <summary>
+        /// Delete journal by id.
+        /// </summary>
         [HttpDelete("{id:length(24)}")]
         public async Task<ActionResult> delete(string id)
         {

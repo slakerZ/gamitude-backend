@@ -35,6 +35,9 @@ namespace gamitude_backend.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Gets pages by journal id.
+        /// </summary>
         [HttpGet("{journalId:length(24)}")]
         public async Task<ActionResult<ControllerResponse<List<GetPageDto>>>> get(string journalId)
         {
@@ -48,7 +51,9 @@ namespace gamitude_backend.Controllers
 
         }
 
-
+        /// <summary>
+        /// Create page.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ControllerResponse<GetPageDto>>> create(CreatePageDto createPage)
         {
@@ -64,7 +69,9 @@ namespace gamitude_backend.Controllers
 
         }
 
-
+        /// <summary>
+        /// Update page by id.
+        /// </summary>
         [HttpPut("{id:length(24)}")]
         public async Task<ActionResult<ControllerResponse<GetPageDto>>> update(string id, UpdatePageDto bulletIn)
         {
@@ -85,7 +92,9 @@ namespace gamitude_backend.Controllers
 
         }
 
-
+        /// <summary>
+        /// Delete page by id.
+        /// </summary>
         [HttpDelete("{id:length(24)}")]
         public async Task<ActionResult> delete(string id)
         {

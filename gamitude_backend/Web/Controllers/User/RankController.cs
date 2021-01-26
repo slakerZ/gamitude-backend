@@ -39,7 +39,9 @@ namespace gamitude_backend.Controllers
             _userRankService = userRankService;
         }
 
-
+        /// <summary>
+        /// Gets all ranks.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<ControllerResponse<List<GetRank>>>> get(int page = 1, int limit = 20, string sortByField = "name", SORT_TYPE sortByType = SORT_TYPE.DESC)
         {
@@ -51,6 +53,10 @@ namespace gamitude_backend.Controllers
                 data = ranks.Select(o => _mapper.Map<GetRank>(o)).ToList()
             });
         }
+
+        /// <summary>
+        /// Gets all ranks of logged in user.
+        /// </summary>
         [HttpGet("user")]
         public async Task<ActionResult<ControllerResponse<List<GetRank>>>> getUser()
         {
@@ -62,6 +68,10 @@ namespace gamitude_backend.Controllers
                 data = ranks.Select(o => _mapper.Map<GetRank>(o)).ToList()
             });
         }
+
+        /// <summary>
+        /// Get current user rank.
+        /// </summary>
         [HttpGet("current")]
         public async Task<ActionResult<ControllerResponse<GetRank>>> getUserCurrent()
         {
@@ -73,6 +83,10 @@ namespace gamitude_backend.Controllers
                 data = _mapper.Map<GetRank>(rank)
             });
         }
+
+        /// <summary>
+        /// Purchase rank.
+        /// </summary>
         [HttpPost("purchase")]
         public async Task<ActionResult<ControllerResponse<GetRank>>> purchase(PostPurchaseRankDto purchaseRank)
         {
@@ -84,6 +98,10 @@ namespace gamitude_backend.Controllers
                 data = _mapper.Map<GetRank>(rank)
             });
         }
+
+        /// <summary>
+        /// Select rank.
+        /// </summary>
         [HttpPost("select")]
         public async Task<ActionResult<ControllerResponse<GetRank>>> select(PostSetRankDto setRank)
         {

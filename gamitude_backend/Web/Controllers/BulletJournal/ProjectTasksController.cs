@@ -40,6 +40,9 @@ namespace gamitude_backend.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get all project tasks of logged in user.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<ControllerResponse<List<GetProjectTaskDto>>>> get()
         {
@@ -53,6 +56,9 @@ namespace gamitude_backend.Controllers
 
         }
 
+        /// <summary>
+        /// Get project tasks by journal and page id.
+        /// </summary>
         [HttpGet("journal/{journalId:length(24)}/page/{pageId:length(24)}")]
         public async Task<ActionResult<ControllerResponse<List<GetProjectTaskDto>>>> get(string journalId, string pageId)
         {
@@ -71,6 +77,9 @@ namespace gamitude_backend.Controllers
 
         }
 
+        /// <summary>
+        /// Create project task.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ControllerResponse<GetProjectTaskDto>>> create(CreateProjectTaskDto createProjectTask)
         {
@@ -87,6 +96,9 @@ namespace gamitude_backend.Controllers
         }
 
 
+        /// <summary>
+        /// Update project task by id.
+        /// </summary>
         [HttpPut("{id:length(24)}")]
         public async Task<ActionResult<ControllerResponse<GetProjectTaskDto>>> update(string id, UpdateProjectTaskDto projectTaskIn)
         {
@@ -107,7 +119,9 @@ namespace gamitude_backend.Controllers
 
         }
 
-
+        /// <summary>
+        /// Delete project task by id.
+        /// </summary>
         [HttpDelete("{id:length(24)}")]
         public async Task<ActionResult> delete(string id)
         {

@@ -28,6 +28,9 @@ namespace gamitude_backend.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Gets token after successful login.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ControllerResponse<GetUserTokenDto>>> login(LoginUserDto user)
         {

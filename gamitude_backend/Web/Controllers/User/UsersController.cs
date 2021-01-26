@@ -33,6 +33,9 @@ namespace gamitude_backend.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Gets logged in user.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<ControllerResponse<GetUserDto>>> id()
         {
@@ -45,6 +48,9 @@ namespace gamitude_backend.Controllers
             });
         }
 
+        /// <summary>
+        /// Gets user money.
+        /// </summary>
         [HttpGet("money")]
         public async Task<ActionResult<ControllerResponse<long>>> money()
         {
@@ -57,6 +63,9 @@ namespace gamitude_backend.Controllers
             });
         }
 
+        /// <summary>
+        /// Create user.
+        /// </summary>
         [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult<ControllerResponse<GetUserDto>>> create(CreateUserDto newUser)
@@ -71,6 +80,9 @@ namespace gamitude_backend.Controllers
             });
         }
 
+        /// <summary>
+        /// Verifies new email with token from sended email.
+        /// </summary>
         [AllowAnonymous]
         [HttpPost("verifyEmail")]
         public async Task<ActionResult<ControllerResponse<string>>> verifyEmail(VerifyEmailDto verify)
@@ -82,6 +94,9 @@ namespace gamitude_backend.Controllers
             return Ok(new ControllerResponse<string> { data = "Email verified" });
         }
 
+        /// <summary>
+        /// Verifies email after email change with token from sended email.
+        /// </summary>
         [AllowAnonymous]
         [HttpPost("verifyEmailNew")]
         public async Task<ActionResult<ControllerResponse<string>>> verifyNewEmail(VerifyEmailNewDto  verify)
@@ -93,6 +108,9 @@ namespace gamitude_backend.Controllers
             return Ok(new ControllerResponse<string> { data = "New Email verified and updated" });
         }
 
+        /// <summary>
+        /// Resends verify email.
+        /// </summary>
         [AllowAnonymous]
         [HttpPost("verifyEmail/resend/{login}")]
         public async Task<ActionResult<ControllerResponse<string>>> resendVerifyEmail(string login)
@@ -104,6 +122,9 @@ namespace gamitude_backend.Controllers
             return Ok(new ControllerResponse<string> { data = "Email send" });
         }
 
+        /// <summary>
+        /// Checks if email exist.
+        /// </summary>
         [AllowAnonymous]
         [HttpGet("ifExists/email/{email}")]
         public async Task<ActionResult<ControllerResponse<Boolean>>> checkByEmail(string email)
@@ -115,6 +136,9 @@ namespace gamitude_backend.Controllers
             return Ok(new ControllerResponse<Boolean> { data = ifExists });
         }
 
+        /// <summary>
+        /// Checks if nickname exist.
+        /// </summary>
         [AllowAnonymous]
         [HttpGet("ifExists/login/{login}")]
         public async Task<ActionResult<ControllerResponse<Boolean>>> checkByLogin(string login)
@@ -139,6 +163,9 @@ namespace gamitude_backend.Controllers
         //     });
         // }
 
+        /// <summary>
+        /// Updates password.
+        /// </summary>
         [HttpPut("password")]
         public async Task<ActionResult<ControllerResponse<GetUserDto>>> updatePassword(ChangePasswordUserDto passwordUserDto)
         {
@@ -149,6 +176,9 @@ namespace gamitude_backend.Controllers
             return Ok(new ControllerResponse<GetUserDto>());
         }
 
+        /// <summary>
+        /// Updates email and sends verification email.
+        /// </summary>
         [HttpPut("email")]
         public async Task<ActionResult<ControllerResponse<GetUserDto>>> updateEmail(ChangeEmailUserDto emailUserDto)
         {
@@ -159,6 +189,9 @@ namespace gamitude_backend.Controllers
             return Ok(new ControllerResponse<GetUserDto>());
         }
 
+        /// <summary>
+        /// Deletes logged in user.
+        /// </summary>
         [HttpDelete]
         public async Task<ActionResult> delete()
         {

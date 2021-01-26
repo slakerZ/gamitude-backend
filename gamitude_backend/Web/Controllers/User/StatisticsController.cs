@@ -38,7 +38,9 @@ namespace gamitude_backend.Controllers
             _dailyStatsService = dailyStatsService;
         }
 
-
+        /// <summary>
+        /// Gets stats of logged in user.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<ControllerResponse<GetStatsDto>>> stats()
         {
@@ -54,6 +56,9 @@ namespace gamitude_backend.Controllers
 
         }
 
+        /// <summary>
+        /// Get daily energy of logged in user.
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult<ControllerResponse<GetDailyEnergyDto>>> energy()
         {

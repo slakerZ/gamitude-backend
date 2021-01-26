@@ -43,6 +43,9 @@ namespace gamitude_backend.Controllers
             _projectTaskService = projectTaskService;
         }
 
+        /// <summary>
+        /// Get all project logs of logged in user.
+        /// </summary>
         [HttpGet]
         public async Task<ControllerResponse<List<ProjectLog>>> get()
         {
@@ -55,6 +58,9 @@ namespace gamitude_backend.Controllers
 
         }
 
+        /// <summary>
+        /// Get project log by id.
+        /// </summary>
         [HttpGet("{id:length(24)}", Name = "GetProjectLog")]
         public async Task<ActionResult<ControllerResponse<ProjectLog>>> get(string id)
         {
@@ -76,6 +82,9 @@ namespace gamitude_backend.Controllers
 
         }
 
+        /// <summary>
+        /// Create project log.
+        /// </summary>
         [HttpPost]
         public async Task<ActionResult<ControllerResponse<ProjectLog>>> create(CreateProjectLogDto createProjectLog)
         {
@@ -111,6 +120,9 @@ namespace gamitude_backend.Controllers
             });
         }
 
+        /// <summary>
+        /// Update project log by id.
+        /// </summary>
         [HttpPut("{id:length(24)}")]
         public async Task<ActionResult<ControllerResponse<ProjectLog>>> update(string id, UpdateProjectLogDto projectLogInDto)
         {
@@ -131,7 +143,10 @@ namespace gamitude_backend.Controllers
             });
 
         }
-
+        
+        /// <summary>
+        /// Delete project log by id.
+        /// </summary>
         [HttpDelete("{id:length(24)}")]
         public async Task<ActionResult> Delete(string id)
         {
