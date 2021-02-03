@@ -41,7 +41,7 @@ namespace gamitude_backend.Controllers
         }
 
         /// <summary>
-        /// Get all projects of logged user.
+        /// Get all projects of logged in user.
         /// </summary>
         [HttpGet]
         public async Task<ActionResult<ControllerResponse<List<GetProjectDto>>>> get()
