@@ -9,8 +9,11 @@ variables:
   TargetFramework: 'netcoreapp5.0'
   RestoreBuildProjects: 'gamitude_backend/*.csproj'
   BuildConfiguration: 'Release'
-  DockerImageName: 'gentle-ally-270120/gamitude_backend'
+  DockerImageName: 'gamitude/backend'
 steps:
+- task: DockerInstaller@0
+  inputs:
+    dockerVersion: '17.09.0-ce'
 - task: DotNetCoreCLI@2
   displayName: Restore
   inputs:
@@ -34,26 +37,18 @@ steps:
     arguments: '--configuration $(BuildConfiguration) --framework=$(TargetFramework)'
     zipAfterPublish: false
     modifyOutputPath: false
-- task: CmdLine@1
-  displayName: 'Lock image version in deployment.yaml'
+
+- task: Bash@3
   inputs:
-    filename: /bin/bash
-    arguments: '-c "awk ''{gsub(\"GAMITUDE_BACKEND_IMAGE\", \"gcr.io/$(DockerImageName):$(Build.BuildId)\", $0); print}'' deployment.yaml > $(build.artifactstagingdirectory)/deployment.yaml"'
+    targetType: 'inline'
+    script: 'cd gamitude_backend && docker build -t gamitude/backend:latest .'
+
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: 'docker save --output $(build.artifactstagingdirectory)/gamitude_backend.tar gamitude/backend'
+
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)'
-- task: Docker@0
-  displayName: 'Build image'
-  inputs:
-    buildContext: './gamitude_backend'
-    containerregistrytype: 'Container Registry'
-    dockerRegistryConnection: 'gcr-gamitude-pipeline'
-    imageName: '$(DockerImageName):$(Build.BuildId)'
-- task: Docker@0
-  displayName: 'Publish image'
-  inputs:
-    containerregistrytype: 'Container Registry'
-    dockerRegistryConnection: 'gcr-gamitude-pipeline'
-    action: 'Push an image'
-    imageName: '$(DockerImageName):$(Build.BuildId)'
